@@ -1,6 +1,6 @@
 # Write-up evidence
 
-All listed screenshots are redacted derivatives of original isolated-lab captures inspected before selection. Opaque masks remove identifiers; originals remain outside this repository. Ancillary PNG metadata was removed. No generated terminal imagery is used. Published derivatives preserve original dimensions, except the explicit Blue crop. Source notes and original images are untouched.
+All listed screenshots are redacted derivatives of original isolated-lab captures inspected before selection. Minimal opaque masks remove identifying values while generic privilege identities and OS/architecture output remain visible; originals remain outside this repository. Ancillary PNG metadata was removed. No generated terminal imagery is used. Published derivatives preserve original dimensions, except the explicit Blue crop. Source notes and original images are untouched.
 
 | Public image | Original capture timestamp | Content |
 | --- | --- | --- |
