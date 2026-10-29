@@ -8,3 +8,10 @@ dialog.addEventListener('keydown',e=>{const buttons=[...el('results').querySelec
 
 // Return directly to the selected article after history navigation.
 window.addEventListener('pageshow',()=>{document.querySelectorAll('.detail-switcher').forEach(menu=>{menu.open=false})});
+
+for(const menu of document.querySelectorAll('.detail-switcher')){
+ const trigger=menu.querySelector('summary');
+ menu.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.open){event.preventDefault();menu.open=false;trigger.focus()}});
+ menu.addEventListener('click',event=>{if(event.target.closest('a'))menu.open=false});
+ document.addEventListener('click',event=>{if(menu.open&&!menu.contains(event.target))menu.open=false});
+}
