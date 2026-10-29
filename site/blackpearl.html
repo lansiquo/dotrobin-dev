@@ -1,41 +1,56 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Robin Lansiquot’s application security workbench: PR Security Reviewer and evidence-led lab write-ups."><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><title>Blackpearl — Lab write-up · dotrobin</title><link rel="stylesheet" href="workbench.css"><script src="workbench.js" defer></script></head><body><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><span class="label">SECURITY / ENGINEERING / EVIDENCE</span><button class="cmd" id="open" aria-haspopup="dialog">⌘ / Ctrl K · Explore</button></header><div class="shell"><aside class="sidebar"><p class="label">EXPLORER</p><nav class="tree" aria-label="Portfolio"><a href="index.html">↳ robin.md</a><small>PROJECTS</small><a href="pr-reviewer.html">↳ PR reviewer</a><small>WRITE-UPS</small><a href="blackpearl.html" aria-current="page">↳ Blackpearl</a><a href="blue.html">↳ Blue</a><a href="butler.html">↳ Butler</a></nav><div class="side-note">Show the reasoning.<br>Show the evidence.<br>Show the limits.</div></aside><main id="main" tabindex="-1"><div class="tabs"><span>◈ &nbsp; blackpearl.md</span><span>dotrobin.dev / workbench</span></div><div class="content article">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Robin Lansiquot’s application security workbench: PR Security Reviewer and evidence-led lab write-ups."><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><title>Blackpearl — Lab write-up · dotrobin</title><link rel="stylesheet" href="workbench.css"><script src="workbench.js" defer></script><style>
+.blackpearl-report{max-width:900px}
+.blackpearl-report h1{font-size:clamp(2.5rem,5vw,4rem);line-height:1.12;max-width:18ch;margin-bottom:1.75rem}
+.blackpearl-report h2{margin:3.25rem 0 1.25rem;padding-top:1.5rem;border-top:1px solid #393143;color:#f4f0ff;line-height:1.4}
+.blackpearl-report h3{margin:2rem 0 .75rem;color:#d8c9f9;font-size:1.12rem;line-height:1.5}
+.blackpearl-report p{margin:1rem 0;line-height:1.85}
+.blackpearl-report .result{display:inline-block;margin:0 0 .75rem;padding:.6rem .9rem;border:1px solid #655080;border-radius:6px;background:#272033;color:#e4d8ff;font:600 .8rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+.blackpearl-report .attack-path{padding:1.25rem 1.5rem;border-left:3px solid #baa0ff;border-radius:0 8px 8px 0;background:#1b1922;color:#d8c9f9;font-size:.9rem;line-height:1.9}
+.blackpearl-report .environment{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;list-style:none;padding:0}
+.blackpearl-report .environment li{margin:0;padding:.8rem 1rem;background:#19181f;border:1px solid #34313e;border-radius:6px;font-size:.875rem;overflow-wrap:anywhere}
+.blackpearl-report :not(pre)>code{padding:.12em .32em;border:1px solid #4e425f;border-radius:4px;background:#272033;color:#e4d8ff;font:.9em/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.blackpearl-report pre{display:block;max-width:100%;min-width:0;margin:1.5rem 0 1.75rem;padding:clamp(1.25rem,3vw,2rem);background:#09090e;border:1px solid #796094;border-left:4px solid #baa0ff;border-radius:8px;box-shadow:0 12px 30px #0003;overflow-x:auto;white-space:pre;overflow-wrap:normal;word-break:normal;tab-size:2;color:#f1eaff;font:500 .9375rem/1.9 ui-monospace,SFMono-Regular,Consolas,monospace}
+.blackpearl-report pre code{padding:0;border:0;background:none;color:inherit;font:inherit;white-space:inherit;overflow-wrap:normal;word-break:normal}
+.blackpearl-report pre:focus-visible{outline:2px solid #baa0ff;outline-offset:4px}
+@media(max-width:600px){.blackpearl-report .environment{grid-template-columns:minmax(0,1fr)}.blackpearl-report h2{margin-top:2.5rem;font-size:1.25rem}.blackpearl-report pre{font-size:.875rem}.blackpearl-report .attack-path{padding:1rem}}
+</style></head><body><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><span class="label">SECURITY / ENGINEERING / EVIDENCE</span><button class="cmd" id="open" aria-haspopup="dialog">⌘ / Ctrl K · Explore</button></header><div class="shell"><aside class="sidebar"><p class="label">EXPLORER</p><nav class="tree" aria-label="Portfolio"><a href="index.html">↳ robin.md</a><small>PROJECTS</small><a href="pr-reviewer.html">↳ PR reviewer</a><small>WRITE-UPS</small><a href="blackpearl.html" aria-current="page">↳ Blackpearl</a><a href="blue.html">↳ Blue</a><a href="butler.html">↳ Butler</a></nav><div class="side-note">Show the reasoning.<br>Show the evidence.<br>Show the limits.</div></aside><main id="main" tabindex="-1"><div class="tabs"><span>◈ &nbsp; blackpearl.md</span><span>dotrobin.dev / workbench</span></div><div class="content article blackpearl-report">
 <h1>Blackpearl — Penetration Testing Report</h1>
-<p>Result: Root access achieved</p>
-<p>I compromised Blackpearl by exploiting Navigate CMS 2.8, obtaining a www-data shell, and escalating privileges through a root-owned SUID PHP interpreter.</p>
-<p>Attack path: DNS enumeration → Web content discovery → Navigate CMS RCE → www-data → Local enumeration → SUID PHP → Root</p>
-<h2>Target environment</h2><ul><li>Target: Blackpearl, 192.168.18.10</li><li>Hostname: blackpearl.tcm</li><li>Attacking machine: Kali Linux, 192.168.18.4</li><li>Operating system: Linux</li><li>Web server: Nginx 1.14.2</li><li>Application: Navigate CMS 2.8</li></ul>
+<p class="result">Result: Root access achieved</p>
+<p>I compromised Blackpearl by exploiting Navigate CMS 2.8, obtaining a <code>www-data</code> shell, and escalating privileges through a root-owned SUID PHP interpreter.</p>
+<p class="attack-path">Attack path: DNS enumeration → Web content discovery → Navigate CMS RCE → <code>www-data</code> → Local enumeration → SUID PHP → Root</p>
+<h2>Target environment</h2><ul class="environment"><li>Target: Blackpearl, <code>192.168.18.10</code></li><li>Hostname: <code>blackpearl.tcm</code></li><li>Attacking machine: Kali Linux, <code>192.168.18.4</code></li><li>Operating system: Linux</li><li>Web server: Nginx 1.14.2</li><li>Application: Navigate CMS 2.8</li></ul>
 <h2>1. DNS enumeration and hostname resolution</h2>
-<p>I used DNSRecon to enumerate the target and identify blackpearl.tcm. I added its IP-to-hostname mapping to /etc/hosts on Kali and my Mac, enabling access through the application’s hostname.</p>
-<p>I verified hostname resolution with getent and checked HTTP connectivity with curl. The server responded with HTTP 200 OK and identified itself as Nginx 1.14.2.</p>
+<p>I used DNSRecon to enumerate the target and identify <code>blackpearl.tcm</code>. I added its IP-to-hostname mapping to <code>/etc/hosts</code> on Kali and my Mac, enabling access through the application’s hostname.</p>
+<p>I verified hostname resolution with <code>getent</code> and checked HTTP connectivity with <code>curl</code>. The server responded with HTTP 200 OK and identified itself as Nginx 1.14.2.</p>
 <h2>2. Web content discovery</h2>
 <p>I used FFUF with the directory-list-2.3-medium wordlist to discover exposed web content. Numerous requests returned identical 652-byte responses, so I filtered that response size to reduce false positives.</p>
-<p>I identified /secret and discovered /navigate during further enumeration. The /navigate directory exposed Navigate CMS 2.8, which became my initial-access target.</p>
+<p>I identified <code>/secret</code> and discovered <code>/navigate</code> during further enumeration. The <code>/navigate</code> directory exposed Navigate CMS 2.8, which became my initial-access target.</p>
 <h2>3. Vulnerability research</h2>
 <p>I researched Navigate CMS 2.8 and identified a Metasploit module that exploited authentication bypass and file-upload weaknesses to execute PHP code remotely.</p>
-<p>I selected the Navigate CMS RCE module, reviewed its options, and configured the target:</p><ul><li>Target address: 192.168.18.10</li><li>Virtual host: blackpearl.tcm</li><li>Application path: /navigate/</li><li>Callback address: 192.168.18.4</li></ul>
+<p>I selected the Navigate CMS RCE module, reviewed its options, and configured the target:</p><ul><li>Target address: <code>192.168.18.10</code></li><li>Virtual host: <code>blackpearl.tcm</code></li><li>Application path: <code>/navigate/</code></li><li>Callback address: <code>192.168.18.4</code></li></ul>
 <h2>4. Initial access</h2>
-<p>I executed the exploit and obtained a shell through the vulnerable CMS. I ran whoami and confirmed that the session operated as www-data.</p>
+<p>I executed the exploit and obtained a shell through the vulnerable CMS. I ran <code>whoami</code> and confirmed that the session operated as <code>www-data</code>.</p>
 <p>This established remote command execution under the web-server account, but I still needed to identify a local privilege-escalation path.</p>
 <h2>5. Shell stabilization and local enumeration</h2>
-<p>I used Python’s pty module to spawn an interactive Bash shell and improve terminal functionality.</p>
+<p>I used Python’s <code>pty</code> module to spawn an interactive Bash shell and improve terminal functionality.</p>
 <p>I inspected my user identity, group memberships, sudo permissions, and shell history. These checks did not reveal a useful escalation path, so I continued with broader local enumeration.</p>
 <h2>6. LinPEAS enumeration</h2>
-<p>I hosted LinPEAS from Kali using Python’s HTTP server on port 8000, transferred the script to /tmp on Blackpearl, made it executable, and ran it.</p>
+<p>I hosted LinPEAS from Kali using Python’s HTTP server on port 8000, transferred the script to <code>/tmp</code> on Blackpearl, made it executable, and ran it.</p>
 <p>I reviewed the results for privileged executables, writable paths, scheduled tasks, and configuration weaknesses. The enumeration identified PHP 7.3 as a potential privilege-escalation vector.</p>
 <h2>7. SUID PHP investigation</h2>
-<p>I enumerated SUID binaries and inspected /usr/bin/php7.3. I identified the root-owned PHP interpreter as an executable that could run with elevated effective privileges.</p>
-<p>I consulted GTFOBins and identified a technique using PHP’s pcntl_exec() function to launch a shell while retaining those privileges.</p>
+<p>I enumerated SUID binaries and inspected <code>/usr/bin/php7.3</code>. I identified the root-owned PHP interpreter as an executable that could run with elevated effective privileges.</p>
+<p>I consulted GTFOBins and identified a technique using PHP’s <code>pcntl_exec()</code> function to launch a shell while retaining those privileges.</p>
 <h2>8. Privilege escalation</h2>
 <p>My initial command failed because of incorrect shell syntax. I corrected the quoting and executed:</p>
-<pre><code>/usr/bin/php7.3 -r &#x27;pcntl_exec(&quot;/bin/sh&quot;, [&quot;-p&quot;]);&#x27;</code></pre>
-<p>The command replaced the PHP process with /bin/sh. The -p option preserved the elevated effective privileges inherited from the SUID interpreter.</p>
-<p>I ran whoami in the resulting shell and received root, confirming successful privilege escalation.</p>
+<pre tabindex="0" role="region" aria-label="PHP privilege escalation command"><code>/usr/bin/php7.3 -r &#x27;pcntl_exec(&quot;/bin/sh&quot;, [&quot;-p&quot;]);&#x27;</code></pre>
+<p>The command replaced the PHP process with <code>/bin/sh</code>. The <code>-p</code> option preserved the elevated effective privileges inherited from the SUID interpreter.</p>
+<p>I ran <code>whoami</code> in the resulting shell and received root, confirming successful privilege escalation.</p>
 <h2>9. Findings and remediation</h2>
 <h3>Navigate CMS remote code execution</h3>
-<p>I exploited the vulnerable CMS to execute commands as www-data. This exposed the application’s files and resources accessible to its service account and provided a foothold for further compromise.</p>
+<p>I exploited the vulnerable CMS to execute commands as <code>www-data</code>. This exposed the application’s files and resources accessible to its service account and provided a foothold for further compromise.</p>
 <p>I recommended upgrading or replacing the vulnerable CMS, restricting unnecessary application functionality, and limiting service-account permissions.</p>
 <h3>SUID PHP privilege escalation</h3>
-<p>I used the privileged PHP interpreter to escalate from www-data to a root-effective shell. Combined with the CMS vulnerability, this enabled full host compromise.</p>
+<p>I used the privileged PHP interpreter to escalate from <code>www-data</code> to a root-effective shell. Combined with the CMS vulnerability, this enabled full host compromise.</p>
 <p>I recommended removing unnecessary SUID permissions from interpreter binaries, auditing privileged executable ownership and permissions, and enforcing least privilege.</p>
 <h2>Conclusion</h2>
 <p>I completed the attack chain from web application exploitation to root access. The assessment demonstrated how a vulnerable CMS and an unnecessarily privileged interpreter could be chained to compromise the entire host.</p>
