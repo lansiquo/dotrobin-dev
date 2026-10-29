@@ -1,0 +1,22 @@
+
+.writeup{max-width:900px}
+.writeup h1{font-size:clamp(2.5rem,5vw,4rem);line-height:1.12;max-width:18ch;margin-bottom:1.75rem}
+.writeup h2{margin:3.25rem 0 1.25rem;padding-top:1.5rem;border-top:1px solid #393143;color:#f4f0ff;line-height:1.4}
+.writeup h3{margin:2rem 0 .75rem;color:#d8c9f9;font-size:1.12rem;line-height:1.5}
+.writeup p{margin:1rem 0;line-height:1.85}
+.writeup .result{display:inline-block;margin:0 0 .75rem;padding:.6rem .9rem;border:1px solid #655080;border-radius:6px;background:#272033;color:#e4d8ff;font:600 .8rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+.writeup .attack-path{padding:1.25rem 1.5rem;border-left:3px solid #baa0ff;border-radius:0 8px 8px 0;background:#1b1922;color:#d8c9f9;font-size:.9rem;line-height:1.9}
+.writeup .environment{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;list-style:none;padding:0}
+.writeup .environment li{margin:0;padding:.8rem 1rem;background:#19181f;border:1px solid #34313e;border-radius:6px;font-size:.875rem;overflow-wrap:anywhere}
+.writeup :not(pre)>code{padding:.12em .32em;border:1px solid #4e425f;border-radius:4px;background:#272033;color:#e4d8ff;font:.9em/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.writeup pre{display:block;max-width:100%;min-width:0;margin:1.5rem 0 1.75rem;padding:clamp(1.25rem,3vw,2rem);background:#09090e;border:1px solid #796094;border-left:4px solid #baa0ff;border-radius:8px;box-shadow:0 12px 30px #0003;overflow-x:auto;white-space:pre;overflow-wrap:normal;word-break:normal;tab-size:2;color:#f1eaff;font:500 .9375rem/1.9 ui-monospace,SFMono-Regular,Consolas,monospace}
+.writeup pre code{padding:0;border:0;background:none;color:inherit;font:inherit;white-space:inherit;overflow-wrap:normal;word-break:normal}
+.writeup pre:focus-visible{outline:2px solid #baa0ff;outline-offset:4px}
+@media(max-width:600px){.writeup .environment{grid-template-columns:minmax(0,1fr)}.writeup h2{margin-top:2.5rem;font-size:1.25rem}.writeup pre{font-size:.875rem}.writeup .attack-path{padding:1rem}}
+
+.writeup figure.evidence{margin:1.75rem 0 2.25rem;padding:1rem;background:#111017;border:1px solid #494052;border-radius:8px}
+.writeup .evidence a{display:block;max-width:100%}
+.writeup .evidence img{display:block;width:auto;max-width:100%;height:auto;margin:0;border:0;border-radius:3px}
+.writeup .evidence figcaption{margin-top:.85rem;font-size:.8rem;line-height:1.6;color:#bbb3c8}
+.writeup .evidence figcaption a{display:inline;color:#d8c9f9}
+@media(max-width:600px){.writeup figure.evidence{padding:.65rem}.writeup .evidence figcaption{font-size:.75rem}}
