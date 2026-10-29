@@ -1,0 +1,5 @@
+Space Grotesk by Florian Karsten / The Space Grotesk Project Authors.
+Source: https://github.com/floriankarsten/space-grotesk
+Revision: 03507d024a01282884232081fc6011c09ff4e849
+Original asset: fonts/woff2/SpaceGrotesk[wght].woff2
+Distributed unchanged under SIL Open Font License 1.1; see OFL-Space-Grotesk.txt.
