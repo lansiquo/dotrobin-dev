@@ -6,3 +6,5 @@ html{scroll-behavior:smooth}.sidebar,.content,.inspect,.project,.code{min-width:
 
 /* Keep the navigation control aligned when the redundant header tagline is omitted. */
 .top .cmd{margin-left:auto}
+
+.security-controls h3{margin:0;color:var(--ink);font-size:17px;font-weight:500}.security-controls .controls-scope{margin:8px 0 18px;color:var(--muted);font-size:12px;line-height:1.6}.security-controls ul{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.6}.security-controls li{padding-left:3px;margin:9px 0}.security-controls li::marker{color:var(--accent)}.security-controls .controls-pending{border-top:1px solid var(--line);padding-top:15px;margin:20px 0 8px;color:#d8c9f9;font-size:12px;line-height:1.6}.security-controls .controls-status{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
