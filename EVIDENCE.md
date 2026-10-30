@@ -1,6 +1,6 @@
 # Write-up evidence
 
-All listed screenshots are redacted derivatives of original isolated-lab captures inspected before selection. Minimal opaque masks remove identifying values while generic privilege identities and OS/architecture output remain visible; originals remain outside this repository. Ancillary PNG metadata was removed. No generated terminal imagery is used. Published derivatives preserve original dimensions, except the explicit Blue crop. Source notes and original images are untouched.
+All 12 listed screenshots are authentic selected crops from the isolated offline lab. On October 30, 2026, the owner explicitly authorized public disclosure of ordinary lab IPs, usernames, hostnames and system details. The selected unmasked copies were visually inspected before restoration; no passwords, tokens, cookies or private keys were visible in this set. PNG metadata is stripped. Source originals remain outside this repository. No generated terminal imagery is used. The Blue options capture retains its application-chrome crop.
 
 | Public image | Original capture timestamp | Content |
 | --- | --- | --- |
