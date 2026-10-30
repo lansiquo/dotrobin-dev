@@ -1,4 +1,4 @@
-const pages=[['Overview','index.html','robin application security'],['PR Security Reviewer','pr-reviewer.html','python semgrep github project'],['Blackpearl','blackpearl.html','linux cms php'],['Blue','blue.html','windows smb eternalblue'],['Butler','butler.html','windows jenkins services']];
+const pages=[['Overview','index.html','robin application security'],['Pull Request Reviewer','pr-reviewer.html','python semgrep github project'],['Blackpearl','blackpearl.html','linux cms php'],['Blue','blue.html','windows smb eternalblue'],['Butler','butler.html','windows jenkins services']];
 const el=id=>document.getElementById(id), dialog=el('palette');
 function results(){const q=el('search').value.toLowerCase().trim();el('results').replaceChildren();for(const [title,url,tags] of pages){if((title+' '+tags).toLowerCase().includes(q)){const b=document.createElement('button');b.textContent=title+' ↗';b.onclick=()=>{location.href=url};el('results').append(b)}}el('empty').hidden=el('results').children.length>0}
 function openPalette(){el('search').value='';results();dialog.showModal();el('search').focus()}
