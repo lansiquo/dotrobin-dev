@@ -20,3 +20,5 @@
 .writeup .evidence figcaption{margin-top:.85rem;font-size:.8rem;line-height:1.6;color:#bbb3c8}
 .writeup .evidence figcaption a{display:inline;color:#d8c9f9}
 @media(max-width:600px){.writeup figure.evidence{padding:.65rem}.writeup .evidence figcaption{font-size:.75rem}}
+
+.evidence-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;border-radius:3px}.evidence-scroll:focus-visible{outline:2px solid #b391f1;outline-offset:4px}@media(max-width:600px){.writeup .evidence-scroll img{max-width:none;width:auto;height:auto}}
