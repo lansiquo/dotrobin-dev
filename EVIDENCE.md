@@ -36,3 +36,15 @@ Academy selected PNGs preserve original IHDR/IDAT pixel data, stripping ancillar
 - academy-root.png — 20261023115735: modified script uses 8080 and callback confirms root.
 
 Reporting.md's later example listener ports 4444 and 5555 differ from the captures; article explicitly distinguishes them and uses captured commands for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
+
+## Dev (source reviewed November 3, 2026)
+
+Primary source: owner's Obsidian Dev/Reporting.md. Cross-checked linked scanning notes plus contemporaneous captures. The report's SSH `user` is explicitly treated as a placeholder; an earlier captured jp attempt failed, whereas later captures show jeanpaul. The exact successful login command is not retained. The report's expected id output is not claimed as observed.
+
+Selected authentic PNGs (original pixel payloads; metadata stripped):
+- dev-nfs.png — 20261023123203: export listing.
+- dev-archive.png — 20261023123947: archive extraction, filenames only.
+- dev-sudo.png — 20261023161749: NOPASSWD /usr/bin/zip for jeanpaul.
+- dev-root.png — 20261023162559: actual sudo ZIP invocation, root identity and dev hostname.
+
+Excluded: 20261023124042 exposes an OpenSSH private key; 20261023174827 exposes the recovered archive password. Generated diagrams/flag explanations are not used as terminal evidence. No passwords, credential hashes or private-key contents were copied. Generic user template preserved; root result directly captured. Technique cross-check: https://gtfobins.org/gtfobins/zip/ .
