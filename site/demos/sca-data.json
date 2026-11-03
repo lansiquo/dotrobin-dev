@@ -1,0 +1,49 @@
+{
+  "captured": "2026-11-03T13:38:30.540618+00:00",
+  "node": "v22.23.4",
+  "npm": "10.9.9",
+  "packages": [
+    {
+      "name": "minimist",
+      "before": "1.2.5",
+      "after": "1.2.8",
+      "reachable": true
+    },
+    {
+      "name": "semver",
+      "before": "6.3.0",
+      "after": "6.3.1",
+      "reachable": false
+    },
+    {
+      "name": "tar",
+      "before": "6.1.0",
+      "after": "7.5.22",
+      "reachable": false
+    },
+    {
+      "name": "axios",
+      "before": "0.21.0",
+      "after": "1.21.0",
+      "reachable": false
+    }
+  ],
+  "counts": {
+    "before": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 2,
+      "critical": 2,
+      "total": 4
+    },
+    "after": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  }
+}

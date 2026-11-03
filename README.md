@@ -1,9 +1,12 @@
-# dotrobin.dev — Security Workbench
+# dotrobin.dev
 
-Static portfolio: one project, PR Security Reviewer, and three edited lab write-ups: Blackpearl, Blue, Butler.
+Robin Lansiquot’s static security portfolio. Public files live in `site/`; GitHub Pages serves them without a backend or home server.
 
-Public content lives exclusively in `site/`. No original vault, credentials, raw notes, backend service, or package installation is required. GitHub Pages serves the published files; the owner's Mac is not the public server.
+## Interactive project demos
 
-For a temporary local preview: `python3 -m http.server 8765 --bind 127.0.0.1 --directory site`.
+- [Pull Request Reviewer](https://dotrobin.dev/demos/pr.html): explore ten curated review examples and proposed fixes. Illustrative explanations only; no Python execution, Semgrep scan or GitHub action occurs in the browser.
+- [SCA Remediation Lab](https://dotrobin.dev/demos/sca.html): switch between the saved November 3 four-dependency inventories and inspect recorded audit/security/functional-test results. This is a replay, not a fresh registry scan or test run.
 
-The workflow deploys only `site/` from main. Enable GitHub Pages with GitHub Actions after repository selection is approved. Configure dotrobin.dev in Pages settings before DNS. No domain is attached by this source alone. Custom-domain setup and TLS verification remain required.
+These standalone demonstrations are separate from the real local applications. They accept no uploads and expose no backend or private infrastructure.
+
+For a local portfolio preview, run `python3 -m http.server 8788 --bind 127.0.0.1 --directory site`, then open the printed loopback address. Stop with Ctrl-C.

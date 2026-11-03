@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Invoice ownership",
+    "category": "A01:2025 Broken Access Control",
+    "mode": "behavioral",
+    "impact": "A changed invoice ID could expose another customer\u2019s bill.",
+    "fix": "Check ownership on the server before returning an invoice. The current user must come from a trusted authenticated session.",
+    "limit": "Try owner, different user, anonymous user and missing invoice against every read/update route. Verify tenant isolation and server-side identity.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    return invoice.to_dict()\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    if invoice is None or invoice.owner_id != current_user.id:\n        raise PermissionError(\"Invoice unavailable\")\n    return invoice.to_dict()\n"
+    }
+  },
+  {
+    "name": "Debug responses",
+    "category": "A02:2025 Security Misconfiguration",
+    "mode": "scan",
+    "impact": "Debug mode can expose detailed exception traces to visitors.",
+    "fix": "Disable debug responses and keep diagnostics in protected server logs.",
+    "limit": "The rule matches literal FastAPI(debug=True) only. Inspect deployed settings and trigger a controlled exception to confirm no diagnostic data leaks.",
+    "sources": {
+      "vulnerable": "# Illustrative review fixture only. Never executed by this demo.\nfrom fastapi import FastAPI\n\napp = FastAPI(debug=True)\n",
+      "fixed": "# Illustrative review fixture only. Never executed by this demo.\nfrom fastapi import FastAPI\n\napp = FastAPI(debug=False)\n"
+    }
+  },
+  {
+    "name": "Dependency release gates",
+    "category": "A03:2025 Software Supply Chain Failures",
+    "mode": "behavioral",
+    "impact": "Untracked, unaudited dependencies can introduce vulnerable or compromised code into a release.",
+    "fix": "Use a reviewed hash-locked dependency set, provenance checks, current audits and an inventory. The fixed fixture describes required pipeline gates, not an implemented build system.",
+    "limit": "Verify the actual lock, hashes, provenance identities, transitive audit, SBOM and update process. Fail each gate deliberately; hashing alone does not prove a dependency safe.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef build_release(pipeline):\n    pipeline.install(\"requirements.txt\")  # Unlocked dependency ranges\n    return pipeline.package()\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef build_release(pipeline):\n    # Illustrative pipeline contract; these methods are not implemented here.\n    # Each gate must reject missing, stale or failed evidence.\n    pipeline.require_reviewed_lock(\"requirements.lock\")\n    pipeline.verify_dependency_provenance()\n    pipeline.audit_all_dependencies()  # Direct and transitive components\n    pipeline.install_locked(require_hashes=True)\n    pipeline.record_sbom()\n    return pipeline.package()\n"
+    }
+  },
+  {
+    "name": "TLS certificate verification",
+    "category": "A04:2025 Cryptographic Failures",
+    "mode": "scan",
+    "impact": "verify=False disables certificate-chain and hostname checks. An intercepting attacker could impersonate the HTTPS server even though traffic is encrypted.",
+    "fix": "Use the Requests default certificate verification or explicit verify=True. Keep a timeout; it does not replace identity validation.",
+    "limit": "The rule checks literal verify=False in requests.get/post/request only. Validate the actual trust store and certificate failure behavior separately; no network request runs here.",
+    "sources": {
+      "vulnerable": "\"\"\"Static review fixture only: never imported or executed by the demo.\"\"\"\nimport requests\n\n\ndef fetch_status():\n    response = requests.get(\n        \"https://status.example.invalid/health\",\n        verify=False,\n        timeout=5,\n    )\n    response.raise_for_status()\n    return response.text\n",
+      "fixed": "\"\"\"Static review fixture only: never imported or executed by the demo.\"\"\"\nimport requests\n\n\ndef fetch_status():\n    response = requests.get(\n        \"https://status.example.invalid/health\",\n        verify=True,\n        timeout=5,\n    )\n    response.raise_for_status()\n    return response.text\n"
+    }
+  },
+  {
+    "name": "SQL parameter binding",
+    "category": "A05:2025 Injection",
+    "mode": "scan",
+    "impact": "A customer name concatenated into SQL can change the database instruction.",
+    "fix": "Use a query placeholder with a separately bound value so input stays data.",
+    "limit": "This rule targets concatenation directly inside execute. It does not cover every query builder, dynamic identifier or injection path.",
+    "sources": {
+      "vulnerable": "# Trusted analysis sample. The demo never runs this query or connects to a database.\ndef find_customer(connection, customer_name):\n    return connection.execute(\n        \"SELECT id, name FROM customers WHERE name = '\" + customer_name + \"'\"\n    ).fetchall()\n",
+      "fixed": "# Trusted analysis sample. The demo never runs this query or connects to a database.\ndef find_customer(connection, customer_name):\n    return connection.execute(\n        \"SELECT id, name FROM customers WHERE name = ?\", (customer_name,)\n    ).fetchall()\n"
+    }
+  },
+  {
+    "name": "One coupon per customer",
+    "category": "A06:2025 Insecure Design",
+    "mode": "behavioral",
+    "impact": "Without a redemption limit, a customer can repeatedly claim the same credit, including through concurrent requests.",
+    "fix": "Define a one-redemption invariant and enforce it atomically with credit issuance. The fixed fixture illustrates a transaction and uniqueness contract.",
+    "limit": "Threat-model abuse and test concurrent/replayed requests, rollback and cross-account rules against the real database. A method name cannot establish atomicity.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # No requirement limits how often a customer can redeem this coupon.\n    store.credit(user.id, coupon.value)\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # Design contract: one redemption per authenticated customer and coupon.\n    # The transaction and unique constraint must be enforced in the database.\n    with store.transaction():\n        if not store.insert_redemption_unique(user.id, coupon.id):\n            raise ValueError(\"Coupon already redeemed\")\n        store.credit(user.id, coupon.value)\n"
+    }
+  },
+  {
+    "name": "Session rotation at login",
+    "category": "A07:2025 Authentication Failures",
+    "mode": "behavioral",
+    "impact": "Reusing the pre-login session identifier can let someone who knows that identifier inherit the authenticated session.",
+    "fix": "Rotate the session identifier after verified login and invalidate the previous identifier atomically. The session service must implement this contract.",
+    "limit": "Confirm old sessions fail, new identifiers are unpredictable, cookies are Secure/HttpOnly with appropriate SameSite, and expiry/logout work. Also assess MFA and login abuse controls.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef finish_login(auth, sessions, session_id, credentials):\n    user = auth.verify(credentials)\n    # Reuses a session identifier that may be known before login.\n    sessions.bind_user(session_id, user.id)\n    return session_id\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef finish_login(auth, sessions, session_id, credentials):\n    user = auth.verify(credentials)\n    # Contract: invalidate the old ID and atomically issue a fresh random ID.\n    # The session service, secure cookie delivery and expiry need validation.\n    return sessions.rotate_and_bind(session_id, user.id)\n"
+    }
+  },
+  {
+    "name": "Safe YAML deserialization",
+    "category": "A08:2025 Software or Data Integrity Failures",
+    "mode": "scan",
+    "impact": "An unsafe YAML loader can construct Python objects from untrusted tagged data.",
+    "fix": "Use safe_load, bound input size, and validate expected keys, types and ranges.",
+    "limit": "This rule detects selected unsafe YAML loaders only. safe_load does not authenticate the sender, prove data integrity or eliminate all resource risks.",
+    "sources": {
+      "vulnerable": "# Trusted analysis sample. The demo never parses this YAML input.\nimport yaml\n\n\ndef read_settings(text):\n    return yaml.load(text, Loader=yaml.Loader)\n",
+      "fixed": "# Trusted analysis sample. The demo never parses this YAML input.\nimport yaml\n\n\ndef read_settings(text):\n    if not isinstance(text, str) or len(text) > 4096:\n        raise ValueError('Settings must be a small text document')\n    settings = yaml.safe_load(text)\n    if not isinstance(settings, dict) or set(settings) != {'name', 'retries'}:\n        raise ValueError('Expected only name and retries')\n    if not isinstance(settings['name'], str) or not 1 <= len(settings['name']) <= 80:\n        raise ValueError('Name must be 1-80 characters')\n    if type(settings['retries']) is not int or not 0 <= settings['retries'] <= 5:\n        raise ValueError('Retries must be an integer from 0 to 5')\n    return settings\n"
+    }
+  },
+  {
+    "name": "Observable access denials",
+    "category": "A09:2025 Security Logging and Alerting Failures",
+    "mode": "behavioral",
+    "impact": "Unrecorded access denials can hide repeated attempts to reach protected records.",
+    "fix": "Record structured security events without credentials, protect storage, and configure actionable alert routing with an accountable responder.",
+    "limit": "The lab records synthetic events and a threshold alert in memory, sending nothing externally. Real protected retention, redaction, alert delivery and human response still need integration tests.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef denied_access(audit, request_id):\n    # The denial is returned, but defenders cannot see repeated failures.\n    return {\"status\": 403}\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef denied_access(audit, request_id):\n    # Contract: structured encoding, bounded fields, durable protected storage.\n    # No password, token or raw request body belongs in this record.\n    audit.record(event=\"access_denied\", request_id=request_id)\n    # Alert routing and response ownership must be configured and exercised.\n    return {\"status\": 403}\n"
+    }
+  },
+  {
+    "name": "Fail closed on timeout",
+    "category": "A10:2025 Mishandling of Exceptional Conditions",
+    "mode": "behavioral",
+    "impact": "Granting access when a policy service times out turns an outage into an authorization bypass.",
+    "fix": "Deny access on the illustrated timeout. The caller should expose a safe error and record the outage.",
+    "limit": "The lab checks a healthy allow and denial on timeout. Real-service failures, cleanup, rollback, safe responses and bounded retries need separate validation.",
+    "sources": {
+      "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef may_download(policy, user, document):\n    try:\n        return policy.allows(user, document)\n    except TimeoutError:\n        return True  # An unavailable security control grants access.\n",
+      "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef may_download(policy, user, document):\n    try:\n        return policy.allows(user, document)\n    except TimeoutError:\n        # Deny access while the policy service is unavailable.\n        # The caller must return a safe error and record the outage.\n        return False\n"
+    }
+  }
+]
