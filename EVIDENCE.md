@@ -24,3 +24,15 @@ All 12 listed screenshots are authentic selected crops from the isolated offline
 - Butler: no safe selected screenshot for the credential test or original Jenkins shell command. The Burp screenshot was excluded because it exposes login payloads and a session cookie. No selected WinPEAS privileges, exact service payload/trigger chain or 1053 error capture. The existing caveat about unproven escalation attribution remains.
 - Browser/reference-page screenshots with unrelated bookmarks and personal context were excluded. Duplicate captures and generated investigation diagrams were excluded.
 - Recommended remediation is advice, not a claim of remediation performed or a formal client report.
+
+## Academy draft (source reviewed November 3, 2026)
+
+Primary source: owner's Obsidian Academy/Reporting.md, cross-checked against its linked lab captures. Butler/Reporting.md was also reviewed; the existing complete Butler article already reflects it and was not duplicated.
+
+Academy selected PNGs preserve original IHDR/IDAT pixel data, stripping ancillary metadata:
+- academy-ftp.png — 20261022091244: anonymous login and note retrieval.
+- academy-foothold.png — 20261022101923: captured listener uses 1234; www-data identity.
+- academy-cron.png — 20261023115310: UID=0 executes backup.sh.
+- academy-root.png — 20261023115735: modified script uses 8080 and callback confirms root.
+
+Reporting.md's later example listener ports 4444 and 5555 differ from the captures; article explicitly distinguishes them and uses captured commands for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
