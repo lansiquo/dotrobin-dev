@@ -3,3 +3,8 @@ Source: https://github.com/floriankarsten/space-grotesk
 Revision: 03507d024a01282884232081fc6011c09ff4e849
 Original asset: fonts/woff2/SpaceGrotesk[wght].woff2
 Distributed unchanged under SIL Open Font License 1.1; see OFL-Space-Grotesk.txt.
+
+Instrument Serif Italic by The Instrument Serif Project Authors.
+Source: https://github.com/Instrument/instrument-serif
+Packaged via @fontsource/instrument-serif 5.3.0 (files/instrument-serif-latin-400-italic.woff2)
+Distributed unchanged under SIL Open Font License 1.1; see OFL-Instrument-Serif.txt.
