@@ -16,3 +16,13 @@
 .sca-capture figcaption a{white-space:nowrap;color:#d8c9f9}
 @media(max-width:560px){.sca-step-heading h3{flex-basis:calc(100% - 42px);font-size:17px}.sca-step-status{margin-left:42px}.sca-workflow{gap:16px}.sca-workflow-step>p{font-size:14px}}
 @media print{.sca-workflow>.sca-workflow-step{background:transparent;border-color:#777;break-inside:avoid}.sca-step-heading h3,.sca-step-status,.sca-step-number,.sca-capture figcaption{color:black}.sca-capture-image{background:transparent}}
+
+/* Keep the complete case study readable on narrow screens. */
+.sca-article .sca-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;margin:22px 0}
+.sca-article .sca-table-scroll:focus-visible{outline:2px solid #c9b1ff;outline-offset:4px}
+.sca-article .sca-results{width:100%;min-width:450px}
+.sca-article .sca-results caption{text-align:left;margin:0 0 12px;color:#c2b9ce;font-size:13px;line-height:1.6}
+.sca-article .reading-body pre{max-width:100%;overflow-x:auto;white-space:pre;border-left:3px solid #baa0ff}
+.sca-article .reading-body pre:focus-visible{outline:2px solid #c9b1ff;outline-offset:4px}
+.sca-article .reading-body pre code{white-space:inherit}
+@media(max-width:560px){.sca-article .reading-body pre{font-size:12px}.sca-article .reading-body :not(pre)>code{overflow-wrap:anywhere}}
