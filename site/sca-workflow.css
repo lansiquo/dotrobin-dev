@@ -26,3 +26,24 @@
 .sca-article .reading-body pre:focus-visible{outline:2px solid #c9b1ff;outline-offset:4px}
 .sca-article .reading-body pre code{white-space:inherit}
 @media(max-width:560px){.sca-article .reading-body pre{font-size:12px}.sca-article .reading-body :not(pre)>code{overflow-wrap:anywhere}}
+
+/* Only the full baseline text is collapsible; image evidence stays visible. */
+.sca-output{margin:18px 0 0;border:1px solid #655080;border-radius:7px;background:#101016;overflow:hidden}
+.sca-output summary{display:flex;align-items:center;justify-content:space-between;gap:16px;list-style:none;padding:16px;cursor:pointer;color:#f1eaff;min-height:60px}
+.sca-output summary::-webkit-details-marker{display:none}
+.sca-output summary strong{display:block;font-size:14px;line-height:1.5}
+.sca-output summary small{display:block;margin-top:4px;color:#c2b9ce;font-size:12px;line-height:1.5}
+.sca-output summary:hover{background:#211c2a}
+.sca-output summary:focus-visible{outline:2px solid #c9b1ff;outline-offset:-4px}
+.sca-output-chevron{font-size:20px;color:#d8c9f9;transition:transform .15s}
+.sca-output[open]>.sca-output-chevron{transform:rotate(180deg)}
+.sca-output[open]>summary .sca-output-chevron{transform:rotate(180deg)}
+.sca-output-body{border-top:1px solid #494052;padding:0 16px 16px}
+.sca-article .sca-output-note{font-size:12px;line-height:1.6;color:#c2b9ce;margin:14px 0}
+.sca-article .sca-output pre{margin:0;max-height:min(70vh,640px);max-width:100%;overflow:auto;overscroll-behavior:contain;white-space:pre;padding:16px;border:1px solid #494052;border-radius:4px;background:#09090e;color:#f1eaff;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.sca-output pre code{font:inherit;color:inherit;white-space:inherit}
+.sca-article .sca-output-context{font-size:13px;line-height:1.7;color:#c2b9ce;margin-top:12px}
+.sca-article .sca-report-capture{margin:24px 0 32px;padding:16px;border:1px solid #494052;border-radius:8px;background:#15131c}
+@media(max-width:560px){.sca-output summary{padding:14px}.sca-output-body{padding:0 12px 12px}.sca-article .sca-output pre{font-size:12px;padding:12px}.sca-article .sca-report-capture{padding:12px}}
+@media(prefers-reduced-motion:reduce){.sca-output-chevron{transition:none}}
+@media print{.sca-output-body{display:block}.sca-output::details-content{content-visibility:visible}.sca-article .sca-output pre{max-height:none;white-space:pre-wrap;overflow-wrap:anywhere}.sca-output-chevron{display:none}.sca-article .sca-report-capture{background:transparent;border-color:#777}}
