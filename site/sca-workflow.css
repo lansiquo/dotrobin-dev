@@ -1,0 +1,18 @@
+/* SCA terminal evidence: a responsive, sequential scan-to-rescan story. */
+.sca-workflow{list-style:none;display:grid;gap:20px;margin:24px 0 36px;padding:0}
+.sca-workflow>.sca-workflow-step{margin:0;min-width:0;padding:clamp(16px,2.4vw,24px);border:1px solid #494052;border-radius:10px;background:#15131c}
+.sca-step-heading{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+.sca-step-number{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid #655080;border-radius:50%;color:#dbc9ff;background:#272033;font:600 12px/1 ui-monospace,SFMono-Regular,Consolas,monospace}
+.sca-step-heading h3{flex:1 1 210px;margin:0;color:#f1eaff;font-size:18px;line-height:1.4}
+.sca-step-status{display:inline-block;padding:5px 9px;border:1px solid #655080;border-radius:5px;color:#e4d8ff;background:#272033;font:600 11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace}
+.sca-step-status--fail{color:#ffd1bf;border-color:#815749;background:#30211f}
+.sca-step-status--pass{color:#c2efd7;border-color:#456a58;background:#1c2b25}
+.sca-workflow-step>p{margin:16px 0;line-height:1.75}
+.article .sca-capture{margin:18px 0 0}
+.sca-capture-image{display:block;max-width:100%;border-radius:5px;background:#191919;overflow:hidden}
+.article .sca-capture img{display:block;width:auto;max-width:100%;height:auto;border:0;margin:0 auto}
+.sca-capture-image:focus-visible,.sca-capture figcaption a:focus-visible{outline:2px solid #c9b1ff;outline-offset:4px}
+.sca-capture figcaption{margin-top:10px;font-size:12px;line-height:1.65;color:#c2b9ce}
+.sca-capture figcaption a{white-space:nowrap;color:#d8c9f9}
+@media(max-width:560px){.sca-step-heading h3{flex-basis:calc(100% - 42px);font-size:17px}.sca-step-status{margin-left:42px}.sca-workflow{gap:16px}.sca-workflow-step>p{font-size:14px}}
+@media print{.sca-workflow>.sca-workflow-step{background:transparent;border-color:#777;break-inside:avoid}.sca-step-heading h3,.sca-step-status,.sca-step-number,.sca-capture figcaption{color:black}.sca-capture-image{background:transparent}}
