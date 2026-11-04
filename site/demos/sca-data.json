@@ -1,49 +1,113 @@
 {
-  "captured": "2026-11-03T13:38:30.540618+00:00",
+  "captured": "2026-11-04T03:59:18.627Z",
+  "tool": "sca-triage (lansiquo-sca-remediation-lab, commit a105673)",
   "node": "v22.23.4",
   "npm": "10.9.9",
+  "packagesScanned": 33,
   "packages": [
     {
       "name": "minimist",
       "before": "1.2.5",
-      "after": "1.2.8",
-      "reachable": true
+      "after": "1.2.6",
+      "priority": "P1",
+      "severity": "critical",
+      "advisories": 1,
+      "reachability": "imported",
+      "exploitDemonstrated": true,
+      "majorUpgrade": false
+    },
+    {
+      "name": "axios",
+      "before": "1.6.0",
+      "after": "1.20.0",
+      "priority": "P1",
+      "severity": "high",
+      "advisories": 31,
+      "reachability": "imported",
+      "exploitDemonstrated": false,
+      "majorUpgrade": false
     },
     {
       "name": "semver",
-      "before": "6.3.0",
-      "after": "6.3.1",
-      "reachable": false
+      "before": "7.5.1",
+      "after": "7.5.2",
+      "priority": "P1",
+      "severity": "high",
+      "advisories": 1,
+      "reachability": "imported",
+      "exploitDemonstrated": false,
+      "majorUpgrade": false
     },
     {
       "name": "tar",
       "before": "6.1.0",
-      "after": "7.5.22",
-      "reachable": false
-    },
-    {
-      "name": "axios",
-      "before": "0.21.0",
-      "after": "1.21.0",
-      "reachable": false
+      "after": "7.5.21",
+      "priority": "P2",
+      "severity": "critical",
+      "advisories": 18,
+      "reachability": "not-imported",
+      "exploitDemonstrated": false,
+      "majorUpgrade": true
     }
   ],
-  "counts": {
+  "summary": {
     "before": {
-      "info": 0,
-      "low": 0,
-      "moderate": 0,
-      "high": 2,
-      "critical": 2,
-      "total": 4
+      "P1": 3,
+      "P2": 1,
+      "P3": 0,
+      "advisories": 51,
+      "vulnerable": 4,
+      "bySeverity": {
+        "critical": 2,
+        "high": 2,
+        "moderate": 0,
+        "low": 0
+      }
     },
     "after": {
-      "info": 0,
-      "low": 0,
-      "moderate": 0,
-      "high": 0,
-      "critical": 0,
-      "total": 0
+      "P1": 0,
+      "P2": 0,
+      "P3": 0,
+      "advisories": 0,
+      "vulnerable": 0,
+      "bySeverity": {
+        "critical": 0,
+        "high": 0,
+        "moderate": 0,
+        "low": 0
+      }
     }
+  },
+  "tests": {
+    "functional": {
+      "before": {
+        "passed": 5,
+        "total": 5
+      },
+      "after": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    "security": {
+      "name": "parsing untrusted options must not modify Function.prototype",
+      "before": "fail",
+      "after": "pass"
+    },
+    "before": {
+      "passed": 5,
+      "failed": 1,
+      "total": 6
+    },
+    "after": {
+      "passed": 6,
+      "failed": 0,
+      "total": 6
+    }
+  },
+  "gate": {
+    "failOn": "P1",
+    "before": "fail",
+    "after": "pass"
   }
 }

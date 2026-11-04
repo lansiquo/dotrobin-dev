@@ -1,2 +1,83 @@
 'use strict';
-(async()=>{try{const r=await fetch('sca-data.json?v=1');if(!r.ok)throw Error('data');const d=await r.json();const capturedDate=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}).format(new Date(d.captured));let side='before';const $=id=>document.getElementById(id);function evidence(){const type=$('evidence').value;const texts={audit:`Saved audit: ${d.counts[side].total} findings (${d.counts[side].critical} critical, ${d.counts[side].high} high). This is the recorded registry response, not a current vulnerability verdict.`,security:side==='before'?'Recorded assertion FAILED as expected: the minimist input placed a harmless marker on Function.prototype. This is the reachable example; no code execution or data theft is claimed.':'Recorded assertion PASSED: the same minimist input did not pollute Function.prototype. This establishes only the scoped invariant in this fixture.',regression:'Recorded functional tests: 7 of 7 passed. Both versions pass ordinary functional tests; that alone does not establish the security invariant.'};$('evidence-detail').textContent=texts[type]}function render(){$('before').setAttribute('aria-pressed',String(side==='before'));$('after').setAttribute('aria-pressed',String(side==='after'));$('provenance').textContent=`Recorded ${capturedDate} · Node ${d.node} / npm ${d.npm} · Linux. Only minimist is exercised by the application; tar, axios and semver are inventory/remediation examples.`;$('metrics').replaceChildren();for(const [n,label]of [[d.counts[side].total,'recorded audit findings'],[4,'direct dependencies'],['7/7','functional tests passed']]){const box=document.createElement('div');box.className='metric';const value=document.createElement('strong');value.textContent=n;const caption=document.createElement('span');caption.textContent=label;box.append(value,caption);$('metrics').append(box)}$('packages').replaceChildren();for(const p of d.packages){const row=document.createElement('tr');for(const t of [p.name,p[side],p.reachable?'Demonstrated minimist path':'Not exercised by the application']){const td=document.createElement('td');td.textContent=t;row.append(td)}$('packages').append(row)}evidence()}$('before').onclick=()=>{side='before';render()};$('after').onclick=()=>{side='after';render()};$('evidence').onchange=evidence;render();$('app').hidden=false}catch(e){document.getElementById('load-error').hidden=false}})();
+// SCA Remediation Lab demo: replays one recorded sca-triage run (sca-data.json).
+// Nothing is installed or scanned in the browser.
+(async () => {
+  try {
+    const r = await fetch('sca-data.json?v=2');
+    if (!r.ok) throw Error('data');
+    const d = await r.json();
+    const $ = (id) => document.getElementById(id);
+    const date = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(d.captured));
+    const REACH = {
+      imported: 'Imported by the app',
+      'via-imported': 'Pulled in by an imported dependency',
+      'test-only': 'Test code only',
+      'not-imported': 'Not imported',
+    };
+    let side = 'before';
+
+    function evidence() {
+      const s = d.summary[side];
+      const t = d.tests[side];
+      const f = d.tests.functional[side];
+      const texts = {
+        audit:
+          side === 'before'
+            ? `Recorded scan: ${s.vulnerable} vulnerable packages and ${s.advisories} advisories. Ranked P1: ${s.P1}, P2: ${s.P2}. tar has critical advisories but ranks P2 because nothing in the app imports it. The P1 gate failed.`
+            : `Recorded rescan after the upgrades: ${s.vulnerable} vulnerable packages. The P1 gate passed. This reflects the advisory database on ${date}, not a security certification.`,
+        security:
+          side === 'before'
+            ? `Recorded security test FAILED, as expected: untrusted option tokens made minimist place a harmless marker on Function.prototype. This is the one advisory the lab proves end to end; no code execution or data theft is claimed.`
+            : `Recorded security test PASSED: the same input no longer pollutes Function.prototype after the minimist upgrade.`,
+        regression: `Recorded tests: ${t.passed} of ${t.total} passed, including ${f.passed} of ${f.total} functional tests. The functional tests pass on both versions, which is why compatibility tests alone miss this defect.`,
+      };
+      $('evidence-detail').textContent = texts[$('evidence').value];
+    }
+
+    function render() {
+      $('before').setAttribute('aria-pressed', String(side === 'before'));
+      $('after').setAttribute('aria-pressed', String(side === 'after'));
+      $('provenance').textContent = `Recorded ${date} with sca-triage · Node ${d.node} / npm ${d.npm} · Linux · ${d.packagesScanned} installed packages scanned.`;
+
+      const s = d.summary[side];
+      const t = d.tests[side];
+      $('metrics').replaceChildren();
+      for (const [value, label] of [
+        [s.vulnerable, 'vulnerable packages'],
+        [s.P1, 'P1 findings (gate)'],
+        [`${t.passed}/${t.total}`, 'tests passed'],
+      ]) {
+        const box = document.createElement('div');
+        box.className = 'metric';
+        const strong = document.createElement('strong');
+        strong.textContent = value;
+        const caption = document.createElement('span');
+        caption.textContent = label;
+        box.append(strong, caption);
+        $('metrics').append(box);
+      }
+
+      $('packages').replaceChildren();
+      for (const p of d.packages) {
+        const row = document.createElement('tr');
+        const version = side === 'before' ? `${p.before} · ${p.severity}, ${p.advisories} advisor${p.advisories === 1 ? 'y' : 'ies'}` : `${p.after}${p.majorUpgrade ? ' (major upgrade)' : ''}`;
+        const reach = side === 'before' ? `${p.priority} · ${REACH[p.reachability]}${p.exploitDemonstrated ? ', exploit demonstrated' : ''}` : 'No known advisories';
+        for (const text of [p.name, version, reach]) {
+          const td = document.createElement('td');
+          td.textContent = text;
+          row.append(td);
+        }
+        $('packages').append(row);
+      }
+      evidence();
+    }
+
+    $('before').onclick = () => { side = 'before'; render(); };
+    $('after').onclick = () => { side = 'after'; render(); };
+    $('evidence').onchange = evidence;
+    render();
+    $('app').hidden = false;
+  } catch (e) {
+    document.getElementById('load-error').hidden = false;
+  }
+})();

@@ -6,6 +6,6 @@ Only static HTML/CSS/JavaScript and curated JSON are deployed. No source evaluat
 
 PR examples were curated from the owner's current local showcase on November 3, 2026: four static analysis scenarios and six behavioral test scenarios. Source is displayed as inert text. The public walkthrough explains intended checks; it does not claim to run them.
 
-SCA numbers come from the recorded November 3, 2026 baseline, Node 22.23.4/npm 10.9.9 on Linux: four direct dependencies, four audit findings before and zero after, seven functional tests passing per phase, and the minimist invariant failing before/passing after. Only minimist has demonstrated reachability. Findings are time bound and not a security certification.
+SCA numbers come from one recorded run of sca-triage on the repository's intentionally vulnerable lab app (November 4, 2026, Node 22.23.4/npm 10.9.9 on Linux): four vulnerable direct dependencies before (3 × P1, 1 × P2) and zero after, 5/5 functional tests passing in both phases, and the minimist security test failing before and passing after. Only minimist has a demonstrated exploit. Findings are time-bound and not a security certification. The working tool is at https://github.com/lansiquo/lansiquo-sca-remediation-lab.
 
 Use a static HTTP server to preview these files. Data fetches are same site JSON; no external runtime dependencies are used.
