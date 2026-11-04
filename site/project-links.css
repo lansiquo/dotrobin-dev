@@ -36,3 +36,15 @@
 @media print{.project-resources{break-inside:avoid}.project-resources .project-link{background:transparent;color:black;border-color:#777}.project-resources .resource-kicker,.project-resources .resource-meta,.project-resources .resource-title{color:black}.project-resources .resource-notes::details-content{content-visibility:visible;display:block}.project-resources .resource-notes dl{display:grid}.project-resources .resource-notes summary{display:none}}
 @container (max-width:300px){.project-resources .project-link{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;align-items:start}.project-resources .resource-arrow{position:absolute;top:14px;right:14px;width:25px;height:25px}.project-resources .resource-kicker{padding-right:20px}.project-resources .resource-title{font-size:19px}.project-resources .resource-copy{display:flex;gap:8px}}
 @media(max-width:360px){.project-resources .project-link{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;align-items:start}.project-resources .resource-arrow{position:absolute;top:14px;right:14px;width:25px;height:25px}.project-resources .resource-kicker{padding-right:20px}.project-resources .resource-title{font-size:19px}.project-resources .resource-copy{display:flex;gap:8px}}
+
+/* Matching, action-first cards on project pages. Demo source bands stay unchanged. */
+.project-resources--paired .resource-actions{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr}
+.project-resources--paired .project-link{display:flex;align-items:center;gap:14px;min-height:118px;background:#211c2a;border-color:#554660}
+.project-resources--paired .project-link:hover{background:#2c2338;border-color:#c9b1ff}
+.project-resources--paired .resource-icon{width:22px;height:22px;margin:0}
+.project-resources--paired .resource-copy{gap:8px}
+.project-resources--paired .resource-title{font-size:18px;line-height:1.35;letter-spacing:-.2px}
+.project-resources--paired .resource-meta{font-size:13px;line-height:1.5;color:#c2b9ce}
+@container (max-width:620px){.project-resources--paired .resource-actions{grid-template-columns:minmax(0,1fr)}.project-resources--paired .project-link{min-height:108px}}
+@media(max-width:620px){.project-resources--paired .resource-actions{grid-template-columns:minmax(0,1fr)}.project-resources--paired .project-link{min-height:108px}}
+@media print{.project-resources--paired .project-link{background:transparent;color:black;border-color:#777}.project-resources--paired .resource-meta{color:black}}
