@@ -48,3 +48,15 @@ Selected authentic PNGs (original pixel payloads; metadata stripped):
 - dev-root.png — 20261023162559: actual sudo ZIP invocation, root identity and dev hostname.
 
 Excluded: 20261023124042 exposes an OpenSSH private key; 20261023174827 exposes the recovered archive password. Generated diagrams/flag explanations are not used as terminal evidence. No passwords, credential hashes or private-key contents were copied. Generic user template preserved; root result directly captured. Technique cross-check: https://gtfobins.org/gtfobins/zip/ .
+
+## Target architecture review (November 4, 2026)
+
+Architecture values describe the target guest operating systems, not the Kali attacker or physical host. x86_64, amd64 and Windows x64 are the 64-bit x86 architecture. The owner confirmed that Blackpearl, Butler and Dev were the standard TCM Practical Ethical Hacking VM downloads, without rebuilding their operating systems.
+
+- Blue: x64 (64-bit), directly verified in the retained `blue-system.png` Meterpreter `sysinfo` capture.
+- Academy: x86_64 (64-bit), directly verified in the retained `academy-foothold.png` target Linux banner.
+- Blackpearl: x86_64 (64-bit), cross-checked against the original researcher's target `sysinfo` transcript naming `blackpearl`: https://emvee-nl.github.io/posts/TCM-Writeup-Black-Pearl/ .
+- Butler: x64 (64-bit), cross-checked against the original researcher's `systeminfo` transcript naming `BUTLER` and `System Type: x64-based PC`: https://emvee-nl.github.io/posts/TCM-Writeup-Butler/ .
+- Dev: x86_64 (64-bit), cross-checked against the original researcher's target reverse-shell banner, `Linux dev 4.19.0-16-amd64 ... x86_64 GNU/Linux`, in section 12: https://ainkun.medium.com/tcmsecurity-dev-write-up-eee565738e78 .
+
+The external transcripts establish the standard lab images' architecture; they are not represented as captures from the owner's sessions. No new terminal output or screenshots were added.
