@@ -16,7 +16,7 @@
 <p>The first scan checks 33 packages and flags four vulnerable dependencies. <code>minimist</code>, <code>axios</code> and <code>semver</code> are P1 because they combine high or critical advisories with imports found in the application’s source. <code>tar</code> has critical advisories but ranks P2 because the tool finds no import of it.</p>
 <section class="sca-output-card" aria-label="Captured baseline scan output">
 <p class="sca-output-title"><strong>Baseline scan output</strong><small>Preview: captured command and summary · 33 packages · 4 vulnerable dependencies</small></p>
-<pre id="baseline-preview" class="sca-output-preview" tabindex="0" role="region" aria-label="Baseline scan preview, showing the captured command and JSON summary"><code>otrobin@macbook ~/Development/projects/lansiquo-sca-remediation-lab % node ~/Development/projects/lansiquo-sca-remediation-lab/bin/sca-triage.js scan ~/Development/projects/lansiquo-sca-remediation-lab/lab/vulnerable-app --json --fail-on none
+<pre id="baseline-preview" class="sca-output-preview" tabindex="0" role="region" aria-label="Baseline scan preview, showing the captured command and JSON summary"><code>dotrobin@macbook ~/Development/projects/lansiquo-sca-remediation-lab % node ~/Development/projects/lansiquo-sca-remediation-lab/bin/sca-triage.js scan ~/Development/projects/lansiquo-sca-remediation-lab/lab/vulnerable-app --json --fail-on none
 {
   "project": "intentionally-vulnerable-export-job",
   "scannedAt": "2026-11-04T20:01:36.329Z",
@@ -30,8 +30,8 @@
 </code></pre>
 <details class="sca-output">
 <summary><span><strong><span class="sca-show-more">Show more</span><span class="sca-show-less">Show less</span></strong><small>All 4 findings and 51 advisories</small></span><span class="sca-output-chevron" aria-hidden="true">⌄</span></summary>
-<div class="sca-output-body"><p class="sca-output-note">The captured transcript continues below, including the remaining JSON and terminal prompt. The opening command and summary remain above, with no omitted or repeated output.</p>
-<pre id="baseline-output" tabindex="0" role="region" aria-label="Remaining captured scan transcript, continuing after the visible preview"><code>  "findings": [
+<div class="sca-output-body"><p class="sca-output-note">The captured JSON continues below. The opening command and summary remain above, with no omitted or repeated output.</p>
+<pre id="baseline-output" tabindex="0" role="region" aria-label="Remaining captured JSON output, continuing after the visible preview"><code>  "findings": [
     {
       "package": "minimist",
       "version": "1.2.5",
@@ -705,8 +705,7 @@
       }
     }
   ]
-}
-dotrobin@macbook ~/Development/projects/lansiquo-sca-remediation-lab % cd ~/Development/projects/lansiquo-sca-remediation-l</code></pre></div>
+}</code></pre></div>
 </details>
 </section>
 <p class="sca-output-context">This export uses <code>--json --fail-on none</code> to capture the full findings without failing the command. Its three P1 findings would fail the default P1 gate.</p>
