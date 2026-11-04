@@ -36,7 +36,6 @@
 .sca-output summary:hover{background:#211c2a}
 .sca-output summary:focus-visible{outline:2px solid #c9b1ff;outline-offset:-4px}
 .sca-output-chevron{font-size:20px;color:#d8c9f9;transition:transform .15s}
-.sca-output[open]>.sca-output-chevron{transform:rotate(180deg)}
 .sca-output[open]>summary .sca-output-chevron{transform:rotate(180deg)}
 .sca-output-body{border-top:1px solid #494052;padding:0 16px 16px}
 .sca-article .sca-output-note{font-size:12px;line-height:1.6;color:#c2b9ce;margin:14px 0}
@@ -47,3 +46,17 @@
 @media(max-width:560px){.sca-output summary{padding:14px}.sca-output-body{padding:0 12px 12px}.sca-article .sca-output pre{font-size:12px;padding:12px}.sca-article .sca-report-capture{padding:12px}}
 @media(prefers-reduced-motion:reduce){.sca-output-chevron{transition:none}}
 @media print{.sca-output-body{display:block}.sca-output::details-content{content-visibility:visible}.sca-article .sca-output pre{max-height:none;white-space:pre-wrap;overflow-wrap:anywhere}.sca-output-chevron{display:none}.sca-article .sca-report-capture{background:transparent;border-color:#777}}
+
+/* The real command and summary are visible before the optional full findings. */
+.sca-output-card{margin:18px 0 0;border:1px solid #655080;border-radius:7px;background:#101016;overflow:hidden}
+.sca-article .sca-output-title{margin:0;padding:16px;color:#f1eaff;line-height:1.5}
+.sca-output-title strong{display:block;font-size:14px}
+.sca-output-title small{display:block;margin-top:4px;font-size:12px;line-height:1.5;color:#c2b9ce}
+.sca-article .sca-output-preview{margin:0 16px 16px;max-width:calc(100% - 32px);overflow-x:auto;white-space:pre;padding:16px;border:1px solid #494052;border-radius:4px;background:#09090e;color:#f1eaff;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.sca-output-preview code{font:inherit;color:inherit;white-space:inherit}
+.sca-output-card>.sca-output{margin:0;border:0;border-top:1px solid #494052;border-radius:0;background:transparent}
+.sca-output .sca-show-less{display:none}
+.sca-output[open] .sca-show-more{display:none}
+.sca-output[open] .sca-show-less{display:inline}
+@media(max-width:560px){.sca-article .sca-output-title{padding:14px}.sca-article .sca-output-preview{margin:0 12px 12px;max-width:calc(100% - 24px);padding:12px;font-size:12px}}
+@media print{.sca-article .sca-output-preview{white-space:pre-wrap;overflow-wrap:anywhere}.sca-output .sca-show-more,.sca-output .sca-show-less{display:none}}
