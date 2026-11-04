@@ -5,7 +5,7 @@
     "mode": "behavioral",
     "impact": "A changed invoice ID could expose another customer’s bill.",
     "fix": "Check ownership on the server before returning an invoice. The current user must come from a trusted authenticated session.",
-    "limit": "Try owner, different user, anonymous user and missing invoice against every read/update route. Verify tenant isolation and server side identity.",
+    "limit": "Try owner, different user, anonymous user and missing invoice against every read/update route. Verify tenant isolation and server-side identity.",
     "sources": {
       "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    return invoice.to_dict()\n",
       "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    if invoice is None or invoice.owner_id != current_user.id:\n        raise PermissionError(\"Invoice unavailable\")\n    return invoice.to_dict()\n"
@@ -85,7 +85,7 @@
     "mode": "behavioral",
     "impact": "Without a redemption limit, a customer can repeatedly claim the same credit, including through concurrent requests.",
     "fix": "Allow a single redemption and enforce that rule atomically when issuing credit. The fixed fixture illustrates a transaction and uniqueness contract.",
-    "limit": "Model abuse scenarios and test requests that run concurrently or repeat, rollback and access rules between accounts against the real database. A method name cannot establish atomicity.",
+    "limit": "Model abuse scenarios and test concurrent and repeated requests, rollback and cross-account access rules against the real database. A method name cannot establish atomicity.",
     "sources": {
       "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # No requirement limits how often a customer can redeem this coupon.\n    store.credit(user.id, coupon.value)\n",
       "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # Design contract: one redemption per authenticated customer and coupon.\n    # The transaction and unique constraint must be enforced in the database.\n    with store.transaction():\n        if not store.insert_redemption_unique(user.id, coupon.id):\n            raise ValueError(\"Coupon already redeemed\")\n        store.credit(user.id, coupon.value)\n"

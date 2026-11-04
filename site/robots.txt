@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dotrobin.dev/sitemap.xml
