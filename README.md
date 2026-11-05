@@ -4,8 +4,8 @@ Robin Lansiquot’s static security portfolio. Public files live in `site/`; Git
 
 ## Project status
 
-- **sca-triage: functional end-to-end.** The local CLI and GitHub Action implement dependency scanning, import-based prioritization, upgrade application, project tests, a fresh scan and saved evidence. The lab workflow is exercised in CI. See the [case study](https://dotrobin.dev/sca-remediation.html).
-- **sast-triage: in development.** The local review demo works; the broader service remains in development. Its triage step (new vs pre-existing findings, P1–P3 ranking) is planned, not built yet. No live deployment is claimed. See the [project page](https://dotrobin.dev/pr-reviewer.html).
+- **sca-triage: functional end-to-end.** The local CLI and GitHub Action implement dependency scanning, import-based prioritization, upgrade application, project tests, a fresh scan and saved evidence. The lab workflow is exercised in CI. See the [case study](https://dotrobin.dev/sca-triage.html).
+- **sast-triage: in development.** The local review demo works; the broader service remains in development. Its triage step (new vs pre-existing findings, P1–P3 ranking) is built. No live deployment is claimed. See the [project page](https://dotrobin.dev/sast-triage.html).
 
 These labels describe the tools. The browser demos below are separate static presentations.
 
