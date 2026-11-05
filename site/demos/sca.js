@@ -1,5 +1,5 @@
 'use strict';
-// SCA Remediation Lab demo: replays one recorded sca-triage run (sca-data.json).
+// sca-triage demo: replays one recorded sca-triage run (sca-data.json).
 // Nothing is installed or scanned in the browser.
 (async () => {
   try {
