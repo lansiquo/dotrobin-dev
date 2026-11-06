@@ -5,7 +5,7 @@
     "mode": "behavioral",
     "impact": "A changed invoice ID could expose another customer’s bill.",
     "fix": "Check ownership on the server before returning an invoice. The current user must come from a trusted authenticated session.",
-    "limit": "Try owner, different user, anonymous user and missing invoice against every read/update route. Verify tenant isolation and server side identity.",
+    "limit": "Try owner, different user, anonymous user and missing invoice against every read/update route. Verify tenant isolation and server-side identity.",
     "sources": {
       "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    return invoice.to_dict()\n",
       "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef read_invoice(invoices, current_user, invoice_id):\n    invoice = invoices.get(invoice_id)\n    if invoice is None or invoice.owner_id != current_user.id:\n        raise PermissionError(\"Invoice unavailable\")\n    return invoice.to_dict()\n"
@@ -13,6 +13,13 @@
     "explanations": {
       "vulnerable": "The function looks up the supplied invoice ID and returns that invoice without using current_user. If a caller can supply another customer's invoice ID, this function does not stop them from reading it. The ownership check needs to happen before the invoice is returned.",
       "fixed": "The function rejects a missing invoice or an owner ID that differs from current_user.id before returning any invoice data. A matching owner can still read their invoice. This assumes the caller supplies a trusted authenticated user; anonymous-user handling and tenant isolation are not implemented here."
+    },
+    "triage": {
+      "file": "app/billing.py",
+      "line": 42,
+      "severity": "HIGH",
+      "code": "runtime",
+      "new": true
     }
   },
   {
@@ -29,6 +36,13 @@
     "explanations": {
       "vulnerable": "FastAPI(debug=True) enables debug error responses, which can include a traceback when an unhandled exception occurs. That can expose internal implementation details to a visitor. The concern is the debug setting, not evidence that an exception or data leak has occurred in this preview.",
       "fixed": "FastAPI(debug=False) turns off the framework's debug traceback responses. It removes the risky setting shown in the original. Custom error handlers, deployed configuration and protected logging still need review because this change does not control every possible source of diagnostic leakage."
+    },
+    "triage": {
+      "file": "app/main.py",
+      "line": 8,
+      "severity": "MEDIUM",
+      "code": "runtime",
+      "new": false
     }
   },
   {
@@ -45,13 +59,20 @@
     "explanations": {
       "vulnerable": "The release function installs the fixture's unlocked requirements and immediately packages the result. No dependency review, provenance verification or vulnerability gate is shown before packaging, so an unreviewed dependency change could enter the release. This code alone does not establish that any installed package is malicious or vulnerable.",
       "fixed": "The proposed flow requires a reviewed lock, provenance verification and a dependency audit before installation, then records an inventory before packaging. These methods describe a pipeline contract: their implementations must stop the release when required evidence is missing, stale or fails policy. Matching hashes confirms expected package bytes; neither hashes nor an inventory establish that the code is safe."
+    },
+    "triage": {
+      "file": "scripts/release.py",
+      "line": 15,
+      "severity": "MEDIUM",
+      "code": "runtime",
+      "new": true
     }
   },
   {
     "name": "TLS certificate verification",
     "category": "A04:2025 Cryptographic Failures",
     "mode": "scan",
-    "impact": "verify=False disables certificate validity and server name checks. An intercepting attacker could impersonate the HTTPS server even though traffic is encrypted.",
+    "impact": "verify=False disables certificate and hostname verification. An intercepting attacker could impersonate the HTTPS server even though traffic is encrypted.",
     "fix": "Use the Requests default certificate verification or explicit verify=True. Keep a timeout; it does not replace identity validation.",
     "limit": "The rule checks literal verify=False in requests.get/post/request only. Validate the actual trust store and certificate failure behavior separately; no network request runs here.",
     "sources": {
@@ -61,6 +82,13 @@
     "explanations": {
       "vulnerable": "verify=False tells Requests to accept the HTTPS server's certificate without validating its trust or hostname. An attacker able to intercept the connection could impersonate that server while the traffic remains encrypted. The timeout and raise_for_status() do not restore certificate verification.",
       "fixed": "verify=True enables Requests' certificate verification, including trust and hostname checks, before accepting the HTTPS response. The timeout remains a separate availability control. The deployed trust configuration and failure handling still need testing; this preview makes no network request."
+    },
+    "triage": {
+      "file": "tests/test_payments.py",
+      "line": 23,
+      "severity": "HIGH",
+      "code": "test",
+      "new": true
     }
   },
   {
@@ -77,6 +105,13 @@
     "explanations": {
       "vulnerable": "customer_name is joined directly into the SQL text between quote characters. A crafted value can break out of that string and change the query's meaning, rather than being treated only as a customer name. The unsafe operation is building SQL syntax from input before execute() receives it.",
       "fixed": "The SQL text keeps a ? placeholder while customer_name is passed separately in a one-item tuple. With a driver that supports this placeholder style, such as Python's sqlite3, the value is bound as data even when it contains quotes or SQL-like text. This addresses the shown value insertion; dynamic table or column names need separate controls."
+    },
+    "triage": {
+      "file": "app/customers.py",
+      "line": 31,
+      "severity": "CRITICAL",
+      "code": "runtime",
+      "new": true
     }
   },
   {
@@ -85,7 +120,7 @@
     "mode": "behavioral",
     "impact": "Without a redemption limit, a customer can repeatedly claim the same credit, including through concurrent requests.",
     "fix": "Allow a single redemption and enforce that rule atomically when issuing credit. The fixed fixture illustrates a transaction and uniqueness contract.",
-    "limit": "Model abuse scenarios and test requests that run concurrently or repeat, rollback and access rules between accounts against the real database. A method name cannot establish atomicity.",
+    "limit": "Model abuse scenarios, then test concurrent and repeated requests, rollback behavior and cross-account access against the real database. A method name cannot establish atomicity.",
     "sources": {
       "vulnerable": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # No requirement limits how often a customer can redeem this coupon.\n    store.credit(user.id, coupon.value)\n",
       "fixed": "# Authored lab fixture: runs only with synthetic adapters, never real services.\ndef redeem_coupon(store, user, coupon):\n    # Design contract: one redemption per authenticated customer and coupon.\n    # The transaction and unique constraint must be enforced in the database.\n    with store.transaction():\n        if not store.insert_redemption_unique(user.id, coupon.id):\n            raise ValueError(\"Coupon already redeemed\")\n        store.credit(user.id, coupon.value)\n"
@@ -93,6 +128,13 @@
     "explanations": {
       "vulnerable": "Each call credits the customer without checking whether that customer has already redeemed this coupon. Repeating the request can therefore issue the credit again. The missing rule is one redemption per customer-and-coupon pair, not one coupon in total per customer.",
       "fixed": "The function attempts to record a unique customer-and-coupon pair before issuing credit, with both operations inside one transaction. A duplicate redemption is rejected before credit is issued. This depends on a real database uniqueness constraint and correct commit/rollback behavior; the synthetic adapter and method names do not prove safety under concurrent requests."
+    },
+    "triage": {
+      "file": "app/coupons.py",
+      "line": 18,
+      "severity": "MEDIUM",
+      "code": "runtime",
+      "new": false
     }
   },
   {
@@ -109,6 +151,13 @@
     "explanations": {
       "vulnerable": "After verifying credentials, the function attaches the authenticated user to the existing session ID and returns that same ID. If an attacker already knows or has fixed that identifier, they may be able to reuse it after the victim logs in. Verifying the credentials does not remove this session-fixation risk.",
       "fixed": "After credential verification, the function asks the session service to rotate the ID and bind the user to the replacement. To prevent reuse of the old session, that service must issue an unpredictable new ID and invalidate the old one as part of the same operation. The snippet calls this contract but does not implement or verify those guarantees."
+    },
+    "triage": {
+      "file": "app/auth.py",
+      "line": 27,
+      "severity": "HIGH",
+      "code": "runtime",
+      "new": false
     }
   },
   {
@@ -125,6 +174,14 @@
     "explanations": {
       "vulnerable": "yaml.Loader accepts YAML tags that can construct Python objects and invoke Python functions. If an untrusted sender controls the YAML, parsing can therefore do more than read ordinary settings data. The function applies no size limit or schema checks before returning the result.",
       "fixed": "The function limits the input to 4,096 characters, uses safe_load rather than yaml.Loader to reject unsafe Python-object tags, and requires exactly name and retries. It checks the name length and accepts only an integer retry count from 0 to 5, excluding booleans. These checks constrain the shown settings format; they do not authenticate the sender or rule out every resource-exhaustion risk."
+    },
+    "triage": {
+      "file": "app/settings.py",
+      "line": 12,
+      "severity": "HIGH",
+      "code": "runtime",
+      "new": true,
+      "confidence": "LOW"
     }
   },
   {
@@ -141,6 +198,13 @@
     "explanations": {
       "vulnerable": "The function returns a 403 status but does not use the audit object or request ID to record the denial. Unless another layer records it, defenders lose an event that could help identify repeated access attempts. Rejecting a request and making the rejection observable are separate requirements.",
       "fixed": "The function records an access_denied event with a request ID and still returns 403. That event can support correlation, but the shown call does not implement protected retention, field validation or alert delivery. The lab's in-memory event and threshold behavior cannot establish that a real responder would receive an alert."
+    },
+    "triage": {
+      "file": "app/records.py",
+      "line": 40,
+      "severity": "LOW",
+      "code": "runtime",
+      "new": true
     }
   },
   {
@@ -157,6 +221,13 @@
     "explanations": {
       "vulnerable": "When policy.allows() raises TimeoutError, the exception handler returns True. If the caller treats True as permission, a policy-service outage grants access without a successful authorization decision. A normal denial is still returned as False; the bypass is specifically in the timeout path.",
       "fixed": "The timeout handler returns False, so the caller can deny the download when the policy service cannot answer. Normal policy responses are unchanged. The caller must enforce that result, and safe error responses, outage logging and handling other failure types remain outside this snippet."
+    },
+    "triage": {
+      "file": "app/downloads.py",
+      "line": 9,
+      "severity": "HIGH",
+      "code": "runtime",
+      "new": true
     }
   }
 ]
