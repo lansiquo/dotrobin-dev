@@ -24,6 +24,24 @@
       return 'notice';
     }
 
+    // Plain-language reason for a finding's priority and check annotation.
+    function reason(t, p, level) {
+      const sev = t.severity.toLowerCase();
+      const high = t.severity === 'CRITICAL' || t.severity === 'HIGH';
+      const base = high && t.code !== 'test' ? 'P1' : high || (t.severity === 'MEDIUM' && t.code !== 'test') ? 'P2' : 'P3';
+      let rank;
+      if (high && t.code === 'test') rank = `${titleCase(t.severity)}, but only in test code → ${base}.`;
+      else if (base === 'P3') rank = `${titleCase(t.severity)} severity → ${base}.`;
+      else rank = `${titleCase(t.severity)} severity in runtime code → ${base}.`;
+      if (p !== base) rank += ` Low rule confidence drops it to ${p}.`;
+      const outcome = level === 'failure'
+        ? 'New, so it fails the check.'
+        : t.new
+          ? `New, but ${p} only adds a ${level}.`
+          : `Pre-existing, so it’s annotated but doesn’t fail the check.`;
+      return `${rank} ${outcome}`;
+    }
+
     const titleCase = (s) => s.charAt(0) + s.slice(1).toLowerCase();
 
     function render() {
@@ -38,7 +56,7 @@
       $('after').setAttribute('aria-pressed', String(variant === 'fixed'));
       $('result').hidden = true;
       [...$('choices').children].forEach((b, i) => b.setAttribute('aria-pressed', String(i === current)));
-      [...$('triage-rows').children].forEach((r, i) => r.classList.toggle('selected', i === current));
+      [...$('triage-rows').children].forEach((r) => r.classList.toggle('selected', Number(r.dataset.index) === current));
     }
 
     function select(i) {
@@ -86,7 +104,17 @@
         span.textContent = level === 'failure' ? 'Fails check' : level === 'warning' ? 'Warning' : 'Notice';
         badge.append(span);
         tr.append(badge);
-        rows.append(tr);
+        const whyRow = document.createElement('tr');
+        whyRow.className = 'why-row';
+        const why = document.createElement('td');
+        why.colSpan = 7;
+        const whyText = document.createElement('span');
+        whyText.className = 'why-text';
+        whyText.textContent = `Why: ${reason(t, p, level)}`;
+        why.append(whyText);
+        whyRow.append(why);
+        tr.dataset.index = whyRow.dataset.index = String(i);
+        rows.append(tr, whyRow);
       });
       const gate = $('gate');
       if (blocking.length) {
