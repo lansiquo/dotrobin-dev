@@ -7,7 +7,6 @@
     if (!r.ok) throw Error('data');
     const d = await r.json();
     const $ = (id) => document.getElementById(id);
-    const date = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(d.captured));
     const REACH = {
       imported: 'Imported by the app',
       'via-imported': 'Pulled in by an imported dependency',
@@ -24,7 +23,7 @@
         audit:
           side === 'before'
             ? `Recorded scan: ${s.vulnerable} vulnerable packages and ${s.advisories} advisories. Ranked P1: ${s.P1}, P2: ${s.P2}. tar has critical advisories but ranks P2 because nothing in the app imports it. The P1 gate failed.`
-            : `Recorded rescan after the upgrades: ${s.vulnerable} vulnerable packages. The P1 gate passed. This reflects the advisory database on ${date}, not a security certification.`,
+            : `Recorded rescan after the upgrades: ${s.vulnerable} vulnerable packages. The P1 gate passed. This reflects the advisory database at the time of the run, not a security certification.`,
         security:
           side === 'before'
             ? `Recorded security test FAILED, as expected: untrusted option tokens made minimist place a harmless marker on Function.prototype. This is the one advisory the lab proves end to end; no code execution or data theft is claimed.`
