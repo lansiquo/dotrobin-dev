@@ -4,3 +4,4 @@
 .homepage .profile-intro .cert-pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0}.cert-pill{display:inline-flex;align-items:center;padding:5px 12px;border:1px solid #81659e;border-radius:999px;background:#1d1726;color:var(--ink);font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.3px}.cert-pill-progress{border-style:dashed;border-color:#5f5470;background:none;color:var(--muted)}
 @media(min-width:1025px){.homepage .profile-intro{column-gap:36px}.homepage .profile-contact{border-left:1px solid var(--line);padding-left:28px;width:259px}}
 .lab-tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:auto 0 0;padding:7px 0 0}.lab-tags li{padding:3px 9px;border:1px solid #41404c;border-radius:999px;color:#c9bed7;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.collection+.collection{margin-top:48px}
