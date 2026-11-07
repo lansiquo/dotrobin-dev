@@ -3,7 +3,7 @@
 // Nothing is installed or scanned in the browser.
 (async () => {
   try {
-    const r = await fetch('sca-data.json?v=2');
+    const r = await fetch('sca-data.json?v=3');
     if (!r.ok) throw Error('data');
     const d = await r.json();
     const $ = (id) => document.getElementById(id);
@@ -37,7 +37,6 @@
     function render() {
       $('before').setAttribute('aria-pressed', String(side === 'before'));
       $('after').setAttribute('aria-pressed', String(side === 'after'));
-      $('provenance').textContent = `Recorded ${date} with sca-triage · Node ${d.node} / npm ${d.npm} · Linux · ${d.packagesScanned} installed packages scanned.`;
 
       const s = d.summary[side];
       const t = d.tests[side];

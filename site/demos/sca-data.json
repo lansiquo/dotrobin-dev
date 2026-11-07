@@ -1,8 +1,5 @@
 {
   "captured": "2026-11-04T03:59:18.627Z",
-  "tool": "sca-triage (lansiquo-sca-remediation-lab, commit a105673)",
-  "node": "v22.23.4",
-  "npm": "10.9.9",
   "packagesScanned": 33,
   "packages": [
     {
