@@ -3,7 +3,7 @@
 // Nothing is scanned in the browser. priority() and the gate mirror analyzers/triage.py.
 (async () => {
   try {
-    const response = await fetch('pr-data.json?v=triage-1');
+    const response = await fetch('pr-data.json?v=scope-1');
     if (!response.ok) throw Error('data');
     const data = await response.json();
     const $ = (id) => document.getElementById(id);
