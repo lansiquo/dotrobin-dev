@@ -10,6 +10,27 @@
     let current = 0;
     let variant = 'vulnerable';
 
+    function slug(name) {
+      return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+
+    function readHash() {
+      const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+      if (!raw) return null;
+      const [nameSlug, which] = raw.split('/');
+      const index = data.findIndex((d) => slug(d.name) === nameSlug);
+      if (index < 0) return null;
+      if (which === 'proposed-fix') return { index, variant: 'fixed' };
+      if (!which || which === 'original') return { index, variant: 'vulnerable' };
+      return null;
+    }
+
+    function syncHash(push) {
+      const next = `#${slug(data[current].name)}/${variant === 'fixed' ? 'proposed-fix' : 'original'}`;
+      if (location.hash === next) return;
+      history[push ? 'pushState' : 'replaceState'](null, '', next);
+    }
+
     function priority({ severity, code, confidence }) {
       const high = severity === 'CRITICAL' || severity === 'HIGH';
       const testCode = code === 'test';
@@ -59,9 +80,9 @@
       [...$('triage-rows').children].forEach((r) => r.classList.toggle('selected', Number(r.dataset.index) === current));
     }
 
-    function select(i) {
+    function select(i, nextVariant = 'vulnerable') {
       current = i;
-      variant = 'vulnerable';
+      variant = nextVariant;
       render();
     }
 
@@ -82,6 +103,7 @@
         open.textContent = `${d.category.split(' ')[0]} ${d.name}`;
         open.addEventListener('click', () => {
           select(i);
+          syncHash(true);
           $('examples').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         });
         const kind = document.createElement('span');
@@ -156,17 +178,26 @@
     data.forEach((d, i) => {
       const b = document.createElement('button');
       b.textContent = d.category + ' · ' + d.name;
-      b.addEventListener('click', () => select(i));
+      b.addEventListener('click', () => { select(i); syncHash(true); });
       $('choices').append(b);
     });
-    $('before').onclick = () => { variant = 'vulnerable'; render(); };
-    $('after').onclick = () => { variant = 'fixed'; render(); };
+    $('before').onclick = () => { variant = 'vulnerable'; render(); syncHash(true); };
+    $('after').onclick = () => { variant = 'fixed'; render(); syncHash(true); };
     $('inspect').onclick = () => {
       $('result').textContent = data[current].explanations[variant];
       $('result').hidden = false;
     };
     $('run-scan').onclick = runScan;
-    render();
+    const initial = readHash();
+    if (initial) select(initial.index, initial.variant);
+    else render();
+    if (initial) $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+    window.addEventListener('popstate', () => {
+      const next = readHash();
+      if (next) select(next.index, next.variant);
+      else select(0);
+      $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+    });
     $('app').hidden = false;
   } catch (e) {
     document.getElementById('load-error').hidden = false;

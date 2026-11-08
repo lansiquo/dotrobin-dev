@@ -11,3 +11,5 @@ table th{overflow-wrap:normal;word-break:normal}
 .triage-table tr.selected>td:first-child{background:#241d2e}
 .table-wrap caption{position:sticky;left:0;white-space:normal;text-align:left;max-width:calc(100vw - 80px)}
 .evidence-badge{display:block;width:max-content;margin-top:4px;padding:1px 7px;border:1px solid #5f5470;border-radius:999px;color:#c3b9cf;font:11px/1.4 system-ui,sans-serif}
+.demo-site-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0}
+.demo-site-links a{border-bottom:1px solid #625475;padding-bottom:2px}

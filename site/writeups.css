@@ -26,3 +26,5 @@
 /* Keep each environment field at a consistent position across lab writeups. */
 @media(max-width:1000px){.writeup .environment{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(5rem,auto) minmax(7rem,auto) minmax(5rem,auto) minmax(7rem,auto) minmax(9rem,auto) minmax(5rem,auto)}}
 .writeup .environment li{display:flex;align-items:center}.writeup .environment-item{min-width:0}
+.command-provenance{margin:1.5rem 0 .4rem;color:var(--muted);font:11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.04em}
+.writeup .command-provenance+pre{margin-top:0}

