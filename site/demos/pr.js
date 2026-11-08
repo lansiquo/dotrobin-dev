@@ -15,7 +15,12 @@
     }
 
     function readHash() {
-      const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+      let raw;
+      try {
+        raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+      } catch {
+        return null; // Malformed percent-encoding: treat it as no saved example.
+      }
       if (!raw) return null;
       const [nameSlug, which] = raw.split('/');
       const index = data.findIndex((d) => slug(d.name) === nameSlug);
@@ -201,9 +206,14 @@
     if (initial) $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
     window.addEventListener('popstate', () => {
       const next = readHash();
-      if (next) select(next.index, next.variant);
-      else select(0);
-      $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+      if (next) {
+        select(next.index, next.variant);
+        $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+      } else {
+        // Back to an entry with no saved example: reset the selection and let
+        // the browser restore that entry's scroll position.
+        select(0);
+      }
     });
     $('app').hidden = false;
   } catch (e) {
