@@ -91,16 +91,36 @@
       render();
     }
 
-    function renderTriage() {
+    // Triage replay. The table is built once per run, then each step fills in
+    // the part of the page it describes, so the page always matches the step list.
+    const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scanCount = data.filter((d) => d.mode === 'scan').length;
+    const behavioralCount = data.length - scanCount;
+    let rowRefs = [];
+    let runId = 0; // Bumped by Reset, so an older run stops at its next step.
+    let state = 'idle'; // idle | running | done
+
+    function pendingCell() {
+      const td = document.createElement('td');
+      td.className = 'cell-pending';
+      td.textContent = '—';
+      return td;
+    }
+
+    function fillCell(td, text, child) {
+      td.className = 'cell-filled';
+      td.replaceChildren(child || document.createTextNode(text));
+    }
+
+    function buildTriage() {
       const rows = $('triage-rows');
       rows.replaceChildren();
-      const blocking = [];
-      data.forEach((d, i) => {
+      rowRefs = data.map((d, i) => {
         const t = d.triage;
         const p = priority(t);
         const level = annotation(t, p);
-        if (level === 'failure') blocking.push(d.name);
         const tr = document.createElement('tr');
+        tr.hidden = true;
         const first = document.createElement('td');
         const open = document.createElement('button');
         open.type = 'button';
@@ -109,33 +129,29 @@
         open.addEventListener('click', () => {
           select(i);
           syncHash(true);
-          $('examples').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          $('examples').scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth' });
         });
         const kind = document.createElement('span');
         kind.className = 'evidence-badge';
         kind.textContent = d.mode === 'scan' ? 'Semgrep example' : 'Behavioral example';
         first.append(open, kind);
         tr.append(first);
-        const cells = [
+        for (const text of [
           `${t.file}:${t.line}`,
           titleCase(t.severity) + (t.confidence === 'LOW' ? ' · low confidence' : ''),
           t.code === 'test' ? 'Test' : 'Runtime',
-          t.new ? 'New' : 'Pre-existing',
-          p,
-        ];
-        for (const text of cells) {
+        ]) {
           const td = document.createElement('td');
           td.textContent = text;
           tr.append(td);
         }
-        const badge = document.createElement('td');
-        const span = document.createElement('span');
-        span.className = `badge badge-${level}`;
-        span.textContent = level === 'failure' ? 'Fails check' : level === 'warning' ? 'Warning' : 'Notice';
-        badge.append(span);
-        tr.append(badge);
+        const status = pendingCell();
+        const prio = pendingCell();
+        const note = pendingCell();
+        tr.append(status, prio, note);
         const whyRow = document.createElement('tr');
         whyRow.className = 'why-row';
+        whyRow.hidden = true;
         const why = document.createElement('td');
         why.colSpan = 7;
         const whyText = document.createElement('span');
@@ -145,7 +161,40 @@
         whyRow.append(why);
         tr.dataset.index = whyRow.dataset.index = String(i);
         rows.append(tr, whyRow);
+        return { d, t, p, level, tr, whyRow, status, prio, note };
       });
+      const gate = $('gate');
+      gate.className = 'gate gate-pending';
+      gate.textContent = 'Gate: waiting for the triage steps to finish.';
+      render();
+    }
+
+    function showRows(mode) {
+      for (const r of rowRefs) {
+        if (r.d.mode !== mode) continue;
+        r.tr.hidden = false;
+        r.tr.classList.add('row-in');
+      }
+    }
+
+    function fillStatus() {
+      for (const r of rowRefs) fillCell(r.status, r.t.new ? 'New' : 'Pre-existing');
+    }
+
+    function fillPriority() {
+      for (const r of rowRefs) fillCell(r.prio, r.p);
+    }
+
+    function decide() {
+      const blocking = [];
+      for (const r of rowRefs) {
+        const span = document.createElement('span');
+        span.className = `badge badge-${r.level}`;
+        span.textContent = r.level === 'failure' ? 'Fails check' : r.level === 'warning' ? 'Warning' : 'Notice';
+        fillCell(r.note, '', span);
+        r.whyRow.hidden = false;
+        if (r.level === 'failure') blocking.push(r.d.name);
+      }
       const gate = $('gate');
       if (blocking.length) {
         gate.className = 'gate gate-fail';
@@ -154,38 +203,109 @@
         gate.className = 'gate gate-pass';
         gate.textContent = 'Gate: PASS — no new P1 findings.';
       }
-      $('triage-output').hidden = false;
-      render();
+    }
+
+    const steps = [
+      {
+        label: 'Open pull request #42',
+        status: `Opening simulated pull request #42 with ${data.length} curated examples. Nothing is fetched.`,
+        apply: () => { buildTriage(); $('triage-output').hidden = false; },
+      },
+      {
+        label: `Replay ${scanCount} Semgrep findings`,
+        status: `Adding the ${scanCount} saved Semgrep findings to the table.`,
+        apply: () => showRows('scan'),
+      },
+      {
+        label: `Replay ${behavioralCount} behavioral findings`,
+        status: `Adding the ${behavioralCount} saved behavioral test results to the table.`,
+        apply: () => showRows('behavioral'),
+      },
+      {
+        label: 'Label new or pre-existing',
+        status: 'Labelling each finding: is it on a line this pull request changed?',
+        apply: fillStatus,
+      },
+      {
+        label: 'Rank P1–P3',
+        status: 'Ranking each finding by severity, runtime or test code, and rule confidence.',
+        apply: fillPriority,
+      },
+      {
+        label: 'Decide the check',
+        status: 'Annotating each finding and deciding whether the check fails.',
+        apply: decide,
+      },
+    ];
+
+    function stepItems() {
+      return [...$('run-steps').children];
+    }
+
+    function setStep(active) {
+      stepItems().forEach((li, i) => {
+        li.className = i < active ? 'is-done' : i === active ? 'is-active' : 'is-pending';
+        if (i === active) li.setAttribute('aria-current', 'step');
+        else li.removeAttribute('aria-current');
+      });
+    }
+
+    function setControls(next, detail) {
+      state = next;
+      const button = $('run-scan');
+      button.disabled = next === 'running';
+      $('run-icon').textContent = next === 'done' ? '↻' : '▶';
+      $('run-label').textContent = next === 'running' ? `Running… ${detail}` : next === 'done' ? 'Run again' : 'Run demo';
+      $('reset-scan').hidden = next === 'idle';
+      $('reset-scan').textContent = next === 'running' ? 'Stop and reset' : 'Reset';
+    }
+
+    function resetDemo() {
+      runId += 1;
+      setStep(-1);
+      $('triage-output').hidden = true;
+      $('triage-rows').replaceChildren();
+      rowRefs = [];
+      $('scan-status').textContent = '';
+      setControls('idle');
     }
 
     async function runScan() {
-      const button = $('run-scan');
-      const status = $('scan-status');
-      const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650;
+      if (state === 'running') return;
+      if (state === 'done') resetDemo();
+      const id = ++runId;
+      const delay = reducedMotion() ? 0 : 800;
       const wait = () => new Promise((r) => setTimeout(r, delay));
-      button.disabled = true;
-      button.textContent = 'Running demo';
-      $('triage-output').hidden = true;
+      const status = $('scan-status');
       try {
-        for (const step of [
-          'Simulated pull request #42 · 10 curated examples, not a live fetch.',
-          'Replaying four saved Semgrep examples.',
-          'Replaying six saved behavioral examples.',
-          'Applying the saved new and pre-existing labels.',
-        ]) {
-          status.textContent = step;
+        for (let i = 0; i < steps.length; i += 1) {
+          setControls('running', `step ${i + 1} of ${steps.length}`);
+          setStep(i);
+          status.textContent = steps[i].status;
+          steps[i].apply();
           await wait();
+          if (id !== runId) return; // Reset was pressed.
         }
-        status.textContent = 'Replay complete: 10 curated examples. Nothing was scanned.';
-        renderTriage();
-        button.disabled = false;
-        button.textContent = 'Replay demo';
+        setStep(steps.length);
+        status.textContent = `Replay complete: ${data.length} curated examples. Nothing was scanned.`;
+        setControls('done');
       } catch (e) {
-        if (status) status.textContent = 'The saved demo did not finish. Nothing was scanned.';
-        button.disabled = false;
-        button.textContent = 'Run demo';
+        if (id !== runId) return;
+        status.textContent = 'The saved demo did not finish. Nothing was scanned.';
+        setControls('done');
       }
     }
+
+    steps.forEach((step) => {
+      const li = document.createElement('li');
+      li.className = 'is-pending';
+      li.textContent = step.label;
+      $('run-steps').append(li);
+    });
+    $('reset-scan').onclick = () => {
+      resetDemo();
+      $('run-scan').focus();
+    };
 
     data.forEach((d, i) => {
       const b = document.createElement('button');
