@@ -31,3 +31,4 @@ table th{overflow-wrap:normal;word-break:normal}
 @media(prefers-reduced-motion:no-preference){.triage-table tr.row-in>td,.triage-table td.cell-filled{animation:cell-in .6s ease-out}.run-steps li{transition:background .2s,border-color .2s,color .2s}}
 @keyframes cell-in{from{background-color:#3b2d55}}
 @media(max-width:700px){.run-steps{grid-template-columns:1fr 1fr}.run-controls button{flex:1 1 auto}}
+.gate+.metrics{margin-top:14px}
