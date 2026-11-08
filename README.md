@@ -4,7 +4,7 @@ Robin Lansiquot’s static security portfolio. Public files live in `site/`; Git
 
 ## Project status
 
-- **sca-triage: Version 1.0.** An npm SCA scanner, run from the command line or as a GitHub Action. It scans dependencies, ranks findings by import evidence, applies the proposed upgrades, runs the project's tests, rescans and saves before-and-after evidence. CI runs the full lab workflow on every change. See the [case study](https://dotrobin.dev/sca-triage.html) and the [repository](https://github.com/lansiquo/sca-triage).
+- **sca-triage: Version 1.0.** An npm SCA scanner, run from the command line or as a GitHub Action. It scans dependencies, ranks findings by import evidence, applies the proposed upgrades, runs the project's tests, rescans and saves before-and-after evidence. CI runs the full lab workflow on every push to `main` and every pull request. See the [case study](https://dotrobin.dev/sca-triage.html) and the [repository](https://github.com/lansiquo/sca-triage).
 - **sast-triage: Version 1.0.** A Semgrep pull request reviewer that labels each finding new or pre-existing, ranks it P1–P3 and fails the check only on new P1 findings. It runs locally and in its own CI; live GitHub deployment is prepared and not yet complete. See the [case study](https://dotrobin.dev/sast-triage.html) and the [repository](https://github.com/lansiquo/sast-triage).
 
 ## Interactive project demos
