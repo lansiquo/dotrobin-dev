@@ -1,6 +1,6 @@
 # Write-up evidence
 
-All 12 listed screenshots are authentic selected crops from the isolated offline lab. On October 30, 2026, the owner explicitly authorized public disclosure of ordinary lab IPs, usernames, hostnames and system details. The selected unmasked copies were visually inspected before restoration; no passwords, tokens, cookies or private keys were visible in this set. PNG metadata is stripped. Source originals remain outside this repository. No generated terminal imagery is used. The Blue options capture retains its application-chrome crop.
+`site/evidence/` holds 23 screenshots: the 12 Blackpearl, Blue and Butler captures in the table below, 4 Academy and 4 Dev captures listed in their sections, and 3 sca-triage captures listed under "sca-triage case study". The 12 tabled screenshots are authentic selected crops from the isolated offline lab. On October 30, 2026, the owner explicitly authorized public disclosure of ordinary lab IPs, usernames, hostnames and system details. The selected unmasked copies were visually inspected before restoration; no passwords, tokens, cookies or private keys were visible in this set. PNG metadata is stripped. Source originals remain outside this repository. No generated terminal imagery is used. The Blue options capture retains its application-chrome crop.
 
 | Public image | Original capture timestamp | Content |
 | --- | --- | --- |
@@ -60,3 +60,15 @@ Architecture values describe the target guest operating systems, not the Kali at
 - Dev: x86_64 (64-bit), cross-checked against the original researcher's target reverse-shell banner, `Linux dev 4.19.0-16-amd64 ... x86_64 GNU/Linux`, in section 12: https://ainkun.medium.com/tcmsecurity-dev-write-up-eee565738e78 .
 
 The external transcripts establish the standard lab images' architecture; they are not represented as captures from the owner's sessions. No new terminal output or screenshots were added.
+
+## sca-triage case study
+
+These 3 PNGs back `site/sca-triage.html`. They are terminal captures of the owner's own sca-triage remediation lab (`lansiquo-sca-remediation-lab`, an intentionally vulnerable npm app), not the offline penetration-testing lab. Each holds only IHDR/IDAT/IEND chunks; ancillary metadata is absent. Original capture timestamps were not recorded in this repository and are not invented here; the report capture shows its own generation time.
+
+| Public image | Original capture timestamp | Content |
+| --- | --- | --- |
+| sca-apply-fixes.png | Not recorded | `sca-triage fix --apply`: four pinned upgrades with `--ignore-scripts`, passing `npm test`, 0 vulnerable packages, evidence directory |
+| sca-clean-rescan.png | Not recorded | Follow-up scan: 37 packages, 0 vulnerable, P1 gate passes |
+| sca-remediation-report.png | Report generated 2026-11-04T20:04:43.088Z (shown in capture) | REPORT.md: before (4 vulnerable; P1 3, P2 1), changes applied, test failure-to-pass transition, after (0 vulnerable), stated limits |
+
+The captures show the workstation prompt (`dotrobin@macbook`) and local project paths under `~/Development/projects/`; no passwords, tokens, cookies or private keys are visible.
