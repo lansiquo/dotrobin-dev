@@ -10,6 +10,27 @@
     let current = 0;
     let variant = 'vulnerable';
 
+    function slug(name) {
+      return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+
+    function readHash() {
+      const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+      if (!raw) return null;
+      const [nameSlug, which] = raw.split('/');
+      const index = data.findIndex((d) => slug(d.name) === nameSlug);
+      if (index < 0) return null;
+      if (which === 'proposed-fix') return { index, variant: 'fixed' };
+      if (!which || which === 'original') return { index, variant: 'vulnerable' };
+      return null;
+    }
+
+    function syncHash(push) {
+      const next = `#${slug(data[current].name)}/${variant === 'fixed' ? 'proposed-fix' : 'original'}`;
+      if (location.hash === next) return;
+      history[push ? 'pushState' : 'replaceState'](null, '', next);
+    }
+
     function priority({ severity, code, confidence }) {
       const high = severity === 'CRITICAL' || severity === 'HIGH';
       const testCode = code === 'test';
@@ -46,7 +67,7 @@
 
     function render() {
       const d = data[current];
-      $('category').textContent = d.category + ' · ' + (d.mode === 'scan' ? 'Static analysis example' : 'Behavior test example');
+      $('category').textContent = d.category + ' · ' + (d.mode === 'scan' ? 'Semgrep example' : 'Behavioral example');
       $('name').textContent = d.name;
       $('impact').textContent = d.impact;
       $('source').textContent = d.sources[variant];
@@ -59,9 +80,9 @@
       [...$('triage-rows').children].forEach((r) => r.classList.toggle('selected', Number(r.dataset.index) === current));
     }
 
-    function select(i) {
+    function select(i, nextVariant = 'vulnerable') {
       current = i;
-      variant = 'vulnerable';
+      variant = nextVariant;
       render();
     }
 
@@ -82,9 +103,13 @@
         open.textContent = `${d.category.split(' ')[0]} ${d.name}`;
         open.addEventListener('click', () => {
           select(i);
+          syncHash(true);
           $('examples').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         });
-        first.append(open);
+        const kind = document.createElement('span');
+        kind.className = 'evidence-badge';
+        kind.textContent = d.mode === 'scan' ? 'Semgrep example' : 'Behavioral example';
+        first.append(open, kind);
         tr.append(first);
         const cells = [
           `${t.file}:${t.line}`,
@@ -136,34 +161,43 @@
       button.disabled = true;
       $('triage-output').hidden = true;
       for (const step of [
-        'Fetching pull request #42 · 10 changed files…',
-        'Running Semgrep rules on changed files…',
-        'Running behavioral checks…',
-        'Comparing findings with the base branch…',
+        'Simulated pull request #42 · 10 curated examples, not a live fetch.',
+        'Replaying four saved Semgrep examples.',
+        'Replaying six saved behavioral examples.',
+        'Applying the saved new and pre-existing labels.',
       ]) {
-        status.textContent = `Replay: ${step}`;
+        status.textContent = step;
         await wait();
       }
-      status.textContent = 'Replay complete: 10 findings triaged.';
+      status.textContent = 'Replay complete: 10 curated examples. Nothing was scanned.';
       renderTriage();
       button.disabled = false;
-      button.textContent = 'Run scan again';
+      button.textContent = 'Replay demo again';
     }
 
     data.forEach((d, i) => {
       const b = document.createElement('button');
       b.textContent = d.category + ' · ' + d.name;
-      b.addEventListener('click', () => select(i));
+      b.addEventListener('click', () => { select(i); syncHash(true); });
       $('choices').append(b);
     });
-    $('before').onclick = () => { variant = 'vulnerable'; render(); };
-    $('after').onclick = () => { variant = 'fixed'; render(); };
+    $('before').onclick = () => { variant = 'vulnerable'; render(); syncHash(true); };
+    $('after').onclick = () => { variant = 'fixed'; render(); syncHash(true); };
     $('inspect').onclick = () => {
       $('result').textContent = data[current].explanations[variant];
       $('result').hidden = false;
     };
     $('run-scan').onclick = runScan;
-    render();
+    const initial = readHash();
+    if (initial) select(initial.index, initial.variant);
+    else render();
+    if (initial) $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+    window.addEventListener('popstate', () => {
+      const next = readHash();
+      if (next) select(next.index, next.variant);
+      else select(0);
+      $('examples').scrollIntoView({ behavior: 'auto', block: 'start' });
+    });
     $('app').hidden = false;
   } catch (e) {
     document.getElementById('load-error').hidden = false;
