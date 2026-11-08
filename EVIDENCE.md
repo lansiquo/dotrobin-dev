@@ -63,12 +63,14 @@ The external transcripts establish the standard lab images' architecture; they a
 
 ## sca-triage case study
 
-These 3 PNGs back `site/sca-triage.html`. They are terminal captures of the owner's own sca-triage remediation lab (`lansiquo-sca-remediation-lab`, an intentionally vulnerable npm app), not the offline penetration-testing lab. Each holds only IHDR/IDAT/IEND chunks; ancillary metadata is absent. Original capture timestamps were not recorded in this repository and are not invented here; the report capture shows its own generation time.
+These 5 PNGs back `site/sca-triage.html`. They are terminal captures of the owner's own sca-triage remediation lab (`lansiquo-sca-remediation-lab`, an intentionally vulnerable npm app), not the offline penetration-testing lab. Each holds only IHDR/IDAT/IEND chunks; ancillary metadata is absent. Original capture timestamps were not recorded in this repository and are not invented here; the report capture shows its own generation time.
 
 | Public image | Original capture timestamp | Content |
 | --- | --- | --- |
-| sca-apply-fixes.png | Not recorded | `sca-triage fix --apply`: four pinned upgrades with `--ignore-scripts`, passing `npm test`, 0 vulnerable packages, evidence directory |
+| sca-lab-install.png | 2026-11-08 (supplied by the owner; exact time not recorded) | Fresh `git clone` and `npm run lab:install`: 33 packages added, npm deprecation warning for tar 6.1.0 |
+| sca-baseline-scan.png | 2026-11-08 (supplied by the owner; exact time not recorded) | `npm run lab:scan`: 33 packages, 4 vulnerable (P1 3, P2 1) with import locations and fix versions; P1 gate fails |
+| sca-plan-apply.png | 2026-11-08 (supplied by the owner; exact time not recorded) | `npm run lab:plan` dry run, then `fix --apply` on a copy: four pinned upgrades with `--ignore-scripts`, passing `npm test`, 0 vulnerable packages, evidence directory |
 | sca-clean-rescan.png | Not recorded | Follow-up scan: 37 packages, 0 vulnerable, P1 gate passes |
 | sca-remediation-report.png | Report generated 2026-11-04T20:04:43.088Z (shown in capture) | REPORT.md: before (4 vulnerable; P1 3, P2 1), changes applied, test failure-to-pass transition, after (0 vulnerable), stated limits |
 
-The captures show the workstation prompt (`dotrobin@macbook`) and local project paths under `~/Development/projects/`; no passwords, tokens, cookies or private keys are visible.
+The captures show the workstation prompt (`dotrobin@macbook` or `dotrobin@mac`) and local project paths under `~/Development/projects/`; the bottom row of `sca-lab-install.png` and `sca-plan-apply.png` was cropped to remove a partial next prompt; no passwords, tokens, cookies or private keys are visible.
