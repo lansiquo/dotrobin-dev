@@ -1,6 +1,6 @@
 # Write-up evidence
 
-`site/evidence/` holds 23 screenshots: the 12 Blackpearl, Blue and Butler captures in the table below, 4 Academy and 4 Dev captures listed in their sections, and 3 sca-triage captures listed under "sca-triage case study". The 12 tabled screenshots are authentic selected crops from the isolated offline lab. On October 30, 2026, the owner explicitly authorized public disclosure of ordinary lab IPs, usernames, hostnames and system details. The selected unmasked copies were visually inspected before restoration; no passwords, tokens, cookies or private keys were visible in this set. PNG metadata is stripped. Source originals remain outside this repository. No generated terminal imagery is used. The Blue options capture retains its application-chrome crop.
+`site/evidence/` holds 23 screenshots: the 12 Blackpearl, Blue and Butler captures in the table below, 4 Academy and 4 Dev captures listed in their sections, and 3 sca-triage captures listed under "sca-triage case study". The 12 tabled screenshots are authentic selected crops from the isolated offline lab. The owner explicitly authorized public disclosure of ordinary lab IPs, usernames, hostnames and system details. The selected unmasked copies were visually inspected before restoration; no passwords, tokens, cookies or private keys were visible in this set. PNG metadata is stripped. Source originals remain outside this repository. No generated terminal imagery is used. The Blue options capture retains its application-chrome crop.
 
 | Public image | Original capture timestamp | Content |
 | --- | --- | --- |
@@ -25,7 +25,7 @@
 - Browser/reference-page screenshots with unrelated bookmarks and personal context were excluded. Duplicate captures and generated investigation diagrams were excluded.
 - Recommended remediation is advice, not a claim of remediation performed or a formal client report.
 
-## Academy draft (source reviewed November 3, 2026)
+## Academy draft
 
 Primary source: owner's Obsidian Academy/Reporting.md, cross-checked against its linked lab captures. Butler/Reporting.md was also reviewed; the existing complete Butler article already reflects it and was not duplicated.
 
@@ -37,7 +37,7 @@ Academy selected PNGs preserve original IHDR/IDAT pixel data, stripping ancillar
 
 Reporting.md's later example listener ports 4444 and 5555 differ from the captures; article explicitly distinguishes them and uses captured commands for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
 
-## Dev (source reviewed November 3, 2026)
+## Dev
 
 Primary source: owner's Obsidian Dev/Reporting.md. Cross-checked linked scanning notes plus contemporaneous captures. The report's SSH `user` is explicitly treated as a placeholder; an earlier captured jp attempt failed, whereas later captures show jeanpaul. The exact successful login command is not retained. The report's expected id output is not claimed as observed.
 
@@ -49,7 +49,7 @@ Selected authentic PNGs (original pixel payloads; metadata stripped):
 
 Excluded: 20261023124042 exposes an OpenSSH private key; 20261023174827 exposes the recovered archive password. Generated diagrams/flag explanations are not used as terminal evidence. No passwords, credential hashes or private-key contents were copied. Generic user template preserved; root result directly captured. Technique cross-check: https://gtfobins.org/gtfobins/zip/ .
 
-## Target architecture review (November 4, 2026)
+## Target architecture review
 
 Architecture values describe the target guest operating systems, not the Kali attacker or physical host. x86_64, amd64 and Windows x64 are the 64-bit x86 architecture. The owner confirmed that Blackpearl, Butler and Dev were the standard TCM Practical Ethical Hacking VM downloads, without rebuilding their operating systems.
 
