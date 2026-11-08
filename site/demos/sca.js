@@ -21,13 +21,13 @@
       const f = d.tests.functional[side];
       const majors = d.packages.filter((p) => p.majorUpgrade);
       const majorNote = majors.length
-        ? ` ${majors.map((p) => `${p.name} ${p.before} to ${p.after}`).join(', ')} is a recorded major upgrade. The saved tests do not include a separate compatibility check for that change.`
+        ? ` ${majors.map((p) => `${p.name} ${p.before} to ${p.after}`).join(', ')} is a recorded major upgrade, flagged for release-note review. The saved tests cover the app’s own behavior.`
         : '';
       const texts = {
         audit:
           side === 'before'
             ? `Recorded scan: ${s.vulnerable} vulnerable packages and ${s.advisories} advisories. Ranked P1: ${s.P1}, P2: ${s.P2}. tar has critical advisories but ranks P2 because nothing in the app imports it. The P1 gate failed.`
-            : `Recorded rescan after the upgrades: ${s.vulnerable} vulnerable packages. The P1 gate passed. This reflects the advisory database at the time of the run, not a security certification.${majorNote}`,
+            : `Recorded rescan after the upgrades: ${s.vulnerable} vulnerable packages. The P1 gate passed. This reflects the advisory database at scan time; zero findings is not a security certification.${majorNote}`,
         security:
           side === 'before'
             ? `Recorded security test FAILED, as expected: untrusted option tokens made minimist place a harmless marker on Function.prototype. This is the one advisory the lab proves end to end; no code execution or data theft is claimed.`
