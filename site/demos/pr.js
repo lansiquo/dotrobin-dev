@@ -208,7 +208,7 @@
     const steps = [
       {
         label: 'Open pull request #42',
-        status: `Opening simulated pull request #42 with ${data.length} curated examples. Nothing is fetched.`,
+        status: `Opening pull request #42 with ${data.length} examples.`,
         apply: () => { buildTriage(); $('triage-output').hidden = false; },
       },
       {
@@ -287,11 +287,11 @@
           if (id !== runId) return; // Reset was pressed.
         }
         setStep(steps.length);
-        status.textContent = `Replay complete: ${data.length} curated examples. Nothing was scanned.`;
+        status.textContent = `Triage complete: ${data.length} findings labelled, ranked and checked.`;
         setControls('done');
       } catch (e) {
         if (id !== runId) return;
-        status.textContent = 'The saved demo did not finish. Nothing was scanned.';
+        status.textContent = 'The demo did not finish. Reload the page to try again.';
         setControls('done');
       }
     }
