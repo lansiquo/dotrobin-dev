@@ -17,7 +17,7 @@
 <figcaption>Setup: clone the repository and install the lab app’s pinned dependencies with install scripts disabled. <a href="evidence/sca-lab-install.png" target="_blank" rel="noopener">View full size</a>.</figcaption>
 </figure>
 <figure class="sca-capture">
-<a class="sca-capture-image" href="evidence/sca-baseline-scan.png" target="_blank" rel="noopener" aria-label="Open the baseline scan screenshot at full size (opens in a new tab)"><img src="evidence/sca-baseline-scan.png" width="1386" height="559" loading="lazy" decoding="async" alt="sca-triage scan of the lab app: 33 packages scanned, 4 vulnerable. P1: minimist 1.2.5 critical, axios 1.6.0 high with 31 advisories and semver 7.5.1 high, each imported by the app’s code. P2: tar 6.1.0 critical with 18 advisories, not imported. The P1 gate fails."></a>
+<a class="sca-capture-image" href="evidence/sca-baseline-scan.png" target="_blank" rel="noopener" aria-label="Open the baseline scan screenshot at full size (opens in a new tab)"><img src="evidence/sca-baseline-scan.png" width="1229" height="529" loading="lazy" decoding="async" alt="sca-triage scan of the lab app: 33 packages scanned, 4 vulnerable. P1: minimist 1.2.5 critical, axios 1.6.0 high with 31 advisories and semver 7.5.1 high, each imported by the app’s code. P2: tar 6.1.0 critical with 18 advisories, not imported. The P1 gate fails."></a>
 <figcaption>Each finding shows where the app imports the package and the smallest fixing version. The P1 gate fails, so the command exits with code 1. <a href="evidence/sca-baseline-scan.png" target="_blank" rel="noopener">View full size</a>.</figcaption>
 </figure>
 </li>
