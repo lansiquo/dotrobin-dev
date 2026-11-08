@@ -1,6 +1,6 @@
 # Standalone portfolio demonstrations
 
-[PR review walkthrough](https://dotrobin.dev/demos/pr.html) · [SCA evidence explorer](https://dotrobin.dev/demos/sca.html)
+[PR review walkthrough](https://dotrobin.dev/demos/sast-triage.html) · [SCA evidence explorer](https://dotrobin.dev/demos/sca.html)
 
 Only static HTML/CSS/JavaScript and curated JSON are deployed. No source evaluator, scanner service, credential, arbitrary input endpoint or localhost request exists.
 

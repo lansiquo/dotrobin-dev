@@ -11,7 +11,7 @@ These labels describe the tools. The browser demos below are separate static pre
 
 ## Interactive project demos
 
-- [sast-triage](https://dotrobin.dev/demos/pr.html): explore ten curated review examples and proposed fixes. Illustrative explanations only; no Python execution, Semgrep scan or GitHub action occurs in the browser.
+- [sast-triage](https://dotrobin.dev/demos/sast-triage.html): explore ten curated review examples and proposed fixes. Illustrative explanations only; no Python execution, Semgrep scan or GitHub action occurs in the browser.
 - [sca-triage](https://dotrobin.dev/demos/sca.html): switch between the recorded four-dependency inventories and inspect recorded audit/security/functional-test results. This is a replay, not a fresh registry scan or test run.
 
 These standalone demonstrations are separate from the real local applications. They accept no uploads and expose no backend or private infrastructure.

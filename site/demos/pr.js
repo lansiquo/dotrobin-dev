@@ -159,20 +159,27 @@
       const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650;
       const wait = () => new Promise((r) => setTimeout(r, delay));
       button.disabled = true;
+      button.textContent = 'Running demo';
       $('triage-output').hidden = true;
-      for (const step of [
-        'Simulated pull request #42 · 10 curated examples, not a live fetch.',
-        'Replaying four saved Semgrep examples.',
-        'Replaying six saved behavioral examples.',
-        'Applying the saved new and pre-existing labels.',
-      ]) {
-        status.textContent = step;
-        await wait();
+      try {
+        for (const step of [
+          'Simulated pull request #42 · 10 curated examples, not a live fetch.',
+          'Replaying four saved Semgrep examples.',
+          'Replaying six saved behavioral examples.',
+          'Applying the saved new and pre-existing labels.',
+        ]) {
+          status.textContent = step;
+          await wait();
+        }
+        status.textContent = 'Replay complete: 10 curated examples. Nothing was scanned.';
+        renderTriage();
+        button.disabled = false;
+        button.textContent = 'Replay demo';
+      } catch (e) {
+        if (status) status.textContent = 'The saved demo did not finish. Nothing was scanned.';
+        button.disabled = false;
+        button.textContent = 'Run demo';
       }
-      status.textContent = 'Replay complete: 10 curated examples. Nothing was scanned.';
-      renderTriage();
-      button.disabled = false;
-      button.textContent = 'Replay demo again';
     }
 
     data.forEach((d, i) => {
