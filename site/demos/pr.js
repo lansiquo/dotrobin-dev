@@ -46,7 +46,7 @@
 
     function render() {
       const d = data[current];
-      $('category').textContent = d.category + ' · ' + (d.mode === 'scan' ? 'Static analysis example' : 'Behavior test example');
+      $('category').textContent = d.category + ' · ' + (d.mode === 'scan' ? 'Semgrep example' : 'Behavioral example');
       $('name').textContent = d.name;
       $('impact').textContent = d.impact;
       $('source').textContent = d.sources[variant];
@@ -84,7 +84,10 @@
           select(i);
           $('examples').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         });
-        first.append(open);
+        const kind = document.createElement('span');
+        kind.className = 'evidence-badge';
+        kind.textContent = d.mode === 'scan' ? 'Semgrep example' : 'Behavioral example';
+        first.append(open, kind);
         tr.append(first);
         const cells = [
           `${t.file}:${t.line}`,
@@ -136,18 +139,18 @@
       button.disabled = true;
       $('triage-output').hidden = true;
       for (const step of [
-        'Fetching pull request #42 · 10 changed files…',
-        'Running Semgrep rules on changed files…',
-        'Running behavioral checks…',
-        'Comparing findings with the base branch…',
+        'Simulated pull request #42 · 10 curated examples, not a live fetch.',
+        'Replaying four saved Semgrep examples.',
+        'Replaying six saved behavioral examples.',
+        'Applying the saved new and pre-existing labels.',
       ]) {
-        status.textContent = `Replay: ${step}`;
+        status.textContent = step;
         await wait();
       }
-      status.textContent = 'Replay complete: 10 findings triaged.';
+      status.textContent = 'Replay complete: 10 curated examples. Nothing was scanned.';
       renderTriage();
       button.disabled = false;
-      button.textContent = 'Run scan again';
+      button.textContent = 'Replay demo again';
     }
 
     data.forEach((d, i) => {
