@@ -1,167 +1,33 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests"><link rel="canonical" href="https://dotrobin.dev/sca-triage.html"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><meta name="description" content="A captured SCA remediation workflow: scan an intentionally vulnerable npm app, apply four dependency upgrades, run tests and confirm a clean rescan."><title>sca-triage · dotrobin</title><meta property="og:type" content="website"><meta property="og:site_name" content="dotrobin.dev"><meta property="og:title" content="sca-triage · dotrobin"><meta property="og:description" content="A captured SCA remediation workflow: scan an intentionally vulnerable npm app, apply four dependency upgrades, run tests and confirm a clean rescan."><meta property="og:url" content="https://dotrobin.dev/sca-triage.html"><meta property="og:image" content="https://dotrobin.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Robin Lansiquot, application security portfolio"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="portfolio.css?v=nav-1"><link rel="stylesheet" href="reading.css?v=nav-1"><script src="reading.js?v=continuous-1" defer></script><link rel="stylesheet" href="detail-header.css?v=nav-1"><link rel="stylesheet" href="collection.css?v=nav-1"><link rel="stylesheet" href="project-links.css?v=source-actions-2"><link rel="stylesheet" href="sca-workflow.css?v=workflow-4"><link rel="stylesheet" href="contact.css?v=1"><script src="contact.js?v=1" defer></script></head><body class="detail-page"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><nav class="site-nav" aria-label="Main"><a href="index.html#projects" aria-current="true">Projects</a><a href="index.html#writeups">Writeups</a><a href="Robin_Lansiquot_Resume.pdf" target="_blank" rel="noopener">Résumé</a><a href="#contact">Contact</a></nav></header><div class="shell"><main id="main" tabindex="-1"><div class="content article sca-article"><header class="detail-heading"><div class="detail-identity"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 21 6v6c0 5-9 10-9 10S3 17 3 12V6Z"/><path d="m9 9-3 3 3 3m6-6 3 3-3 3m-2-7-2 9"/></svg><div><span class="detail-kind">FEATURED PROJECT</span><h1>sca-triage</h1></div></div></header><p class="lead">I built <code>sca-triage</code>, an npm SCA scanner that ranks vulnerabilities by whether your code loads the vulnerable package, applies the smallest safe upgrades and checks them with the project’s tests. This lab takes one app from four vulnerable dependencies to a clean rescan.</p><section class="project-resources project-resources--paired" aria-label="sca-triage source and demo"><div class="resource-heading">Explore the project</div><div class="resource-actions"><a class="project-link project-link--demo" href="demos/sca.html"><svg class="resource-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 8h18m-11 3 5 3-5 3z"/></svg><span class="resource-copy"><strong class="resource-title">Try interactive demo</strong><span class="resource-meta">Step through a recorded run</span></span></a><a class="project-link project-link--source" href="https://github.com/lansiquo/sca-triage" target="_blank" rel="noopener" aria-label="View sca-triage source on GitHub (opens in a new tab)"><svg class="resource-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M6 7.5v9M18 8.5v2a5 5 0 0 1-5 5H6"/></svg><span class="resource-copy"><strong class="resource-title">Version 1.2 on GitHub</strong><span class="resource-meta">CLI · GitHub Action · Runnable lab</span></span></a></div></section><p class="notice"><strong>Version 1.2</strong> runs locally and as a GitHub Action. The demo replays a recorded run; the terminal output below is from the real CLI.</p>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests"><link rel="canonical" href="https://dotrobin.dev/sca-triage.html"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><meta name="description" content="sca-triage on OWASP NodeGoat: ranks 180 vulnerable npm packages by import evidence, applies the 12 P1 upgrades and rescans."><title>sca-triage · dotrobin</title><meta property="og:type" content="website"><meta property="og:site_name" content="dotrobin.dev"><meta property="og:title" content="sca-triage · dotrobin"><meta property="og:description" content="sca-triage on OWASP NodeGoat: ranks 180 vulnerable npm packages by import evidence, applies the 12 P1 upgrades and rescans."><meta property="og:url" content="https://dotrobin.dev/sca-triage.html"><meta property="og:image" content="https://dotrobin.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Robin Lansiquot, application security portfolio"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="portfolio.css?v=nav-1"><link rel="stylesheet" href="reading.css?v=nav-1"><script src="reading.js?v=continuous-1" defer></script><link rel="stylesheet" href="detail-header.css?v=nav-1"><link rel="stylesheet" href="collection.css?v=nav-1"><link rel="stylesheet" href="project-links.css?v=source-actions-2"><link rel="stylesheet" href="sca-workflow.css?v=workflow-4"><link rel="stylesheet" href="contact.css?v=1"><script src="contact.js?v=1" defer></script></head><body class="detail-page"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><nav class="site-nav" aria-label="Main"><a href="index.html#projects" aria-current="true">Projects</a><a href="index.html#writeups">Writeups</a><a href="Robin_Lansiquot_Resume.pdf" target="_blank" rel="noopener">Résumé</a><a href="#contact">Contact</a></nav></header><div class="shell"><main id="main" tabindex="-1"><div class="content article sca-article"><header class="detail-heading"><div class="detail-identity"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 21 6v6c0 5-9 10-9 10S3 17 3 12V6Z"/><path d="m9 9-3 3 3 3m6-6 3 3-3 3m-2-7-2 9"/></svg><div><span class="detail-kind">FEATURED PROJECT</span><h1>sca-triage</h1></div></div></header><p class="lead">I built <code>sca-triage</code>, an npm SCA scanner that ranks vulnerabilities by whether your code loads the vulnerable package, applies the smallest safe upgrades and checks them with the project’s tests. Here it runs on OWASP NodeGoat, a real app with 1,479 locked packages.</p><section class="project-resources project-resources--single" aria-label="sca-triage source"><div class="resource-heading">Explore the project</div><div class="resource-actions"><a class="project-link project-link--source" href="https://github.com/lansiquo/sca-triage" target="_blank" rel="noopener" aria-label="View sca-triage source on GitHub (opens in a new tab)"><svg class="resource-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M6 7.5v9M18 8.5v2a5 5 0 0 1-5 5H6"/></svg><span class="resource-copy"><strong class="resource-title">Version 1.2 on GitHub</strong><span class="resource-meta">CLI · GitHub Action</span></span></a></div></section><p class="notice"><strong>Version 1.2</strong> runs locally and as a GitHub Action. The terminal output below is from the real CLI.</p>
 <div class="reading-layout">
-<div class="reading-toc"><details class="contents-menu" open><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="On this page"><a href="#scope">The problem</a><a href="#workflow">Scan, fix, rescan</a><a href="#report">Generated report</a><a href="#outcome">What changed</a><a href="#decision">How it works</a><a href="#nodegoat">On a real project</a><a href="#verification">What has been verified</a><a href="#limits">Scope and limits</a><a href="#run">Run it yourself</a></nav></details></div>
+<div class="reading-toc"><details class="contents-menu" open><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="On this page"><a href="#scope">The problem</a><a href="#workflow">Scan, fix, rescan</a><a href="#report">Generated report</a><a href="#outcome">What changed</a><a href="#decision">How it works</a><a href="#verification">What has been verified</a><a href="#limits">Scope and limits</a><a href="#run">Run it yourself</a></nav></details></div>
 <div class="reading-body">
 <h2 id="scope">The problem</h2>
 <p><code>npm audit</code> gives every advisory the same urgency. <code>sca-triage</code> adds triage: what to fix first, the upgrade for each, and test evidence that the fix didn’t break the app.</p>
-<p>The lab app pins four vulnerable dependencies. It imports <code>minimist</code>, <code>semver</code> and <code>axios</code> but not <code>tar</code>, which shows how import evidence changes priority.</p>
+<p><a href="https://github.com/OWASP/NodeGoat">OWASP NodeGoat</a> is a deliberately vulnerable Node.js app for security training. At commit <code>c5cb68a</code> it locks 1,479 packages, 180 of them with known advisories. Import evidence narrows “fix now” to 13.</p>
 
 <h2 id="workflow">Scan, fix, rescan</h2>
-<p>This walkthrough runs each step by hand, so you can see every command and its output. <code>npm run lab</code> runs the same steps in one command; see <a href="#run">Run it yourself</a>.</p>
+<p>Each step is one command, shown with its output.</p>
 <ol class="sca-workflow" aria-label="Captured remediation workflow">
 <li class="sca-workflow-step">
-<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">01</span><h3>Establish the vulnerable baseline</h3><span class="sca-step-status sca-step-status--fail">3 P1 · 1 P2</span></div>
-<p>Install with install scripts disabled and scan: 4 of 33 packages are vulnerable. <code>minimist</code>, <code>axios</code> and <code>semver</code> are P1 because the app imports them; <code>tar</code> is critical but P2 because nothing imports it. The P1 gate fails, as intended.</p>
-<section class="sca-output-card" aria-label="Install and baseline scan output">
-<p class="sca-output-title"><strong>Install and baseline scan</strong><small>33 packages · 4 vulnerable · gate fails</small></p>
-<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Install and baseline scan output"><code>$ git clone https://github.com/lansiquo/sca-triage.git
-$ cd sca-triage
-$ npm ci --prefix lab/vulnerable-app --ignore-scripts --no-audit --no-fund
-npm warn deprecated tar@6.1.0: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-
-added 33 packages in 362ms
-$ node bin/sca-triage.js scan lab/vulnerable-app
-intentionally-vulnerable-export-job: 33 packages scanned, 4 vulnerable (P1: 3, P2: 1, P3: 0)
-
-[P1] minimist@1.2.5  CRITICAL, 1 advisory
-     reachability: imported by your code (src/export-job.js:7)
-     fix: 1.2.5 -&gt; 1.2.6
-       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
-[P1] axios@1.6.0  HIGH, 31 advisories
-     reachability: imported by your code (src/notify.js:7)
-     fix: 1.6.0 -&gt; 1.20.0
-       - GHSA-jr5f-v2jv-69x6 high: axios Requests Vulnerable To Possible SSRF and Credential Leakage via Absolute URL
-       - GHSA-q8qp-cvcw-x6jj high: Axios has prototype pollution read-side gadgets in HTTP adapter that allow credential injection and request hijacking
-       - GHSA-4hjh-wcwx-xvwj high: Axios is vulnerable to DoS attack through lack of data size check
-       - ...and 28 more
-[P1] semver@7.5.1  HIGH, 1 advisory
-     reachability: imported by your code (src/export-job.js:8)
-     fix: 7.5.1 -&gt; 7.5.2
-       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
-[P2] tar@6.1.0  CRITICAL, 18 advisories
-     reachability: not imported
-     fix: 6.1.0 -&gt; 7.5.21 (major upgrade)
-       - GHSA-23hp-3jrh-7fpw critical: node-tar: Decompression/parse DoS via unlimited input
-       - GHSA-34x7-hfp2-rc4v high: node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal
-       - GHSA-8qq5-rm4j-mr97 high: node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization
-       - ...and 15 more
-
-Gate (--fail-on P1): FAIL</code></pre>
-</section>
-</li>
-<li class="sca-workflow-step">
-<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">02</span><h3>Plan and apply the upgrades</h3><span class="sca-step-status">4 upgrades applied</span></div>
-<p><code>plan</code> is a dry run; it flags <code>tar</code> 6 → 7 as a major upgrade. <code>fix</code> runs on a copy, keeping the lab vulnerable: it installs the pinned upgrades with <code>--ignore-scripts</code>, runs the tests, rescans and saves the evidence.</p>
-<section class="sca-output-card" aria-label="Plan and fix output">
-<p class="sca-output-title"><strong>Dry-run plan, then fix on a copy</strong><small>4 upgrades · tests pass · evidence saved</small></p>
-<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Plan and fix output"><code>$ node bin/sca-triage.js plan lab/vulnerable-app
-minimist: 1.2.5 -&gt; 1.2.6
-    npm install minimist@1.2.6 --save-exact
-axios: 1.6.0 -&gt; 1.20.0
-    npm install axios@1.20.0 --save-exact
-semver: 7.5.1 -&gt; 7.5.2
-    npm install semver@7.5.2 --save-exact
-tar: 6.1.0 -&gt; 7.5.21  (major upgrade: review release notes)
-    npm install tar@7.5.21 --save-exact
-
-Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
-$ cp -r lab/vulnerable-app /tmp/lab-copy
-$ node bin/sca-triage.js fix /tmp/lab-copy --evidence /tmp/lab-evidence
-Upgraded 4 package(s):
-  npm install minimist@1.2.6 axios@1.20.0 semver@7.5.2 tar@7.5.21 --save-exact --ignore-scripts --save-prod
-Tests (npm test): passed
-After: 0 vulnerable packages (P1: 0, P2: 0, P3: 0)
-Evidence: /tmp/lab-evidence</code></pre>
-</section>
-</li>
-<li class="sca-workflow-step">
-<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">03</span><h3>Rescan the fixed copy</h3><span class="sca-step-status sca-step-status--pass">P1 gate: pass</span></div>
-<p>The same scan on the fixed copy finds 37 packages, none vulnerable, and the P1 gate passes.</p>
-<section class="sca-output-card" aria-label="Rescan output">
-<p class="sca-output-title"><strong>Rescan of the fixed copy</strong><small>37 packages · 0 vulnerable · gate passes</small></p>
-<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Rescan output"><code>$ node bin/sca-triage.js scan /tmp/lab-copy
-intentionally-vulnerable-export-job: 37 packages scanned, 0 vulnerable (P1: 0, P2: 0, P3: 0)
-No known vulnerabilities in the installed versions.
-
-Gate (--fail-on P1): pass</code></pre>
-</section>
-</li>
-<li class="sca-workflow-step">
-<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">04</span><h3 id="report">Review REPORT.md</h3><span class="sca-step-status">Evidence saved</span></div>
-<p><code>REPORT.md</code> collects the findings, changes, test runs, final scan and limits in one file.</p>
-<section class="sca-output-card" aria-label="Saved REPORT.md">
-<p class="sca-output-title"><strong>REPORT.md</strong><small>Before · changes · tests · after · limits</small></p>
-<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Saved REPORT.md"><code>$ cat /tmp/lab-evidence/REPORT.md
-# Remediation evidence: intentionally-vulnerable-export-job
-
-## Before
-4 vulnerable packages (P1: 3, P2: 1, P3: 0).
-
-| Priority | Package | Severity | Advisories | Reachability | Fix |
-|---|---|---|---|---|---|
-| P1 | `minimist@1.2.5` | critical | 1 | imported by your code | 1.2.5 -&gt; 1.2.6 |
-| P1 | `axios@1.6.0` | high | 31 | imported by your code | 1.6.0 -&gt; 1.20.0 |
-| P1 | `semver@7.5.1` | high | 1 | imported by your code | 7.5.1 -&gt; 7.5.2 |
-| P2 | `tar@6.1.0` | critical | 18 | not imported | 6.1.0 -&gt; 7.5.21 (major upgrade) |
-
-## Changes applied
-
-- `npm install minimist@1.2.6 axios@1.20.0 semver@7.5.2 tar@7.5.21 --save-exact --ignore-scripts --save-prod`
-
-## Project tests (`npm test`)
-
-| Run | Result | Output |
-|---|---|---|
-| Before upgrade | **FAILED** (exit code 1), 5 passed / 1 failed | `tests.before.txt` |
-| After upgrade | **passed** (exit code 0), 6 passed / 0 failed | `tests.after.txt` |
-
-Failing before the upgrade:
-
-- parsing untrusted options must not modify Function.prototype
-
-## After
-0 vulnerable packages (P1: 0, P2: 0, P3: 0).
-
-_No known vulnerabilities in the installed versions._
-
-## Limits
-
-- Reachability is import-level: "imported" means the code loads the package, not that the vulnerable function is proven to run.
-- Results reflect the advisory database at scan time. Zero findings is not a security certification.</code></pre>
-</section>
-</li>
-</ol>
-<p class="sca-output-context">Output from one run of these commands, with <code>git clone</code> progress and the report timestamp trimmed.</p>
-
-<h2 id="outcome">What changed</h2>
-<div class="sca-table-scroll" role="region" aria-label="Captured dependency upgrades" tabindex="0"><table class="sca-results"><caption>Versions shown in the baseline and fix captures</caption><thead><tr><th scope="col">Dependency</th><th scope="col">Before</th><th scope="col">Applied version</th><th scope="col">Baseline priority</th></tr></thead><tbody>
-<tr><th scope="row">minimist</th><td>1.2.5</td><td>1.2.6</td><td>P1</td></tr>
-<tr><th scope="row">axios</th><td>1.6.0</td><td>1.20.0</td><td>P1</td></tr>
-<tr><th scope="row">semver</th><td>7.5.1</td><td>7.5.2</td><td>P1</td></tr>
-<tr><th scope="row">tar</th><td>6.1.0</td><td>7.5.21 (major upgrade)</td><td>P2</td></tr>
-</tbody></table></div>
-<p>Vulnerable dependencies went from four to zero, the P1 gate from fail to pass, and the lab’s tests from 5 of 6 passing to 6 of 6. The test that now passes is a <a href="https://github.com/lansiquo/sca-triage/blob/main/lab/vulnerable-app/test/security.test.js">security regression test</a> checking that crafted options can’t modify <code>Function.prototype</code> (minimist, <a href="https://github.com/advisories/GHSA-xvch-5gv4-984h">GHSA-xvch-5gv4-984h</a>). The rescan and functional tests confirm the other three upgrades.</p>
-
-<h2 id="decision">How it works</h2>
-<p>Ranking combines advisory severity with static import evidence:</p>
-<ul><li><strong>P1:</strong> high or critical, and the code imports the package directly or through an imported dependency.</li><li><strong>P2:</strong> high or critical without that evidence, or moderate with it.</li><li><strong>P3:</strong> everything else.</li></ul>
-<p>Import detection covers <code>require()</code>, <code>import</code>, <code>export … from</code> and <code>createRequire()</code> across JavaScript, TypeScript, Vue, Svelte and Astro files, following workspaces, peer dependencies and npm aliases.</p>
-<p>Each fix is the smallest non-prerelease version outside every advisory range, including advisories that only affect newer versions, preferring the same release line; major upgrades are flagged. Direct dependencies are pinned with <code>--save-exact</code>; transitive ones get scoped npm <code>overrides</code>. If an install fails, the manifests and lockfile are put back. All priorities are fixed by default; the gate only decides whether a scan fails.</p>
-<p>Built on Node.js built-ins with no third-party dependencies, it reads <code>package-lock.json</code> v2/v3 plus GitHub Advisory Database data from the npm registry, and runs as a CLI or a <a href="https://github.com/lansiquo/sca-triage/blob/main/action.yml">GitHub Action</a>. Source: <a href="https://github.com/lansiquo/sca-triage/blob/main/src/triage.js">ranking and version selection</a> · <a href="https://github.com/lansiquo/sca-triage/blob/main/src/fix.js">upgrade and evidence workflow</a>.</p>
-
-<h2 id="nodegoat">On a real project</h2>
-<p>Beyond the lab, I scanned <a href="https://github.com/OWASP/NodeGoat">OWASP NodeGoat</a>, a deliberately vulnerable Node.js app with 1,479 locked packages. The scan matches 437 advisories across 180 vulnerable packages and narrows “fix now” to 13 P1 packages the app loads, each with its import location and the smallest safe upgrade. <code>swig</code> has no fixed release, so it needs replacing rather than upgrading.</p>
-<section class="sca-output-card" aria-label="NodeGoat scan output"><p class="sca-output-title"><strong>NodeGoat scan</strong><small>1,479 packages · 180 vulnerable · 13 P1</small></p><pre class="sca-output-preview" tabindex="0" role="region" aria-label="NodeGoat scan output"><code>$ node bin/sca-triage.js scan NodeGoat
+<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">01</span><h3>Scan the baseline</h3><span class="sca-step-status sca-step-status--fail">13 P1 · 123 P2 · 44 P3</span></div>
+<p>The scan reads only the lockfile and source. 437 advisories match 180 packages. 13 are P1: high or critical, and loaded by the app directly or through a dependency it imports, such as <code>express</code> or <code>mongodb</code>. The P1 gate fails.</p>
+<section class="sca-output-card" aria-label="Baseline scan output">
+<p class="sca-output-title"><strong>Baseline scan</strong><small>1,479 packages · 180 vulnerable · gate fails</small></p>
+<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Baseline scan output"><code>$ node sca-triage/bin/sca-triage.js scan NodeGoat
 owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 13, P2: 123, P3: 44)
 
 [P1] bson@1.0.9  CRITICAL, 2 advisories
      reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     dependency of: mongodb
      fix: 1.0.9 -&gt; 1.1.4 (override)
 [P1] minimist@0.0.10  CRITICAL, 2 advisories
      reachability: pulled in by an imported dependency (via swig (server.js:9))
+     dependency of: forever, swig
      fix: 0.0.10 -&gt; 0.2.4 (major upgrade) (override)
 [P1] proxy-addr@2.0.4  CRITICAL, 1 advisory
      reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
      fix: 2.0.4 -&gt; 2.0.8 (override)
 [P1] underscore@1.9.1  CRITICAL, 2 advisories
      reachability: imported by your code (config/config.js:1)
@@ -171,6 +37,7 @@ owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 13, P2: 123, P3: 4
      fix: 1.18.3 -&gt; 1.20.9
 [P1] debug@2.2.0  HIGH, 2 advisories
      reachability: pulled in by an imported dependency (via helmet (server.js:10))
+     dependency of: helmet
      fix: 2.2.0 -&gt; 2.6.9 (override)
 [P1] marked@0.3.5  HIGH, 6 advisories
      reachability: imported by your code (server.js:13)
@@ -180,37 +47,242 @@ owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 13, P2: 123, P3: 4
      fix: 2.2.36 -&gt; 3.1.13 (major upgrade)
 [P1] path-to-regexp@0.1.7  HIGH, 3 advisories
      reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
      fix: 0.1.7 -&gt; 0.1.13 (override)
 [P1] qs@6.5.2  HIGH, 3 advisories
      reachability: pulled in by an imported dependency (via body-parser (server.js:5), via express (app/routes/tutorial.js:1))
+     dependency of: body-parser, cypress, express, grunt-contrib-watch
      fix: 6.5.2 -&gt; 6.16.1 (override)
 [P1] semver@5.6.0  HIGH, 1 advisory
      reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     dependency of: cypress, grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, mongodb, nodemon
      fix: 5.6.0 -&gt; 5.7.2 (override)
 [P1] swig@1.4.2  HIGH, 1 advisory
      reachability: imported by your code (server.js:9)
      fix: no fixed version published
 [P1] uglify-js@2.4.24  HIGH, 1 advisory
      reachability: pulled in by an imported dependency (via swig (server.js:9))
+     dependency of: swig
      fix: 2.4.24 -&gt; 2.6.0 (override)
 
 … 123 P2 and 44 P3 findings, and each finding’s advisory list, trimmed
 
-Gate (--fail-on P1): FAIL</code></pre></section>
-<p class="sca-output-context">NodeGoat commit <code>c5cb68a</code>, scanned with sca-triage <code>984903c</code>. Only the lockfile and source are read; nothing from NodeGoat is installed or run. The <a href="https://github.com/lansiquo/sca-triage#on-a-real-project-owasp-nodegoat">README</a> has the commands to repeat it.</p>
+Gate (--fail-on P1): FAIL</code></pre>
+</section>
+</li>
+<li class="sca-workflow-step">
+<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">02</span><h3>Plan and apply the P1 upgrades</h3><span class="sca-step-status">12 upgrades applied</span></div>
+<p><code>plan</code> is a dry run: 4 direct dependencies are pinned with <code>npm install</code> and 8 transitive packages get npm <code>overrides</code>, scoped to the packages that pull them in. <code>swig</code> has no fixed release. <code>fix</code> applies the upgrades to a copy with install scripts disabled. NodeGoat’s <code>npm test</code> runs no tests (its unit-test folder doesn’t exist), so the run uses <code>--no-tests</code> and the upgrades are marked unverified.</p>
+<section class="sca-output-card" aria-label="Plan and fix output">
+<p class="sca-output-title"><strong>Dry-run plan, then fix on a copy</strong><small>12 upgrades · tests not run · evidence saved</small></p>
+<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Plan and fix output"><code>$ node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1
+bson: 1.0.9 -&gt; 1.1.4
+    overrides: "bson": "1.1.4"
+minimist: 0.0.10 -&gt; 0.2.4  (major upgrade: review release notes)
+    overrides: "optimist" &gt; "minimist": "0.2.4"
+proxy-addr: 2.0.4 -&gt; 2.0.8
+    overrides: "proxy-addr": "2.0.8"
+underscore: 1.9.1 -&gt; 1.13.8
+    npm install underscore@1.13.8 --save-exact
+body-parser: 1.18.3 -&gt; 1.20.9
+    npm install body-parser@1.20.9 --save-exact
+debug: 2.2.0 -&gt; 2.6.9
+    overrides: "connect" &gt; "debug": "2.6.9"
+    overrides: "finalhandler" &gt; "debug": "2.6.9"
+marked: 0.3.5 -&gt; 4.0.10  (major upgrade: review release notes)
+    npm install marked@4.0.10 --save-exact
+mongodb: 2.2.36 -&gt; 3.1.13  (major upgrade: review release notes)
+    npm install mongodb@3.1.13 --save-exact
+path-to-regexp: 0.1.7 -&gt; 0.1.13
+    overrides: "path-to-regexp": "0.1.13"
+qs: 6.5.2 -&gt; 6.16.1
+    overrides: "body-parser" &gt; "qs": "6.16.1"
+    overrides: "request" &gt; "qs": "6.16.1"
+    overrides: "express" &gt; "qs": "6.16.1"
+    overrides: "tiny-lr" &gt; "qs": "6.16.1"
+semver: 5.6.0 -&gt; 5.7.2
+    overrides: "cross-spawn" &gt; "semver": "5.7.2"
+    overrides: "editorconfig" &gt; "semver": "5.7.2"
+    overrides: "grunt-jsbeautifier" &gt; "semver": "5.7.2"
+    overrides: "nodemon" &gt; "semver": "5.7.2"
+    overrides: "normalize-package-data" &gt; "semver": "5.7.2"
+    overrides: "package-json" &gt; "semver": "5.7.2"
+    overrides: "read-installed" &gt; "semver": "5.7.2"
+    overrides: "require_optional" &gt; "semver": "5.7.2"
+    overrides: "semver-diff" &gt; "semver": "5.7.2"
+uglify-js: 2.4.24 -&gt; 2.6.0
+    overrides: "swig" &gt; "uglify-js": "2.6.0"
+swig@1.4.2: no fixed version published yet
+
+Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
+$ cp -r NodeGoat NodeGoat-fixed
+$ node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence
+Upgraded 12 package(s):
+  npm install underscore@1.13.8 body-parser@1.20.9 marked@4.0.10 mongodb@3.1.13 --save-exact --ignore-scripts --save-prod
+  package.json overrides: "bson": "1.1.4"
+  package.json overrides: "optimist" &gt; "minimist": "0.2.4"
+  package.json overrides: "proxy-addr": "2.0.8"
+  package.json overrides: "connect" &gt; "debug": "2.6.9"
+  package.json overrides: "finalhandler" &gt; "debug": "2.6.9"
+  package.json overrides: "path-to-regexp": "0.1.13"
+  package.json overrides: "body-parser" &gt; "qs": "6.16.1"
+  package.json overrides: "request" &gt; "qs": "6.16.1"
+  package.json overrides: "express" &gt; "qs": "6.16.1"
+  package.json overrides: "tiny-lr" &gt; "qs": "6.16.1"
+  package.json overrides: "cross-spawn" &gt; "semver": "5.7.2"
+  package.json overrides: "editorconfig" &gt; "semver": "5.7.2"
+  package.json overrides: "grunt-jsbeautifier" &gt; "semver": "5.7.2"
+  package.json overrides: "nodemon" &gt; "semver": "5.7.2"
+  package.json overrides: "normalize-package-data" &gt; "semver": "5.7.2"
+  package.json overrides: "package-json" &gt; "semver": "5.7.2"
+  package.json overrides: "read-installed" &gt; "semver": "5.7.2"
+  package.json overrides: "require_optional" &gt; "semver": "5.7.2"
+  package.json overrides: "semver-diff" &gt; "semver": "5.7.2"
+  package.json overrides: "swig" &gt; "uglify-js": "2.6.0"
+Tests: not run — changes applied but UNVERIFIED (disabled with --no-tests)
+After: 164 vulnerable packages (P1: 3, P2: 118, P3: 43)
+Evidence: /home/runner/work/sca-triage/sca-triage/evidence</code></pre>
+</section>
+</li>
+<li class="sca-workflow-step">
+<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">03</span><h3>Rescan the fixed copy</h3><span class="sca-step-status sca-step-status--fail">P1: 13 → 3</span></div>
+<p>The rescan finds 164 vulnerable packages and 3 P1s: <code>swig</code>, and older copies of <code>body-parser</code> and <code>debug</code> that <code>express</code> and <code>helmet</code> still pull in. That is why <code>fix</code> rescans instead of assuming the upgrades worked.</p>
+<section class="sca-output-card" aria-label="Rescan output">
+<p class="sca-output-title"><strong>Rescan of the fixed copy</strong><small>1,464 packages · 164 vulnerable · 3 P1</small></p>
+<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Rescan output"><code>$ node sca-triage/bin/sca-triage.js scan NodeGoat-fixed
+owasp-nodejs-goat: 1464 packages scanned, 164 vulnerable (P1: 3, P2: 118, P3: 43)
+
+[P1] body-parser@1.18.3  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 1.18.3 -&gt; 1.20.9 (override)
+[P1] debug@2.2.0  HIGH, 2 advisories
+     reachability: pulled in by an imported dependency (via helmet (server.js:10))
+     dependency of: helmet
+     fix: 2.2.0 -&gt; 2.6.9 (override)
+[P1] swig@1.4.2  HIGH, 1 advisory
+     reachability: imported by your code (server.js:9)
+     fix: no fixed version published
+
+… 118 P2 and 43 P3 findings, and each finding’s advisory list, trimmed
+
+Gate (--fail-on P1): FAIL</code></pre>
+</section>
+</li>
+<li class="sca-workflow-step">
+<div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">04</span><h3 id="report">Review REPORT.md</h3><span class="sca-step-status">Evidence saved</span></div>
+<p><code>REPORT.md</code> records the findings before and after, every change, and that the tests were not run.</p>
+<section class="sca-output-card" aria-label="Saved REPORT.md">
+<p class="sca-output-title"><strong>REPORT.md</strong><small>Before · changes · tests · after · limits</small></p>
+<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Saved REPORT.md"><code>$ cat evidence/REPORT.md
+# Remediation evidence: owasp-nodejs-goat
+
+## Before
+180 vulnerable packages (P1: 13, P2: 123, P3: 44).
+
+| Priority | Package | Severity | Advisories | Reachability | Fix |
+|---|---|---|---|---|---|
+| P1 | `bson@1.0.9` | critical | 2 | pulled in by an imported dependency | 1.0.9 -&gt; 1.1.4 (override) |
+| P1 | `minimist@0.0.10` | critical | 2 | pulled in by an imported dependency | 0.0.10 -&gt; 0.2.4 (major upgrade) (override) |
+| P1 | `proxy-addr@2.0.4` | critical | 1 | pulled in by an imported dependency | 2.0.4 -&gt; 2.0.8 (override) |
+| P1 | `underscore@1.9.1` | critical | 2 | imported by your code | 1.9.1 -&gt; 1.13.8 |
+| P1 | `body-parser@1.18.3` | high | 3 | imported by your code | 1.18.3 -&gt; 1.20.9 |
+| P1 | `debug@2.2.0` | high | 2 | pulled in by an imported dependency | 2.2.0 -&gt; 2.6.9 (override) |
+| P1 | `marked@0.3.5` | high | 6 | imported by your code | 0.3.5 -&gt; 4.0.10 (major upgrade) |
+| P1 | `mongodb@2.2.36` | high | 1 | imported by your code | 2.2.36 -&gt; 3.1.13 (major upgrade) |
+| P1 | `path-to-regexp@0.1.7` | high | 3 | pulled in by an imported dependency | 0.1.7 -&gt; 0.1.13 (override) |
+| P1 | `qs@6.5.2` | high | 3 | pulled in by an imported dependency | 6.5.2 -&gt; 6.16.1 (override) |
+| P1 | `semver@5.6.0` | high | 1 | pulled in by an imported dependency | 5.6.0 -&gt; 5.7.2 (override) |
+| P1 | `swig@1.4.2` | high | 1 | imported by your code | no fixed version published |
+| P1 | `uglify-js@2.4.24` | high | 1 | pulled in by an imported dependency | 2.4.24 -&gt; 2.6.0 (override) |
+… 167 P2 and P3 rows trimmed
+
+## Changes applied
+
+- `npm install underscore@1.13.8 body-parser@1.20.9 marked@4.0.10 mongodb@3.1.13 --save-exact --ignore-scripts --save-prod`
+- `package.json overrides: "bson": "1.1.4"`
+- `package.json overrides: "optimist" &gt; "minimist": "0.2.4"`
+- `package.json overrides: "proxy-addr": "2.0.8"`
+- `package.json overrides: "connect" &gt; "debug": "2.6.9"`
+- `package.json overrides: "finalhandler" &gt; "debug": "2.6.9"`
+- `package.json overrides: "path-to-regexp": "0.1.13"`
+- `package.json overrides: "body-parser" &gt; "qs": "6.16.1"`
+- `package.json overrides: "request" &gt; "qs": "6.16.1"`
+- `package.json overrides: "express" &gt; "qs": "6.16.1"`
+- `package.json overrides: "tiny-lr" &gt; "qs": "6.16.1"`
+- `package.json overrides: "cross-spawn" &gt; "semver": "5.7.2"`
+- `package.json overrides: "editorconfig" &gt; "semver": "5.7.2"`
+- `package.json overrides: "grunt-jsbeautifier" &gt; "semver": "5.7.2"`
+- `package.json overrides: "nodemon" &gt; "semver": "5.7.2"`
+- `package.json overrides: "normalize-package-data" &gt; "semver": "5.7.2"`
+- `package.json overrides: "package-json" &gt; "semver": "5.7.2"`
+- `package.json overrides: "read-installed" &gt; "semver": "5.7.2"`
+- `package.json overrides: "require_optional" &gt; "semver": "5.7.2"`
+- `package.json overrides: "semver-diff" &gt; "semver": "5.7.2"`
+- `package.json overrides: "swig" &gt; "uglify-js": "2.6.0"`
+
+## Project tests (`npm test`)
+
+**Not run — changes applied but UNVERIFIED** (disabled with --no-tests).
+
+## After
+164 vulnerable packages (P1: 3, P2: 118, P3: 43).
+
+| Priority | Package | Severity | Advisories | Reachability | Fix |
+|---|---|---|---|---|---|
+| P1 | `body-parser@1.18.3` | high | 3 | pulled in by an imported dependency | 1.18.3 -&gt; 1.20.9 (override) |
+| P1 | `debug@2.2.0` | high | 2 | pulled in by an imported dependency | 2.2.0 -&gt; 2.6.9 (override) |
+| P1 | `swig@1.4.2` | high | 1 | imported by your code | no fixed version published |
+… 161 P2 and P3 rows trimmed
+
+## Limits
+
+- Reachability is import-level: "imported" means the code loads the package, not that the vulnerable function is proven to run.
+- Results reflect the advisory database at scan time. Zero findings is not a security certification.</code></pre>
+</section>
+</li>
+</ol>
+<p class="sca-output-context">Output from one run of these commands, with each finding’s advisory list, the P2 and P3 findings and the report timestamp trimmed. Results follow the live advisory database, so a new run can differ.</p>
+
+<h2 id="outcome">What changed</h2>
+<div class="sca-table-scroll" role="region" aria-label="P1 packages before and after the fix" tabindex="0"><table class="sca-results"><caption>The 13 P1 packages in the baseline scan and after one fix pass</caption><thead><tr><th scope="col">Package</th><th scope="col">Before</th><th scope="col">Fix</th><th scope="col">How</th><th scope="col">Rescan</th></tr></thead><tbody>
+<tr><th scope="row">bson</th><td>1.0.9</td><td>1.1.4</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">minimist</th><td>0.0.10</td><td>0.2.4 (major)</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">proxy-addr</th><td>2.0.4</td><td>2.0.8</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">underscore</th><td>1.9.1</td><td>1.13.8</td><td>pinned</td><td>no longer P1</td></tr>
+<tr><th scope="row">body-parser</th><td>1.18.3</td><td>1.20.9</td><td>pinned</td><td>still P1: the copy under <code>express</code></td></tr>
+<tr><th scope="row">debug</th><td>2.2.0</td><td>2.6.9</td><td>override</td><td>still P1: the copy under <code>helmet</code></td></tr>
+<tr><th scope="row">marked</th><td>0.3.5</td><td>4.0.10 (major)</td><td>pinned</td><td>no longer P1</td></tr>
+<tr><th scope="row">mongodb</th><td>2.2.36</td><td>3.1.13 (major)</td><td>pinned</td><td>no longer P1</td></tr>
+<tr><th scope="row">path-to-regexp</th><td>0.1.7</td><td>0.1.13</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">qs</th><td>6.5.2</td><td>6.16.1</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">semver</th><td>5.6.0</td><td>5.7.2</td><td>override</td><td>no longer P1</td></tr>
+<tr><th scope="row">swig</th><td>1.4.2</td><td>none published</td><td>—</td><td>still P1</td></tr>
+<tr><th scope="row">uglify-js</th><td>2.4.24</td><td>2.6.0</td><td>override</td><td>no longer P1</td></tr>
+</tbody></table></div>
+<p>One <code>fix</code> pass took P1 findings from 13 to 3 and vulnerable packages from 180 to 164. The P1 gate still fails: <code>swig</code> needs replacing, and the two older copies need another look. Three upgrades cross a major version (<code>minimist</code>, <code>marked</code>, <code>mongodb</code>), and with no tests to run they are unverified.</p>
+
+<h2 id="decision">How it works</h2>
+<p>Ranking combines advisory severity with static import evidence:</p>
+<ul><li><strong>P1:</strong> high or critical, and the code imports the package directly or through an imported dependency.</li><li><strong>P2:</strong> high or critical without that evidence, or moderate with it.</li><li><strong>P3:</strong> everything else.</li></ul>
+<p>Import detection covers <code>require()</code>, <code>import</code>, <code>export … from</code> and <code>createRequire()</code> across JavaScript, TypeScript, Vue, Svelte and Astro files, following workspaces, peer dependencies and npm aliases.</p>
+<p>Each fix is the smallest non-prerelease version outside every advisory range, including advisories that only affect newer versions, preferring the same release line; major upgrades are flagged. Direct dependencies are pinned with <code>--save-exact</code>; transitive ones get scoped npm <code>overrides</code>. If an install fails, the manifests and lockfile are put back. All priorities are fixed by default; the gate only decides whether a scan fails.</p>
+<p>Built on Node.js built-ins with no third-party dependencies, it reads <code>package-lock.json</code> v2/v3 plus GitHub Advisory Database data from the npm registry, and runs as a CLI or a <a href="https://github.com/lansiquo/sca-triage/blob/main/action.yml">GitHub Action</a>. Source: <a href="https://github.com/lansiquo/sca-triage/blob/main/src/triage.js">ranking and version selection</a> · <a href="https://github.com/lansiquo/sca-triage/blob/main/src/fix.js">upgrade and evidence workflow</a>.</p>
 
 <h2 id="verification">What has been verified</h2>
-<p class="evidence-note">Checked on commit <a href="https://github.com/lansiquo/sca-triage/commit/bd01be6"><code>bd01be6</code></a> (v1.2.0): <code>npm test</code> passed all 66 tests, and <code>npm run lab</code> completed with 4 vulnerable packages before the fix and 0 after.</p>
-<dl class="verification-grid"><div><dt>66 unit tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning, registry retries, rollback and reports.</dd></div><div><dt>CI</dt><dd>Unit tests on Node 20 and 22, plus a lab gate on every push and pull request: the baseline scan and security test must fail, the fixed copy must pass both, and <code>npm run lab</code> must complete.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat, scanned at a pinned commit with the output above, so anyone can repeat the run.</dd></div></dl>
+<p class="evidence-note">Checked on sca-triage v1.2.0 (<a href="https://github.com/lansiquo/sca-triage/commit/bd01be6"><code>bd01be6</code></a>): <code>npm test</code> passed all 66 tests, and the NodeGoat run above was made with the same scanner code.</p>
+<dl class="verification-grid"><div><dt>66 unit tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning, registry retries, rollback and reports.</dd></div><div><dt>CI</dt><dd>Unit tests on Node 20 and 22 on every push to main and every pull request.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat at a pinned commit, scanned, fixed and rescanned with the output above, so anyone can repeat the run.</dd></div></dl>
 <h2 id="limits">Scope and limits</h2>
-<ul><li>The lab is an intentionally vulnerable learning app with invented data.</li><li>It covers npm projects (<code>package-lock.json</code> v2/v3) and known advisories; pair it with code review for exploitability.</li><li>Reachability is import-level: “imported” means the package is loaded, not that the vulnerable function runs. It lowers priority but never hides a finding.</li></ul>
+<ul><li>It covers npm projects (<code>package-lock.json</code> v2/v3) and known advisories; pair it with code review for exploitability.</li><li>Reachability is import-level: “imported” means the package is loaded, not that the vulnerable function runs. It lowers priority but never hides a finding.</li><li>An upgrade is only as verified as the project’s tests. NodeGoat has none, so its upgrades are unverified.</li><li>One <code>fix</code> pass can leave older nested copies of an upgraded package; the rescan lists them.</li></ul>
 <h2 id="run">Run it yourself</h2>
-<p>Requires Node.js 20+ and npm registry access. Keep the vulnerable app local. There are two ways to run the lab; both run the same steps and leave the original lab vulnerable for the next run.</p>
-<p><strong>One command.</strong> Runs every step, prints each command first, stops if a result isn’t the expected one, and works in a new temporary folder each time:</p>
-<pre tabindex="0" role="region" aria-label="Run the lab in one command"><code>git clone https://github.com/lansiquo/sca-triage.git
-cd sca-triage
-npm run lab</code></pre>
-<p><strong>Step by step.</strong> Run the commands from the walkthrough above one at a time to see each result. They reuse fixed folders, so clear them first; otherwise <code>cp</code> puts the new copy inside the old one and <code>fix</code> runs on an already-fixed copy:</p>
-<pre tabindex="0" role="region" aria-label="Clear the lab folders"><code>rm -rf /tmp/lab-copy /tmp/lab-evidence</code></pre>
-<p>The first scan exits with code 1, as expected. Results follow the live advisory database, so a new run can differ.</p>
+<p>Requires Node.js 20+ and npm registry access. From an empty folder:</p>
+<pre tabindex="0" role="region" aria-label="Run sca-triage on NodeGoat"><code>git clone https://github.com/lansiquo/sca-triage.git
+git clone https://github.com/OWASP/NodeGoat.git
+git -C NodeGoat checkout c5cb68a
+node sca-triage/bin/sca-triage.js scan NodeGoat
+node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1
+cp -r NodeGoat NodeGoat-fixed
+node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence
+node sca-triage/bin/sca-triage.js scan NodeGoat-fixed</code></pre>
+<p><code>scan</code> and <code>plan</code> only read files. <code>fix</code> installs NodeGoat’s dependencies with install scripts disabled and runs none of its code. Both scans exit with code 1 because the P1 gate fails.</p>
 <p><a href="https://github.com/lansiquo/sca-triage">Explore the source and README</a> · <a href="index.html#projects">All projects</a></p> </div></div></div></main></div><footer class="status"><span>ROBIN LANSIQUOT &nbsp; / &nbsp; APPLICATION SECURITY</span><nav class="footer-links" id="contact" aria-label="Contact"><a href="mailto:lansiquo@gmail.com">Email</a><a href="https://www.linkedin.com/in/robin-lansiquot/" target="_blank" rel="noopener">LinkedIn</a><a href="Robin_Lansiquot_Resume.pdf" target="_blank" rel="noopener">Résumé</a></nav></footer></body></html>

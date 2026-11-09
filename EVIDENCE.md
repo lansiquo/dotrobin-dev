@@ -63,7 +63,7 @@ The external transcripts establish the standard lab images' architecture; they a
 
 ## sca-triage case study
 
-`site/sca-triage.html` shows terminal output as text rather than screenshots. The four lab steps come from one run of the commands they show, on a fresh clone of sca-triage at `bd01be6` (v1.2.0) in a Linux environment. They replace an earlier v1.1.0 run supplied by the owner; apart from the `fix` change list, the report's change list and test counts, and npm's install time, every line matches that run. The `git clone` progress lines, a `rm -rf` cleanup command and the report's generation timestamp were trimmed. Paths are limited to `/tmp/lab-copy` and `/tmp/lab-evidence`; no passwords, tokens, cookies or private keys appear. `npm test` (66 tests) and `npm run lab` also passed on `bd01be6`.
+`site/sca-triage.html` shows terminal output as text rather than screenshots. The four steps come from one run of the commands they show on OWASP NodeGoat at commit `c5cb68a`, made on a GitHub Actions runner (https://github.com/lansiquo/sca-triage/actions/runs/42655474149) from a temporary sca-triage branch whose `bin/` and `src/` are identical to v1.2.0 (`bd01be6`). It ran there because this project's cloud environment cannot download the GitHub tarball that one NodeGoat dev dependency (`grunt-if`) installs from. The text is the log of that step with GitHub's timestamps removed. Trimmed: each finding's advisory list, the P2 and P3 findings in both scans and in the report's tables, and the report's generation timestamp. Nothing else was edited. The table under "What changed" is built from the plan, fix and rescan output. `npm test` (66 tests) passed on `bd01be6`. No passwords, tokens, cookies or private keys appear.
 
 ## sast-triage case study
 
