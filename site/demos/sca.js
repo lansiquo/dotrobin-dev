@@ -62,7 +62,7 @@
   }
 
   function start(d) {
-    let side = 'before';
+    let side = null; // nothing selected until the visitor picks Before or After
     let view = 'audit';
     const gate = d.gate.failOn;
     const exploited = d.packages.filter((p) => p.exploitDemonstrated);
@@ -146,6 +146,9 @@
     function render() {
       $('before').setAttribute('aria-pressed', String(side === 'before'));
       $('after').setAttribute('aria-pressed', String(side === 'after'));
+      $('choose-hint').hidden = Boolean(side);
+      $('results').hidden = !side;
+      if (!side) return;
       $('evidence').value = view;
 
       const s = d.summary[side];
@@ -209,11 +212,12 @@
     $('after').onclick = () => setSide('after');
     $('evidence').onchange = () => {
       view = VIEWS.includes($('evidence').value) ? $('evidence').value : 'audit';
+      if (!side) return;
       renderEvidence();
       syncHash(false);
     };
     window.addEventListener('popstate', () => {
-      const next = readHash() || { side: 'before', view: 'audit' };
+      const next = readHash() || { side: null, view: 'audit' };
       side = next.side;
       view = next.view;
       render();
