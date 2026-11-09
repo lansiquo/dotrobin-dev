@@ -1,0 +1,2535 @@
+# Log of the "NodeGoat run" step, GitHub Actions run 42722845659 (lansiquo/sca-triage), 2026-11-09.
+# sca-triage at 3fb8391: fix/audit-followups (b0b823c, version 1.2.3) plus a commit that only adds this workflow.
+# GitHub's per-line timestamps are removed; nothing else is changed.
+##[group]Run set +e
+[36;1mset +e[0m
+[36;1mecho "sca-triage $(git -C sca-triage rev-parse --short HEAD), node $(node -v), npm $(npm -v)"[0m
+[36;1mgit clone -q https://github.com/OWASP/NodeGoat.git[0m
+[36;1mgit -C NodeGoat checkout -q c5cb68a[0m
+[36;1mecho "NodeGoat $(git -C NodeGoat rev-parse --short HEAD)"[0m
+[36;1mstep() { echo "\$ $*"; "$@" 2>&1; echo "[exit $?]"; }[0m
+[36;1mstep node sca-triage/bin/sca-triage.js scan NodeGoat[0m
+[36;1mstep node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1[0m
+[36;1mecho '$ cp -r NodeGoat NodeGoat-fixed'; cp -r NodeGoat NodeGoat-fixed[0m
+[36;1mstep node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence[0m
+[36;1mstep node sca-triage/bin/sca-triage.js scan NodeGoat-fixed[0m
+[36;1mecho '$ cat evidence/REPORT.md'; cat evidence/REPORT.md[0m
+[36;1mecho "npm ls invalid entries after fix: $(cd NodeGoat-fixed && npm ls --all 2>&1 | grep -c invalid)"[0m
+shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+##[endgroup]
+sca-triage 3fb8391, node v22.23.4, npm 10.9.9
+NodeGoat c5cb68a
+$ node sca-triage/bin/sca-triage.js scan NodeGoat
+owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 12, P2: 122, P3: 46)
+
+[P1] bson@1.0.9  CRITICAL, 2 advisories
+     reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     dependency of: mongodb
+     fix: 1.0.9 -> 1.1.4 (override)
+       - GHSA-v8w9-2789-6hhr critical: Deserialization of Untrusted Data in bson
+       - GHSA-4jwp-vfvf-657p moderate: Deserialization of Untrusted Data in bson
+[P1] minimist@0.0.10  CRITICAL, 2 advisories
+     reachability: pulled in by an imported dependency (via swig (server.js:9))
+     dependency of: forever, swig
+     fix: 0.0.10 -> 0.2.4 (major upgrade) (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P1] proxy-addr@2.0.4  CRITICAL, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 2.0.4 -> 2.0.8 (override)
+       - GHSA-jqcg-44mw-7w3h critical: proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet
+[P1] underscore@1.9.1  CRITICAL, 2 advisories
+     reachability: imported by your code (config/config.js:1)
+     fix: 1.9.1 -> 1.13.8
+       - GHSA-cf4h-3jhx-xvhq critical: Arbitrary Code Execution in underscore
+       - GHSA-qpx9-hpmf-5gmw high: Underscore has unlimited recursion in _.flatten and _.isEqual, potential for DoS attack
+[P1] body-parser@1.18.3  HIGH, 3 advisories
+     reachability: imported by your code (server.js:5)
+     fix: 1.18.3 -> 1.20.9
+       - GHSA-qwcr-r2fm-qrc7 high: body-parser vulnerable to denial of service when url encoding is enabled
+       - GHSA-27r3-jxmh-p828 high: body-parser vulnerable to Denial of Service via trailing bytes after a compressed request body
+       - GHSA-v422-hmwv-36x6 low: body-parser vulnerable to denial of service when invalid limit value silently disables size enforcement
+[P1] marked@0.3.5  HIGH, 6 advisories
+     reachability: imported by your code (server.js:13)
+     fix: 0.3.5 -> 4.0.10 (major upgrade)
+       - GHSA-x5pg-88wf-qq4p high: Regular Expression Denial of Service in marked
+       - GHSA-rrrm-qjm4-v8hf high: Inefficient Regular Expression Complexity in marked
+       - GHSA-5v2h-r2cx-5xgj high: Inefficient Regular Expression Complexity in marked
+       - ...and 3 more
+[P1] mongodb@2.2.36  HIGH, 1 advisory
+     reachability: imported by your code (artifacts/db-reset.js:9, server.js:11)
+     fix: 2.2.36 -> 3.1.13 (major upgrade)
+       - GHSA-mh5c-679w-hh4r high: Denial of Service in mongodb
+[P1] path-to-regexp@0.1.7  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 0.1.7 -> 0.1.13 (override)
+       - GHSA-9wv6-86v2-598j high: path-to-regexp outputs backtracking regular expressions
+       - GHSA-rhx6-c78j-4q9w high: path-to-regexp contains a ReDoS
+       - GHSA-37ch-88jc-xwx2 high: path-to-regexp vulnerable to Regular Expression Denial of Service via multiple route parameters
+[P1] qs@6.5.2  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1), via body-parser (server.js:5))
+     dependency of: body-parser, cypress, express, grunt-contrib-watch
+     fix: 6.5.2 -> 6.16.1 (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - GHSA-6rw7-vpxm-498p moderate: qs's arrayLimit bypass in its bracket notation allows DoS via memory exhaustion
+[P1] semver@5.6.0  HIGH, 1 advisory
+     reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     dependency of: cypress, grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, mongodb, nodemon
+     fix: 5.6.0 -> 5.7.2 (override)
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P1] swig@1.4.2  HIGH, 1 advisory
+     reachability: imported by your code (server.js:9)
+     fix: no fixed version published
+       - GHSA-2rq5-699j-x7p6 high: Arbitrary local file read vulnerability during template rendering 
+[P1] uglify-js@2.4.24  HIGH, 1 advisory
+     reachability: pulled in by an imported dependency (via swig (server.js:9))
+     dependency of: swig
+     fix: 2.4.24 -> 2.6.0 (override)
+       - GHSA-c9f4-xj24-8jqx high: Regular Expression Denial of Service in uglify-js
+[P2] babel-traverse@6.11.4  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-67hx-6x53-jw92 critical: Babel vulnerable to arbitrary code execution when compiling specifically crafted malicious code
+[P2] form-data@2.3.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.3.3 -> 2.5.6 (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@2.1.4  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 2.1.4 -> 2.5.6 (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@1.0.1  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.0.1 -> 2.5.6 (major upgrade) (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@2.0.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@0.1.4  CRITICAL, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 0.1.4 -> 2.5.6 (major upgrade) (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] fsevents@1.2.9  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 1.2.9 -> 1.2.11 (override)
+       - GHSA-8r6j-v8pm-fqw3 critical: Code injection in fsevents
+       - GHSA-xv2f-5jw4-v95m critical: Malware in fsevents
+[P2] getobject@0.1.0  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 0.1.0 -> 1.0.0 (major upgrade) (override)
+       - GHSA-957j-59c2-j692 critical: Prototype pollution in getobject
+[P2] growl@1.9.2  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 1.9.2 -> 1.10.0 (override)
+       - GHSA-qh2h-chj9-jffq critical: Growl before 1.10.0 vulnerable to Command Injection
+[P2] handlebars@4.0.5  CRITICAL, 20 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-w457-6q6x-cgp9 critical: Prototype Pollution in handlebars
+       - GHSA-765h-qjxv-5f44 critical: Prototype Pollution in handlebars
+       - GHSA-2w6w-674q-4c4q critical: Handlebars.js has JavaScript Injection via AST Type Confusion
+       - ...and 17 more
+[P2] json-schema@0.2.3  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: cypress, grunt-if, grunt-retire
+     fix: 0.2.3 -> 0.4.0 (major upgrade) (override)
+       - GHSA-896r-f27r-55mw critical: json-schema is vulnerable to Prototype Pollution
+[P2] json-schema@0.2.3  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-896r-f27r-55mw critical: json-schema is vulnerable to Prototype Pollution
+[P2] lodash@4.17.11  CRITICAL, 6 advisories
+     reachability: test code only (via async (test/security/profile-test.js:4))
+     dependency of: async, cypress, grunt, grunt-concurrent, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 4.17.11 -> 4.18.0 (override)
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-p6mc-m468-83gw high: Prototype Pollution in lodash
+       - ...and 3 more
+[P2] lodash@4.13.1  CRITICAL, 9 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-4xc9-xhrj-v574 high: Prototype Pollution in lodash
+       - ...and 6 more
+[P2] lodash@2.4.2  CRITICAL, 4 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 2.4.2 -> 4.18.0 (major upgrade) (override)
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-4xc9-xhrj-v574 high: Prototype Pollution in lodash
+       - ...and 1 more
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-mocha-test, grunt-npm-install, grunt-retire, mocha
+     fix: 0.0.8 -> 0.2.4 (major upgrade) (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.5  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 1.2.5 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-jsbeautifier, nodemon
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] mixin-deep@1.3.1  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 1.3.1 -> 1.3.2 (override)
+       - GHSA-fhjf-83wg-r2j9 critical: Prototype Pollution in mixin-deep
+[P2] set-value@2.0.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 2.0.0 -> 2.0.1 (override)
+       - GHSA-4g88-fppr-53pp critical: Prototype Pollution in set-value
+       - GHSA-4jqc-8m5r-9rpr high: Prototype Pollution in set-value
+[P2] set-value@0.4.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 0.4.3 -> 2.0.1 (major upgrade) (override)
+       - GHSA-4g88-fppr-53pp critical: Prototype Pollution in set-value
+       - GHSA-4jqc-8m5r-9rpr high: Prototype Pollution in set-value
+[P2] tar@4.4.8  CRITICAL, 18 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-23hp-3jrh-7fpw critical: node-tar: Decompression/parse DoS via unlimited input
+       - GHSA-34x7-hfp2-rc4v high: node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal
+       - GHSA-8qq5-rm4j-mr97 high: node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization
+       - ...and 15 more
+[P2] tar@2.2.1  CRITICAL, 16 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-23hp-3jrh-7fpw critical: node-tar: Decompression/parse DoS via unlimited input
+       - GHSA-34x7-hfp2-rc4v high: node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal
+       - GHSA-8qq5-rm4j-mr97 high: node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization
+       - ...and 13 more
+[P2] underscore@1.8.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.8.3 -> 1.13.8 (override)
+       - GHSA-cf4h-3jhx-xvhq critical: Arbitrary Code Execution in underscore
+       - GHSA-qpx9-hpmf-5gmw high: Underscore has unlimited recursion in _.flatten and _.isEqual, potential for DoS attack
+[P2] websocket-driver@0.7.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 0.7.0 -> 0.7.5 (override)
+       - GHSA-xv26-6w52-cph6 critical: websocket-driver: Message corruption via abuse of protocol length headers
+       - GHSA-mp7j-qc5w-4988 moderate: websocket-driver: Resource limit bypass via message compression
+[P2] adm-zip@0.4.4  HIGH, 8 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.4.4 -> 0.6.1 (major upgrade) (override)
+       - GHSA-xcpc-8h2w-3j85 high: adm-zip: Crafted ZIP file triggers 4GB memory allocation
+       - GHSA-7q85-xj36-vmfc high: adm-zip: Uncontrolled memory allocation via the declared uncompressed size (DoS)
+       - GHSA-rcw4-f5rp-g42v high: adm-zip: Decompression-bomb protection (fix for CVE-2026-39244) can be bypassed by declaring uncompressed size as 0
+       - ...and 5 more
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] async@2.6.1  HIGH, 1 advisory
+     reachability: test code only (test/security/profile-test.js:4)
+     fix: 2.6.1 -> 2.6.4
+       - GHSA-fwr7-v2mv-hh25 high: Prototype Pollution in async
+[P2] async@2.6.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 2.6.1 -> 2.6.4 (override)
+       - GHSA-fwr7-v2mv-hh25 high: Prototype Pollution in async
+[P2] brace-expansion@1.1.11  HIGH, 8 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-contrib-jshint, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, jshint, nodemon, selenium-webdriver
+     fix: 1.1.11 -> 1.1.21 (override)
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 5 more
+[P2] brace-expansion@1.1.11  HIGH, 8 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 5 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] braces@2.3.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 2.3.2 -> 3.0.3 (major upgrade) (override)
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] braces@2.3.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 2.3.2 -> 3.0.3 (major upgrade) (override)
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] braces@1.8.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] cross-spawn@7.0.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cross-env
+     fix: 7.0.3 -> 7.0.5 (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@4.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 4.0.2 -> 6.0.6 (major upgrade) (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@6.0.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 6.0.5 -> 6.0.6 (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@5.1.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 5.1.0 -> 6.0.6 (major upgrade) (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@4.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: helmet
+     fix: 2.2.0 -> 2.6.9 (override)
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 2.2.0 -> 2.6.9 (override)
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] decode-uri-component@0.2.0  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 0.2.0 -> 0.5.1 (major upgrade) (override)
+       - GHSA-qr28-fpjm-wq7f high: decode-uri-component vulnerable to denial of service via quadratic replacement of percent-encoded runs
+       - GHSA-w573-4hg7-7wgq high: decode-uri-component vulnerable to Denial of Service (DoS)
+       - GHSA-vcc3-ghjq-m6fr moderate: decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input
+[P2] diff@1.4.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-mocha-test, mocha
+     fix: 1.4.0 -> 3.5.1 (major upgrade) (override)
+       - GHSA-h6ch-v84p-w6p9 high: Regular Expression Denial of Service (ReDoS)
+       - GHSA-73rr-hh4g-fpgx low: jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch
+[P2] dot-prop@4.2.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 4.2.0 -> 4.2.1 (override)
+       - GHSA-ff7x-qrg7-qggm high: dot-prop Prototype Pollution vulnerability
+[P2] extract-zip@1.6.7  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: no fixed version published
+       - GHSA-jmr9-qjv8-65gv high: extract-zip unvalidated symlink path traversal
+       - GHSA-7pqw-9j4j-h8q3 high: extract-zip allows arbitrary file writes through symlink archive entries
+[P2] fstream@1.0.10  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xf7w-r453-m56c high: Arbitrary File Overwrite in fstream
+[P2] grunt@1.0.3  HIGH, 3 advisories
+     reachability: not imported
+     fix: 1.0.3 -> 1.5.3
+       - GHSA-m5pj-vjjf-4m3h high: Arbitrary Code Execution in grunt
+       - GHSA-rm36-94g8-835r high: Race Condition in Grunt
+       - GHSA-j383-35pm-c5h4 moderate: Path Traversal in Grunt
+[P2] hawk@3.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 3.1.3 -> 9.0.1 (major upgrade) (override)
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+[P2] hawk@3.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+[P2] hawk@1.0.0  HIGH, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 1.0.0 -> 9.0.1 (major upgrade) (override)
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+       - GHSA-jcpv-g9rr-qxrc high: Regular Expression Denial of Service in hawk
+[P2] hoek@2.16.3  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: no fixed version published
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] hoek@2.16.3  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] hoek@0.9.1  HIGH, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: no fixed version published
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] i@0.3.6  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.3.6 -> 0.3.7 (override)
+       - GHSA-x55w-vjjp-222r high: inflect vulnerable to Inefficient Regular Expression Complexity
+[P2] ini@1.3.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] ini@1.3.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cypress, forever, grunt-cli, grunt-env, grunt-jsbeautifier, nodemon
+     fix: 1.3.5 -> 1.3.6 (override)
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] ini@1.3.4  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] js-yaml@3.6.1  HIGH, 7 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 3.6.1 -> 3.15.2 (override)
+       - GHSA-8j8c-7jfh-h6hx high: Code Injection in js-yaml
+       - GHSA-52cp-r559-cp3m high: js-yaml: YAML merge-key chains can force quadratic CPU consumption
+       - GHSA-5p4m-2wfm-xmqj high: JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported
+       - ...and 4 more
+[P2] js-yaml@3.5.5  HIGH, 7 advisories
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 3.5.5 -> 3.15.2 (override)
+       - GHSA-8j8c-7jfh-h6hx high: Code Injection in js-yaml
+       - GHSA-52cp-r559-cp3m high: js-yaml: YAML merge-key chains can force quadratic CPU consumption
+       - GHSA-5p4m-2wfm-xmqj high: JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported
+       - ...and 4 more
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] lodash@4.17.21  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-contrib-jshint
+     fix: 4.17.21 -> 4.18.0 (override)
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-xxjr-mmjv-4gpg moderate: Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions
+[P2] lodash@4.17.20  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-env
+     fix: 4.17.20 -> 4.18.0 (override)
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-29mw-wpgm-hmr9 moderate: Regular Expression Denial of Service (ReDoS) in lodash
+       - ...and 1 more
+[P2] lodash@4.17.21  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: jshint
+     fix: 4.17.21 -> 4.18.0 (override)
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-xxjr-mmjv-4gpg moderate: Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions
+[P2] mime@1.2.11  HIGH, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 1.2.11 -> 1.4.1 (override)
+       - GHSA-wrvr-8mpx-r7pp high: mime Regular Expression Denial of Service when MIME lookup performed on untrusted user input
+[P2] minimatch@3.0.4  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.4  HIGH, 4 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-contrib-jshint, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, jshint, nodemon, selenium-webdriver
+     fix: 3.0.4 -> 3.1.4 (override)
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@0.3.0  HIGH, 5 advisories
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 0.3.0 -> 3.1.4 (major upgrade) (override)
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 2 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.2  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] moment@2.24.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.24.0 -> 2.31.0 (override)
+       - GHSA-8hfj-j24r-96c4 high: Path Traversal: 'dir/../../filename' in moment.locale
+       - GHSA-wc69-rhjr-hc9g high: Moment.js vulnerable to Inefficient Regular Expression Complexity
+[P2] nconf@0.6.9  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.6.9 -> 0.11.4 (major upgrade) (override)
+       - GHSA-6xwr-q98w-rvg7 high: Prototype Pollution in nconf
+[P2] nconf@0.10.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.10.0 -> 0.11.4 (major upgrade) (override)
+       - GHSA-6xwr-q98w-rvg7 high: Prototype Pollution in nconf
+[P2] npm@3.10.10  HIGH, 5 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: 3.10.10 -> 6.14.6 (major upgrade) (override)
+       - GHSA-4328-8hgf-7wjr high: npm Vulnerable to Global node_modules Binary Overwrite
+       - GHSA-x8qc-rrcw-4r46 high: npm symlink reference outside of node_modules
+       - GHSA-m6cx-g6qm-p2cx high: Arbitrary File Write in npm
+       - ...and 2 more
+[P2] npm-user-validate@0.1.5  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-pw54-mh39-w3hc high: Regular expression denial of service in npm-user-validate
+       - GHSA-xgh6-85xh-479p low: Regular Expression Denial of Service in npm-user-validate
+[P2] qs@5.2.1  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 5.2.1 -> 6.16.1 (major upgrade) (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - ...and 1 more
+[P2] qs@6.2.1  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - ...and 1 more
+[P2] qs@6.3.2  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 6.3.2 -> 6.16.1 (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - GHSA-6rw7-vpxm-498p moderate: qs's arrayLimit bypass in its bracket notation allows DoS via memory exhaustion
+[P2] qs@0.6.6  HIGH, 5 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 0.6.6 -> 6.16.1 (major upgrade) (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-f9cm-p3w6-xvr3 high: Denial-of-Service Extended Event Loop Blocking in qs
+       - ...and 2 more
+[P2] semver@5.7.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] semver@5.3.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] semver@5.3.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] shelljs@0.3.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, jshint
+     fix: 0.3.0 -> 0.8.5 (major upgrade) (override)
+       - GHSA-4rq4-32rv-6wp6 high: Improper Privilege Management in shelljs
+       - GHSA-64g7-mvw6-v9qj moderate: Improper Privilege Management in shelljs
+[P2] sshpk@1.10.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-2m39-62fm-q8r3 high: Regular Expression Denial of Service in sshpk
+[P2] tmp@0.1.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 0.1.0 -> 0.2.7 (major upgrade) (override)
+       - GHSA-ph9p-34f9-6g65 high: tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape
+       - GHSA-52f5-9888-hmc6 low: tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter
+[P2] tmp@0.0.24  HIGH, 2 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.0.24 -> 0.2.7 (major upgrade) (override)
+       - GHSA-ph9p-34f9-6g65 high: tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape
+       - GHSA-52f5-9888-hmc6 low: tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter
+[P2] tough-cookie@2.2.2  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 2.2.2 -> 4.1.3 (major upgrade) (override)
+       - GHSA-g7q5-pjjr-gqvp high: Regular Expression Denial of Service in tough-cookie
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+       - GHSA-qhv9-728r-6jqg moderate: ReDoS via long string of semicolons in tough-cookie
+[P2] tough-cookie@2.3.1  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-g7q5-pjjr-gqvp high: Regular Expression Denial of Service in tough-cookie
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P2] trim-newlines@1.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 1.0.0 -> 3.0.1 (major upgrade) (override)
+       - GHSA-7p7h-4mm5-852v high: Uncontrolled Resource Consumption in trim-newlines
+[P2] websocket-extensions@0.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 0.1.3 -> 0.1.4 (override)
+       - GHSA-g78m-2chm-r7qv high: Regular Expression Denial of Service in websocket-extensions (NPM package)
+[P2] ws@1.1.5  HIGH, 1 advisory
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 1.1.5 -> 5.2.5 (major upgrade) (override)
+       - GHSA-96hv-2xvq-fx4p high: ws: Memory exhaustion DoS from tiny fragments and data chunks
+[P2] y18n@3.2.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-c4w7-xm78-47vh high: Prototype Pollution in y18n
+[P2] y18n@3.2.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 3.2.1 -> 3.2.2 (override)
+       - GHSA-c4w7-xm78-47vh high: Prototype Pollution in y18n
+[P2] express@4.16.4  MODERATE, 2 advisories
+     reachability: imported by your code (app/routes/tutorial.js:1, server.js:3)
+     fix: 4.16.4 -> 4.20.0
+       - GHSA-rv95-896h-c2vc moderate: Express.js Open Redirect in malformed URLs
+       - GHSA-qw6h-vgh9-j6wx low: express vulnerable to XSS via response.redirect()
+[P3] ajv@6.10.0  MODERATE, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 6.10.0 -> 6.14.0 (override)
+       - GHSA-2g4f-4pwh-qvx6 moderate: ajv has ReDoS when using `$data` option
+       - GHSA-v88g-cgmw-v5xw moderate: Prototype Pollution in Ajv
+[P3] bl@1.0.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.0.3 -> 1.2.3 (override)
+       - GHSA-pp7h-53gx-mx7r moderate: Remote Memory Exposure in bl
+[P3] bl@1.1.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-pp7h-53gx-mx7r moderate: Remote Memory Exposure in bl
+[P3] extend@3.0.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-qrmc-fj45-qfc2 moderate: Prototype Pollution in extend
+[P3] got@6.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 6.7.1 -> 11.8.5 (major upgrade) (override)
+       - GHSA-pfrx-2q88-qq97 moderate: Got allows a redirect to a UNIX socket
+[P3] helmet-csp@1.2.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: helmet
+     fix: 1.2.2 -> 2.9.1 (major upgrade) (override)
+       - GHSA-c3m8-x3cg-qm2c moderate: Configuration Override in helmet-csp
+[P3] hosted-git-info@2.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 2.7.1 -> 2.8.9 (override)
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] hosted-git-info@2.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] hosted-git-info@2.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] is-my-json-valid@2.15.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-4hpf-3wq7-5rpr moderate: Regular expression deinal of service (ReDoS) in is-my-json-valid
+[P3] jsonpointer@4.0.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 4.0.1 -> 5.0.0 (major upgrade) (override)
+       - GHSA-282f-qqgm-c34q moderate: Prototype Pollution in node-jsonpointer
+[P3] jsonpointer@4.0.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-282f-qqgm-c34q moderate: Prototype Pollution in node-jsonpointer
+[P3] micromatch@3.1.10  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 3.1.10 -> 4.0.8 (major upgrade) (override)
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] micromatch@3.1.10  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 3.1.10 -> 4.0.8 (major upgrade) (override)
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] micromatch@2.3.11  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: helmet
+     fix: 0.7.1 -> 2.0.0 (major upgrade) (override)
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 0.7.1 -> 2.0.0 (major upgrade) (override)
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] path-parse@1.0.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-hj48-42vr-x3v9 moderate: Regular Expression Denial of Service in path-parse
+[P3] randomatic@1.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-6g33-f262-xjp4 moderate: Cryptographically Weak PRNG in randomatic
+[P3] request@2.88.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.67.0  MODERATE, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+       - GHSA-7xfp-9c55-5vqj moderate: Remote Memory Exposure in request
+[P3] request@2.75.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.79.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.36.0  MODERATE, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+       - GHSA-7xfp-9c55-5vqj moderate: Remote Memory Exposure in request
+[P3] stringstream@0.0.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mf6x-7mm4-x2g7 moderate: Out-of-bounds Read in stringstream
+[P3] tough-cookie@2.4.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.4.3 -> 4.1.3 (major upgrade) (override)
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P3] tough-cookie@2.3.4  MODERATE, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: grunt-if, grunt-retire, zaproxy
+     fix: 2.3.4 -> 4.1.3 (major upgrade) (override)
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P3] tunnel-agent@0.4.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xc7v-wxcw-j472 moderate: Memory Exposure in tunnel-agent
+[P3] tunnel-agent@0.4.3  MODERATE, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: grunt-if, grunt-retire, zaproxy
+     fix: 0.4.3 -> 0.6.0 (major upgrade) (override)
+       - GHSA-xc7v-wxcw-j472 moderate: Memory Exposure in tunnel-agent
+[P3] undefsafe@2.0.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 2.0.2 -> 2.0.3 (override)
+       - GHSA-332q-7ff2-57h2 moderate: Prototype Pollution in undefsafe
+[P3] uuid@3.3.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress, grunt-if, grunt-retire
+     fix: 3.3.2 -> 11.1.1 (major upgrade) (override)
+       - GHSA-w5hq-g745-h8pq moderate: uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided
+[P3] xml2js@0.4.4  MODERATE, 1 advisory
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.4.4 -> 0.5.0 (major upgrade) (override)
+       - GHSA-776f-qx25-q3cc moderate: xml2js is vulnerable to prototype pollution
+[P3] yargs-parser@2.4.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-p9pc-299p-vxgp moderate: yargs-parser Vulnerable to Prototype Pollution
+[P3] chownr@1.0.1  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c6rq-rjc2-86v2 low: Time-of-check Time-of-use (TOCTOU) Race Condition in chownr
+[P3] cookie@0.3.1  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1), via express-session (server.js:6))
+     dependency of: csurf, express, express-session
+     fix: 0.3.1 -> 0.7.0 (major upgrade) (override)
+       - GHSA-pxg6-pf52-xh8x low: cookie accepts cookie name, path, and domain with out of bounds characters
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@4.1.1  LOW, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] es5-ext@0.10.12  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-4gmj-3p3h-gm8h low: es5-ext vulnerable to Regular Expression Denial of Service in `function#copy` and `function#toStringTokens`
+[P3] on-headers@1.0.1  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express-session (server.js:6))
+     dependency of: express-session
+     fix: 1.0.1 -> 1.1.0 (override)
+       - GHSA-76c9-3jph-rj3q low: on-headers is vulnerable to http response header manipulation
+[P3] send@0.16.2  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 0.16.2 -> 0.19.0 (major upgrade) (override)
+       - GHSA-m6fv-jmcg-4jfg low: send vulnerable to template injection that can lead to XSS
+[P3] serve-static@1.13.2  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 1.13.2 -> 1.16.0 (override)
+       - GHSA-cm22-4g7w-348p low: serve-static vulnerable to template injection that can lead to XSS
+
+Gate (--fail-on P1): FAIL
+[exit 1]
+$ node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1
+bson: 1.0.9 -> 1.1.4
+    overrides: "bson": "1.1.4"
+minimist: 0.0.10 -> 0.2.4  (major upgrade: review release notes)
+    overrides: "optimist" > "minimist": "0.2.4"
+proxy-addr: 2.0.4 -> 2.0.8
+    overrides: "proxy-addr": "2.0.8"
+underscore: 1.9.1 -> 1.13.8
+    npm install underscore@1.13.8 --save-exact --ignore-scripts --save-prod
+body-parser: 1.18.3 -> 1.20.9
+    npm install body-parser@1.20.9 --save-exact --ignore-scripts --save-prod
+    overrides: "express" > "body-parser": "1.20.9"
+marked: 0.3.5 -> 4.0.10  (major upgrade: review release notes)
+    npm install marked@4.0.10 --save-exact --ignore-scripts --save-prod
+mongodb: 2.2.36 -> 3.1.13  (major upgrade: review release notes)
+    npm install mongodb@3.1.13 --save-exact --ignore-scripts --save-prod
+path-to-regexp: 0.1.7 -> 0.1.13
+    overrides: "path-to-regexp": "0.1.13"
+semver: 5.6.0 -> 5.7.2
+    overrides: "cross-spawn" > "semver": "5.7.2"
+    overrides: "editorconfig" > "semver": "5.7.2"
+    overrides: "grunt-jsbeautifier" > "semver": "5.7.2"
+    overrides: "nodemon" > "semver": "5.7.2"
+    overrides: "normalize-package-data" > "semver": "5.7.2"
+    overrides: "package-json" > "semver": "5.7.2"
+    overrides: "read-installed" > "semver": "5.7.2"
+    overrides: "require_optional" > "semver": "5.7.2"
+    overrides: "semver-diff" > "semver": "5.7.2"
+uglify-js: 2.4.24 -> 2.6.0
+    overrides: "swig" > "uglify-js": "2.6.0"
+swig@1.4.2: no fixed version published yet
+Needs a manual upgrade (an npm override would change more than these copies):
+  qs 6.5.2 -> 6.16.1: the override "request" > "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
+
+Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
+[exit 0]
+$ cp -r NodeGoat NodeGoat-fixed
+$ node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence
+Verified 10 of 10 upgrade target(s):
+  npm install underscore@1.13.8 body-parser@1.20.9 marked@4.0.10 mongodb@3.1.13 --save-exact --ignore-scripts --save-prod
+  package.json overrides: "bson": "1.1.4"
+  package.json overrides: "optimist" > "minimist": "0.2.4"
+  package.json overrides: "proxy-addr": "2.0.8"
+  package.json overrides: "express" > "body-parser": "1.20.9"
+  package.json overrides: "path-to-regexp": "0.1.13"
+  package.json overrides: "cross-spawn" > "semver": "5.7.2"
+  package.json overrides: "editorconfig" > "semver": "5.7.2"
+  package.json overrides: "grunt-jsbeautifier" > "semver": "5.7.2"
+  package.json overrides: "nodemon" > "semver": "5.7.2"
+  package.json overrides: "normalize-package-data" > "semver": "5.7.2"
+  package.json overrides: "package-json" > "semver": "5.7.2"
+  package.json overrides: "read-installed" > "semver": "5.7.2"
+  package.json overrides: "require_optional" > "semver": "5.7.2"
+  package.json overrides: "semver-diff" > "semver": "5.7.2"
+  package.json overrides: "swig" > "uglify-js": "2.6.0"
+  package-lock.json: re-resolve body-parser@1.18.3 at node_modules/express/node_modules/body-parser
+Needs a manual upgrade (an npm override would change more than these copies):
+  qs 6.5.2 -> 6.16.1: the override "request" > "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
+Tests: not run — changes applied but UNVERIFIED (disabled with --no-tests)
+After: 170 vulnerable packages (P1: 2, P2: 122, P3: 46)
+Evidence: /home/runner/work/sca-triage/sca-triage/evidence
+[exit 0]
+$ node sca-triage/bin/sca-triage.js scan NodeGoat-fixed
+owasp-nodejs-goat: 1511 packages scanned, 170 vulnerable (P1: 2, P2: 122, P3: 46)
+
+[P1] qs@6.5.2  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: cypress, express, grunt-contrib-watch
+     fix: 6.5.2 -> 6.16.1 (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - GHSA-6rw7-vpxm-498p moderate: qs's arrayLimit bypass in its bracket notation allows DoS via memory exhaustion
+[P1] swig@1.4.2  HIGH, 1 advisory
+     reachability: imported by your code (server.js:9)
+     fix: no fixed version published
+       - GHSA-2rq5-699j-x7p6 high: Arbitrary local file read vulnerability during template rendering 
+[P2] babel-traverse@6.11.4  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-67hx-6x53-jw92 critical: Babel vulnerable to arbitrary code execution when compiling specifically crafted malicious code
+[P2] form-data@2.3.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.3.3 -> 2.5.6 (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@2.1.4  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 2.1.4 -> 2.5.6 (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@1.0.1  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.0.1 -> 2.5.6 (major upgrade) (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@2.0.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] form-data@0.1.4  CRITICAL, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 0.1.4 -> 2.5.6 (major upgrade) (override)
+       - GHSA-fjxv-7rqg-78g4 critical: form-data uses unsafe random function in form-data for choosing boundary
+       - GHSA-hmw2-7cc7-3qxx high: form-data: CRLF injection in form-data via unescaped multipart field names and filenames
+[P2] fsevents@1.2.9  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 1.2.9 -> 1.2.11 (override)
+       - GHSA-8r6j-v8pm-fqw3 critical: Code injection in fsevents
+       - GHSA-xv2f-5jw4-v95m critical: Malware in fsevents
+[P2] getobject@0.1.0  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 0.1.0 -> 1.0.0 (major upgrade) (override)
+       - GHSA-957j-59c2-j692 critical: Prototype pollution in getobject
+[P2] growl@1.9.2  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 1.9.2 -> 1.10.0 (override)
+       - GHSA-qh2h-chj9-jffq critical: Growl before 1.10.0 vulnerable to Command Injection
+[P2] handlebars@4.0.5  CRITICAL, 20 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-w457-6q6x-cgp9 critical: Prototype Pollution in handlebars
+       - GHSA-765h-qjxv-5f44 critical: Prototype Pollution in handlebars
+       - GHSA-2w6w-674q-4c4q critical: Handlebars.js has JavaScript Injection via AST Type Confusion
+       - ...and 17 more
+[P2] json-schema@0.2.3  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: cypress, grunt-if, grunt-retire
+     fix: 0.2.3 -> 0.4.0 (major upgrade) (override)
+       - GHSA-896r-f27r-55mw critical: json-schema is vulnerable to Prototype Pollution
+[P2] json-schema@0.2.3  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-896r-f27r-55mw critical: json-schema is vulnerable to Prototype Pollution
+[P2] lodash@4.17.11  CRITICAL, 6 advisories
+     reachability: test code only (via async (test/security/profile-test.js:4))
+     dependency of: async, cypress, grunt, grunt-concurrent, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 4.17.11 -> 4.18.0 (override)
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-p6mc-m468-83gw high: Prototype Pollution in lodash
+       - ...and 3 more
+[P2] lodash@4.13.1  CRITICAL, 9 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-4xc9-xhrj-v574 high: Prototype Pollution in lodash
+       - ...and 6 more
+[P2] lodash@2.4.2  CRITICAL, 4 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 2.4.2 -> 4.18.0 (major upgrade) (override)
+       - GHSA-jf85-cpcp-j695 critical: Prototype Pollution in lodash
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-4xc9-xhrj-v574 high: Prototype Pollution in lodash
+       - ...and 1 more
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-mocha-test, grunt-npm-install, grunt-retire, mocha
+     fix: 0.0.8 -> 0.2.4 (major upgrade) (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@0.0.8  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] minimist@1.2.5  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 1.2.5 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+[P2] minimist@1.2.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-jsbeautifier, nodemon
+     fix: 1.2.0 -> 1.2.6 (override)
+       - GHSA-xvch-5gv4-984h critical: Prototype Pollution in minimist
+       - GHSA-vh95-rmgr-6w4m moderate: Prototype Pollution in minimist
+[P2] mixin-deep@1.3.1  CRITICAL, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 1.3.1 -> 1.3.2 (override)
+       - GHSA-fhjf-83wg-r2j9 critical: Prototype Pollution in mixin-deep
+[P2] set-value@2.0.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 2.0.0 -> 2.0.1 (override)
+       - GHSA-4g88-fppr-53pp critical: Prototype Pollution in set-value
+       - GHSA-4jqc-8m5r-9rpr high: Prototype Pollution in set-value
+[P2] set-value@0.4.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 0.4.3 -> 2.0.1 (major upgrade) (override)
+       - GHSA-4g88-fppr-53pp critical: Prototype Pollution in set-value
+       - GHSA-4jqc-8m5r-9rpr high: Prototype Pollution in set-value
+[P2] tar@4.4.8  CRITICAL, 18 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-23hp-3jrh-7fpw critical: node-tar: Decompression/parse DoS via unlimited input
+       - GHSA-34x7-hfp2-rc4v high: node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal
+       - GHSA-8qq5-rm4j-mr97 high: node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization
+       - ...and 15 more
+[P2] tar@2.2.1  CRITICAL, 16 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-23hp-3jrh-7fpw critical: node-tar: Decompression/parse DoS via unlimited input
+       - GHSA-34x7-hfp2-rc4v high: node-tar Vulnerable to Arbitrary File Creation/Overwrite via Hardlink Path Traversal
+       - GHSA-8qq5-rm4j-mr97 high: node-tar is Vulnerable to Arbitrary File Overwrite and Symlink Poisoning via Insufficient Path Sanitization
+       - ...and 13 more
+[P2] underscore@1.8.3  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.8.3 -> 1.13.8 (override)
+       - GHSA-cf4h-3jhx-xvhq critical: Arbitrary Code Execution in underscore
+       - GHSA-qpx9-hpmf-5gmw high: Underscore has unlimited recursion in _.flatten and _.isEqual, potential for DoS attack
+[P2] websocket-driver@0.7.0  CRITICAL, 2 advisories
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 0.7.0 -> 0.7.5 (override)
+       - GHSA-xv26-6w52-cph6 critical: websocket-driver: Message corruption via abuse of protocol length headers
+       - GHSA-mp7j-qc5w-4988 moderate: websocket-driver: Resource limit bypass via message compression
+[P2] adm-zip@0.4.4  HIGH, 8 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.4.4 -> 0.6.1 (major upgrade) (override)
+       - GHSA-xcpc-8h2w-3j85 high: adm-zip: Crafted ZIP file triggers 4GB memory allocation
+       - GHSA-7q85-xj36-vmfc high: adm-zip: Uncontrolled memory allocation via the declared uncompressed size (DoS)
+       - GHSA-rcw4-f5rp-g42v high: adm-zip: Decompression-bomb protection (fix for CVE-2026-39244) can be bypassed by declaring uncompressed size as 0
+       - ...and 5 more
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] ansi-regex@3.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.0.0 -> 3.0.1 (override)
+       - GHSA-93q8-gq69-wqmw high: Inefficient Regular Expression Complexity in chalk/ansi-regex
+[P2] async@2.6.1  HIGH, 1 advisory
+     reachability: test code only (test/security/profile-test.js:4)
+     fix: 2.6.1 -> 2.6.4
+       - GHSA-fwr7-v2mv-hh25 high: Prototype Pollution in async
+[P2] async@2.6.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 2.6.1 -> 2.6.4 (override)
+       - GHSA-fwr7-v2mv-hh25 high: Prototype Pollution in async
+[P2] brace-expansion@1.1.11  HIGH, 8 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-contrib-jshint, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, jshint, nodemon, selenium-webdriver
+     fix: 1.1.11 -> 1.1.21 (override)
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 5 more
+[P2] brace-expansion@1.1.11  HIGH, 8 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 5 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] brace-expansion@1.1.6  HIGH, 9 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-mh99-v99m-4gvg high: brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash
+       - GHSA-rgw5-rvv9-x895 high: brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation
+       - GHSA-3jxr-9vmj-r5cp high: brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups
+       - ...and 6 more
+[P2] braces@2.3.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 2.3.2 -> 3.0.3 (major upgrade) (override)
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] braces@2.3.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 2.3.2 -> 3.0.3 (major upgrade) (override)
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] braces@1.8.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-grv7-fg5c-xmjg high: Uncontrolled resource consumption in braces
+[P2] cross-spawn@7.0.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cross-env
+     fix: 7.0.3 -> 7.0.5 (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@4.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 4.0.2 -> 6.0.6 (major upgrade) (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@6.0.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 6.0.5 -> 6.0.6 (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@5.1.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 5.1.0 -> 6.0.6 (major upgrade) (override)
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] cross-spawn@4.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-3xgq-45jj-v275 high: Regular Expression Denial of Service (ReDoS) in cross-spawn
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: helmet
+     fix: 2.2.0 -> 2.6.9 (override)
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 2.2.0 -> 2.6.9 (override)
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] debug@2.2.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-9vvw-cc9w-f27h high: debug Inefficient Regular Expression Complexity vulnerability
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P2] decode-uri-component@0.2.0  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 0.2.0 -> 0.5.1 (major upgrade) (override)
+       - GHSA-qr28-fpjm-wq7f high: decode-uri-component vulnerable to denial of service via quadratic replacement of percent-encoded runs
+       - GHSA-w573-4hg7-7wgq high: decode-uri-component vulnerable to Denial of Service (DoS)
+       - GHSA-vcc3-ghjq-m6fr moderate: decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input
+[P2] diff@1.4.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-mocha-test, mocha
+     fix: 1.4.0 -> 3.5.1 (major upgrade) (override)
+       - GHSA-h6ch-v84p-w6p9 high: Regular Expression Denial of Service (ReDoS)
+       - GHSA-73rr-hh4g-fpgx low: jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch
+[P2] dot-prop@4.2.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 4.2.0 -> 4.2.1 (override)
+       - GHSA-ff7x-qrg7-qggm high: dot-prop Prototype Pollution vulnerability
+[P2] extract-zip@1.6.7  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: no fixed version published
+       - GHSA-jmr9-qjv8-65gv high: extract-zip unvalidated symlink path traversal
+       - GHSA-7pqw-9j4j-h8q3 high: extract-zip allows arbitrary file writes through symlink archive entries
+[P2] fstream@1.0.10  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xf7w-r453-m56c high: Arbitrary File Overwrite in fstream
+[P2] grunt@1.0.3  HIGH, 3 advisories
+     reachability: not imported
+     fix: 1.0.3 -> 1.5.3
+       - GHSA-m5pj-vjjf-4m3h high: Arbitrary Code Execution in grunt
+       - GHSA-rm36-94g8-835r high: Race Condition in Grunt
+       - GHSA-j383-35pm-c5h4 moderate: Path Traversal in Grunt
+[P2] hawk@3.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 3.1.3 -> 9.0.1 (major upgrade) (override)
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+[P2] hawk@3.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+[P2] hawk@1.0.0  HIGH, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 1.0.0 -> 9.0.1 (major upgrade) (override)
+       - GHSA-44pw-h2cw-w3vq high: Uncontrolled Resource Consumption in Hawk
+       - GHSA-jcpv-g9rr-qxrc high: Regular Expression Denial of Service in hawk
+[P2] hoek@2.16.3  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: no fixed version published
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] hoek@2.16.3  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] hoek@0.9.1  HIGH, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: no fixed version published
+       - GHSA-c429-5p7v-vgjp high: hoek subject to prototype pollution via the clone function.
+       - GHSA-jp4x-w63m-7wgm high: Prototype Pollution in hoek
+[P2] i@0.3.6  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.3.6 -> 0.3.7 (override)
+       - GHSA-x55w-vjjp-222r high: inflect vulnerable to Inefficient Regular Expression Complexity
+[P2] ini@1.3.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] ini@1.3.5  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: cypress, forever, grunt-cli, grunt-env, grunt-jsbeautifier, nodemon
+     fix: 1.3.5 -> 1.3.6 (override)
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] ini@1.3.4  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-qqgx-2p2h-9c37 high: ini before 1.3.6 vulnerable to Prototype Pollution via ini.parse
+[P2] js-yaml@3.6.1  HIGH, 7 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: 3.6.1 -> 3.15.2 (override)
+       - GHSA-8j8c-7jfh-h6hx high: Code Injection in js-yaml
+       - GHSA-52cp-r559-cp3m high: js-yaml: YAML merge-key chains can force quadratic CPU consumption
+       - GHSA-5p4m-2wfm-xmqj high: JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported
+       - ...and 4 more
+[P2] js-yaml@3.5.5  HIGH, 7 advisories
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 3.5.5 -> 3.15.2 (override)
+       - GHSA-8j8c-7jfh-h6hx high: Code Injection in js-yaml
+       - GHSA-52cp-r559-cp3m high: js-yaml: YAML merge-key chains can force quadratic CPU consumption
+       - GHSA-5p4m-2wfm-xmqj high: JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported
+       - ...and 4 more
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] kind-of@6.0.2  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, grunt-cli, nodemon
+     fix: 6.0.2 -> 6.0.3 (override)
+       - GHSA-6c8f-qphg-qjgp high: Validation Bypass in kind-of
+[P2] lodash@4.17.21  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-contrib-jshint
+     fix: 4.17.21 -> 4.18.0 (override)
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-xxjr-mmjv-4gpg moderate: Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions
+[P2] lodash@4.17.20  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-env
+     fix: 4.17.20 -> 4.18.0 (override)
+       - GHSA-35jh-r3h4-6jhm high: Command Injection in lodash
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-29mw-wpgm-hmr9 moderate: Regular Expression Denial of Service (ReDoS) in lodash
+       - ...and 1 more
+[P2] lodash@4.17.21  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: jshint
+     fix: 4.17.21 -> 4.18.0 (override)
+       - GHSA-r5fr-rjxr-66jc high: lodash vulnerable to Code Injection via `_.template` imports key names
+       - GHSA-xxjr-mmjv-4gpg moderate: Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions
+[P2] mime@1.2.11  HIGH, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 1.2.11 -> 1.4.1 (override)
+       - GHSA-wrvr-8mpx-r7pp high: mime Regular Expression Denial of Service when MIME lookup performed on untrusted user input
+[P2] minimatch@3.0.4  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.4  HIGH, 4 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: cypress, forever, grunt, grunt-concurrent, grunt-contrib-jshint, grunt-contrib-watch, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire, jshint, nodemon, selenium-webdriver
+     fix: 3.0.4 -> 3.1.4 (override)
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@0.3.0  HIGH, 5 advisories
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 0.3.0 -> 3.1.4 (major upgrade) (override)
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 2 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.3  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] minimatch@3.0.2  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-3ppc-4f35-3m26 high: minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern
+       - GHSA-7r86-cg39-jmmj high: minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments
+       - GHSA-23c5-xmqv-rm74 high: minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions
+       - ...and 1 more
+[P2] moment@2.24.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.24.0 -> 2.31.0 (override)
+       - GHSA-8hfj-j24r-96c4 high: Path Traversal: 'dir/../../filename' in moment.locale
+       - GHSA-wc69-rhjr-hc9g high: Moment.js vulnerable to Inefficient Regular Expression Complexity
+[P2] nconf@0.6.9  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.6.9 -> 0.11.4 (major upgrade) (override)
+       - GHSA-6xwr-q98w-rvg7 high: Prototype Pollution in nconf
+[P2] nconf@0.10.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 0.10.0 -> 0.11.4 (major upgrade) (override)
+       - GHSA-6xwr-q98w-rvg7 high: Prototype Pollution in nconf
+[P2] npm@3.10.10  HIGH, 5 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: 3.10.10 -> 6.14.6 (major upgrade) (override)
+       - GHSA-4328-8hgf-7wjr high: npm Vulnerable to Global node_modules Binary Overwrite
+       - GHSA-x8qc-rrcw-4r46 high: npm symlink reference outside of node_modules
+       - GHSA-m6cx-g6qm-p2cx high: Arbitrary File Write in npm
+       - ...and 2 more
+[P2] npm-user-validate@0.1.5  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-pw54-mh39-w3hc high: Regular expression denial of service in npm-user-validate
+       - GHSA-xgh6-85xh-479p low: Regular Expression Denial of Service in npm-user-validate
+[P2] qs@5.2.1  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 5.2.1 -> 6.16.1 (major upgrade) (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - ...and 1 more
+[P2] qs@6.2.1  HIGH, 4 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - ...and 1 more
+[P2] qs@6.3.2  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 6.3.2 -> 6.16.1 (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-4mjr-xmp4-gh2g moderate: qs: Denial of Service via Attacker Controlled isBuffer
+       - GHSA-6rw7-vpxm-498p moderate: qs's arrayLimit bypass in its bracket notation allows DoS via memory exhaustion
+[P2] qs@0.6.6  HIGH, 5 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: 0.6.6 -> 6.16.1 (major upgrade) (override)
+       - GHSA-hrpp-h998-j3pp high: qs vulnerable to Prototype Pollution
+       - GHSA-gqgv-6jq5-jjj9 high: Prototype Pollution Protection Bypass in qs
+       - GHSA-f9cm-p3w6-xvr3 high: Denial-of-Service Extended Event Loop Blocking in qs
+       - ...and 2 more
+[P2] semver@5.7.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] semver@5.3.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] semver@5.3.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-c2qf-rxjj-qqgw high: semver vulnerable to Regular Expression Denial of Service
+[P2] shelljs@0.3.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-if, jshint
+     fix: 0.3.0 -> 0.8.5 (major upgrade) (override)
+       - GHSA-4rq4-32rv-6wp6 high: Improper Privilege Management in shelljs
+       - GHSA-64g7-mvw6-v9qj moderate: Improper Privilege Management in shelljs
+[P2] sshpk@1.10.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-2m39-62fm-q8r3 high: Regular Expression Denial of Service in sshpk
+[P2] tmp@0.1.0  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 0.1.0 -> 0.2.7 (major upgrade) (override)
+       - GHSA-ph9p-34f9-6g65 high: tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape
+       - GHSA-52f5-9888-hmc6 low: tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter
+[P2] tmp@0.0.24  HIGH, 2 advisories
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.0.24 -> 0.2.7 (major upgrade) (override)
+       - GHSA-ph9p-34f9-6g65 high: tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape
+       - GHSA-52f5-9888-hmc6 low: tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter
+[P2] tough-cookie@2.2.2  HIGH, 3 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 2.2.2 -> 4.1.3 (major upgrade) (override)
+       - GHSA-g7q5-pjjr-gqvp high: Regular Expression Denial of Service in tough-cookie
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+       - GHSA-qhv9-728r-6jqg moderate: ReDoS via long string of semicolons in tough-cookie
+[P2] tough-cookie@2.3.1  HIGH, 2 advisories
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-g7q5-pjjr-gqvp high: Regular Expression Denial of Service in tough-cookie
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P2] trim-newlines@1.0.0  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 1.0.0 -> 3.0.1 (major upgrade) (override)
+       - GHSA-7p7h-4mm5-852v high: Uncontrolled Resource Consumption in trim-newlines
+[P2] websocket-extensions@0.1.3  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 0.1.3 -> 0.1.4 (override)
+       - GHSA-g78m-2chm-r7qv high: Regular Expression Denial of Service in websocket-extensions (NPM package)
+[P2] ws@1.1.5  HIGH, 1 advisory
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 1.1.5 -> 5.2.5 (major upgrade) (override)
+       - GHSA-96hv-2xvq-fx4p high: ws: Memory exhaustion DoS from tiny fragments and data chunks
+[P2] y18n@3.2.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-c4w7-xm78-47vh high: Prototype Pollution in y18n
+[P2] y18n@3.2.1  HIGH, 1 advisory
+     reachability: not imported
+     dependency of: forever
+     fix: 3.2.1 -> 3.2.2 (override)
+       - GHSA-c4w7-xm78-47vh high: Prototype Pollution in y18n
+[P2] express@4.16.4  MODERATE, 2 advisories
+     reachability: imported by your code (app/routes/tutorial.js:1, server.js:3)
+     fix: 4.16.4 -> 4.20.0
+       - GHSA-rv95-896h-c2vc moderate: Express.js Open Redirect in malformed URLs
+       - GHSA-qw6h-vgh9-j6wx low: express vulnerable to XSS via response.redirect()
+[P3] ajv@6.10.0  MODERATE, 2 advisories
+     reachability: not imported
+     dependency of: cypress
+     fix: 6.10.0 -> 6.14.0 (override)
+       - GHSA-2g4f-4pwh-qvx6 moderate: ajv has ReDoS when using `$data` option
+       - GHSA-v88g-cgmw-v5xw moderate: Prototype Pollution in Ajv
+[P3] bl@1.0.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: 1.0.3 -> 1.2.3 (override)
+       - GHSA-pp7h-53gx-mx7r moderate: Remote Memory Exposure in bl
+[P3] bl@1.1.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-pp7h-53gx-mx7r moderate: Remote Memory Exposure in bl
+[P3] extend@3.0.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-qrmc-fj45-qfc2 moderate: Prototype Pollution in extend
+[P3] got@6.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 6.7.1 -> 11.8.5 (major upgrade) (override)
+       - GHSA-pfrx-2q88-qq97 moderate: Got allows a redirect to a UNIX socket
+[P3] helmet-csp@1.2.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: helmet
+     fix: 1.2.2 -> 2.9.1 (major upgrade) (override)
+       - GHSA-c3m8-x3cg-qm2c moderate: Configuration Override in helmet-csp
+[P3] hosted-git-info@2.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt, grunt-concurrent, grunt-if, grunt-jsbeautifier, grunt-npm-install, grunt-retire
+     fix: 2.7.1 -> 2.8.9 (override)
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] hosted-git-info@2.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] hosted-git-info@2.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-43f8-2h32-f4cj moderate: Regular Expression Denial of Service in hosted-git-info
+[P3] is-my-json-valid@2.15.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-4hpf-3wq7-5rpr moderate: Regular expression deinal of service (ReDoS) in is-my-json-valid
+[P3] jsonpointer@4.0.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: 4.0.1 -> 5.0.0 (major upgrade) (override)
+       - GHSA-282f-qqgm-c34q moderate: Prototype Pollution in node-jsonpointer
+[P3] jsonpointer@4.0.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-282f-qqgm-c34q moderate: Prototype Pollution in node-jsonpointer
+[P3] micromatch@3.1.10  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-cli
+     fix: 3.1.10 -> 4.0.8 (major upgrade) (override)
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] micromatch@3.1.10  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: 3.1.10 -> 4.0.8 (major upgrade) (override)
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] micromatch@2.3.11  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-952p-6rrq-rcjv moderate: Regular Expression Denial of Service (ReDoS) in micromatch
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: helmet
+     fix: 0.7.1 -> 2.0.0 (major upgrade) (override)
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-mocha-test, mocha
+     fix: 0.7.1 -> 2.0.0 (major upgrade) (override)
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] ms@0.7.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-w9mr-4mfr-499f moderate: Vercel ms Inefficient Regular Expression Complexity vulnerability
+[P3] path-parse@1.0.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-hj48-42vr-x3v9 moderate: Regular Expression Denial of Service in path-parse
+[P3] randomatic@1.1.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-6g33-f262-xjp4 moderate: Cryptographically Weak PRNG in randomatic
+[P3] request@2.88.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.67.0  MODERATE, 2 advisories
+     reachability: not imported
+     dependency of: grunt-retire
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+       - GHSA-7xfp-9c55-5vqj moderate: Remote Memory Exposure in request
+[P3] request@2.75.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.79.0  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if, grunt-retire
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+[P3] request@2.36.0  MODERATE, 2 advisories
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: zaproxy
+     fix: no fixed version published
+       - GHSA-p8p7-x288-28g6 moderate: Server-Side Request Forgery in Request
+       - GHSA-7xfp-9c55-5vqj moderate: Remote Memory Exposure in request
+[P3] stringstream@0.0.5  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-mf6x-7mm4-x2g7 moderate: Out-of-bounds Read in stringstream
+[P3] tough-cookie@2.4.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 2.4.3 -> 4.1.3 (major upgrade) (override)
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P3] tough-cookie@2.3.4  MODERATE, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: grunt-if, grunt-retire, zaproxy
+     fix: 2.3.4 -> 4.1.3 (major upgrade) (override)
+       - GHSA-72xf-g2v4-qvf3 moderate: tough-cookie Prototype Pollution vulnerability
+[P3] tunnel-agent@0.4.3  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-xc7v-wxcw-j472 moderate: Memory Exposure in tunnel-agent
+[P3] tunnel-agent@0.4.3  MODERATE, 1 advisory
+     reachability: test code only (via zaproxy (test/security/profile-test.js:24))
+     dependency of: grunt-if, grunt-retire, zaproxy
+     fix: 0.4.3 -> 0.6.0 (major upgrade) (override)
+       - GHSA-xc7v-wxcw-j472 moderate: Memory Exposure in tunnel-agent
+[P3] undefsafe@2.0.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 2.0.2 -> 2.0.3 (override)
+       - GHSA-332q-7ff2-57h2 moderate: Prototype Pollution in undefsafe
+[P3] uuid@3.3.2  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: cypress, grunt-if, grunt-retire
+     fix: 3.3.2 -> 11.1.1 (major upgrade) (override)
+       - GHSA-w5hq-g745-h8pq moderate: uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided
+[P3] xml2js@0.4.4  MODERATE, 1 advisory
+     reachability: test code only (via selenium-webdriver (test/security/profile-test.js:5))
+     dependency of: selenium-webdriver
+     fix: 0.4.4 -> 0.5.0 (major upgrade) (override)
+       - GHSA-776f-qx25-q3cc moderate: xml2js is vulnerable to prototype pollution
+[P3] yargs-parser@2.4.1  MODERATE, 1 advisory
+     reachability: not imported
+     dependency of: grunt-if
+     fix: bundled in nyc@7.1.0: upgrade nyc
+       - GHSA-p9pc-299p-vxgp moderate: yargs-parser Vulnerable to Prototype Pollution
+[P3] chownr@1.0.1  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-c6rq-rjc2-86v2 low: Time-of-check Time-of-use (TOCTOU) Race Condition in chownr
+[P3] cookie@0.3.1  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1), via express-session (server.js:6))
+     dependency of: csurf, express, express-session
+     fix: 0.3.1 -> 0.7.0 (major upgrade) (override)
+       - GHSA-pxg6-pf52-xh8x low: cookie accepts cookie name, path, and domain with out of bounds characters
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: cypress
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@4.1.1  LOW, 1 advisory
+     reachability: not imported
+     dependency of: forever, nodemon
+     fix: bundled in fsevents@1.2.9: upgrade fsevents
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: nodemon
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] debug@3.2.6  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-contrib-watch
+     fix: 3.2.6 -> 3.2.7 (override)
+       - GHSA-gxpj-cx7g-858c low: Regular Expression Denial of Service in debug
+[P3] es5-ext@0.10.12  LOW, 1 advisory
+     reachability: not imported
+     dependency of: grunt-npm-install
+     fix: bundled in npm@3.10.10: upgrade npm
+       - GHSA-4gmj-3p3h-gm8h low: es5-ext vulnerable to Regular Expression Denial of Service in `function#copy` and `function#toStringTokens`
+[P3] on-headers@1.0.1  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express-session (server.js:6))
+     dependency of: express-session
+     fix: 1.0.1 -> 1.1.0 (override)
+       - GHSA-76c9-3jph-rj3q low: on-headers is vulnerable to http response header manipulation
+[P3] send@0.16.2  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 0.16.2 -> 0.19.0 (major upgrade) (override)
+       - GHSA-m6fv-jmcg-4jfg low: send vulnerable to template injection that can lead to XSS
+[P3] serve-static@1.13.2  LOW, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     dependency of: express
+     fix: 1.13.2 -> 1.16.0 (override)
+       - GHSA-cm22-4g7w-348p low: serve-static vulnerable to template injection that can lead to XSS
+
+Gate (--fail-on P1): FAIL
+[exit 1]
+$ cat evidence/REPORT.md
+# Remediation evidence: owasp-nodejs-goat
+
+Generated 2026-11-09T23:44:35.579Z by sca-triage. Advisory data: GitHub Advisory Database via the npm registry.
+
+## Before
+180 vulnerable packages (P1: 12, P2: 122, P3: 46).
+
+| Priority | Package | Severity | Advisories | Reachability | Fix |
+|---|---|---|---|---|---|
+| P1 | `bson@1.0.9` | critical | 2 | pulled in by an imported dependency | 1.0.9 -> 1.1.4 (override) |
+| P1 | `minimist@0.0.10` | critical | 2 | pulled in by an imported dependency | 0.0.10 -> 0.2.4 (major upgrade) (override) |
+| P1 | `proxy-addr@2.0.4` | critical | 1 | pulled in by an imported dependency | 2.0.4 -> 2.0.8 (override) |
+| P1 | `underscore@1.9.1` | critical | 2 | imported by your code | 1.9.1 -> 1.13.8 |
+| P1 | `body-parser@1.18.3` | high | 3 | imported by your code | 1.18.3 -> 1.20.9 |
+| P1 | `marked@0.3.5` | high | 6 | imported by your code | 0.3.5 -> 4.0.10 (major upgrade) |
+| P1 | `mongodb@2.2.36` | high | 1 | imported by your code | 2.2.36 -> 3.1.13 (major upgrade) |
+| P1 | `path-to-regexp@0.1.7` | high | 3 | pulled in by an imported dependency | 0.1.7 -> 0.1.13 (override) |
+| P1 | `qs@6.5.2` | high | 3 | pulled in by an imported dependency | 6.5.2 -> 6.16.1 (override) |
+| P1 | `semver@5.6.0` | high | 1 | pulled in by an imported dependency | 5.6.0 -> 5.7.2 (override) |
+| P1 | `swig@1.4.2` | high | 1 | imported by your code | no fixed version published |
+| P1 | `uglify-js@2.4.24` | high | 1 | pulled in by an imported dependency | 2.4.24 -> 2.6.0 (override) |
+| P2 | `babel-traverse@6.11.4` | critical | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `form-data@2.3.3` | critical | 2 | not imported | 2.3.3 -> 2.5.6 (override) |
+| P2 | `form-data@2.1.4` | critical | 2 | not imported | 2.1.4 -> 2.5.6 (override) |
+| P2 | `form-data@1.0.1` | critical | 2 | not imported | 1.0.1 -> 2.5.6 (major upgrade) (override) |
+| P2 | `form-data@2.0.0` | critical | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `form-data@0.1.4` | critical | 2 | test code only | 0.1.4 -> 2.5.6 (major upgrade) (override) |
+| P2 | `fsevents@1.2.9` | critical | 2 | not imported | 1.2.9 -> 1.2.11 (override) |
+| P2 | `getobject@0.1.0` | critical | 1 | not imported | 0.1.0 -> 1.0.0 (major upgrade) (override) |
+| P2 | `growl@1.9.2` | critical | 1 | not imported | 1.9.2 -> 1.10.0 (override) |
+| P2 | `handlebars@4.0.5` | critical | 20 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `json-schema@0.2.3` | critical | 1 | not imported | 0.2.3 -> 0.4.0 (major upgrade) (override) |
+| P2 | `json-schema@0.2.3` | critical | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `lodash@4.17.11` | critical | 6 | test code only | 4.17.11 -> 4.18.0 (override) |
+| P2 | `lodash@4.13.1` | critical | 9 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `lodash@2.4.2` | critical | 4 | test code only | 2.4.2 -> 4.18.0 (major upgrade) (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | 0.0.8 -> 0.2.4 (major upgrade) (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `minimist@1.2.5` | critical | 1 | not imported | 1.2.5 -> 1.2.6 (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `mixin-deep@1.3.1` | critical | 1 | not imported | 1.3.1 -> 1.3.2 (override) |
+| P2 | `set-value@2.0.0` | critical | 2 | not imported | 2.0.0 -> 2.0.1 (override) |
+| P2 | `set-value@0.4.3` | critical | 2 | not imported | 0.4.3 -> 2.0.1 (major upgrade) (override) |
+| P2 | `tar@4.4.8` | critical | 18 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `tar@2.2.1` | critical | 16 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `underscore@1.8.3` | critical | 2 | not imported | 1.8.3 -> 1.13.8 (override) |
+| P2 | `websocket-driver@0.7.0` | critical | 2 | not imported | 0.7.0 -> 0.7.5 (override) |
+| P2 | `adm-zip@0.4.4` | high | 8 | test code only | 0.4.4 -> 0.6.1 (major upgrade) (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `async@2.6.1` | high | 1 | test code only | 2.6.1 -> 2.6.4 |
+| P2 | `async@2.6.1` | high | 1 | not imported | 2.6.1 -> 2.6.4 (override) |
+| P2 | `brace-expansion@1.1.11` | high | 8 | test code only | 1.1.11 -> 1.1.21 (override) |
+| P2 | `brace-expansion@1.1.11` | high | 8 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `braces@2.3.2` | high | 1 | not imported | 2.3.2 -> 3.0.3 (major upgrade) (override) |
+| P2 | `braces@2.3.2` | high | 1 | not imported | 2.3.2 -> 3.0.3 (major upgrade) (override) |
+| P2 | `braces@1.8.5` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `cross-spawn@7.0.3` | high | 1 | not imported | 7.0.3 -> 7.0.5 (override) |
+| P2 | `cross-spawn@4.0.2` | high | 1 | not imported | 4.0.2 -> 6.0.6 (major upgrade) (override) |
+| P2 | `cross-spawn@6.0.5` | high | 1 | not imported | 6.0.5 -> 6.0.6 (override) |
+| P2 | `cross-spawn@5.1.0` | high | 1 | not imported | 5.1.0 -> 6.0.6 (major upgrade) (override) |
+| P2 | `cross-spawn@4.0.0` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `debug@2.2.0` | high | 2 | not imported | 2.2.0 -> 2.6.9 (override) |
+| P2 | `debug@2.2.0` | high | 2 | not imported | 2.2.0 -> 2.6.9 (override) |
+| P2 | `debug@2.2.0` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `debug@2.2.0` | high | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `decode-uri-component@0.2.0` | high | 3 | not imported | 0.2.0 -> 0.5.1 (major upgrade) (override) |
+| P2 | `diff@1.4.0` | high | 2 | not imported | 1.4.0 -> 3.5.1 (major upgrade) (override) |
+| P2 | `dot-prop@4.2.0` | high | 1 | not imported | 4.2.0 -> 4.2.1 (override) |
+| P2 | `extract-zip@1.6.7` | high | 2 | not imported | no fixed version published |
+| P2 | `fstream@1.0.10` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `grunt@1.0.3` | high | 3 | not imported | 1.0.3 -> 1.5.3 |
+| P2 | `hawk@3.1.3` | high | 1 | not imported | 3.1.3 -> 9.0.1 (major upgrade) (override) |
+| P2 | `hawk@3.1.3` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `hawk@1.0.0` | high | 2 | test code only | 1.0.0 -> 9.0.1 (major upgrade) (override) |
+| P2 | `hoek@2.16.3` | high | 2 | not imported | no fixed version published |
+| P2 | `hoek@2.16.3` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `hoek@0.9.1` | high | 2 | test code only | no fixed version published |
+| P2 | `i@0.3.6` | high | 1 | not imported | 0.3.6 -> 0.3.7 (override) |
+| P2 | `ini@1.3.5` | high | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `ini@1.3.5` | high | 1 | not imported | 1.3.5 -> 1.3.6 (override) |
+| P2 | `ini@1.3.4` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `js-yaml@3.6.1` | high | 7 | not imported | 3.6.1 -> 3.15.2 (override) |
+| P2 | `js-yaml@3.5.5` | high | 7 | not imported | 3.5.5 -> 3.15.2 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `lodash@4.17.21` | high | 2 | not imported | 4.17.21 -> 4.18.0 (override) |
+| P2 | `lodash@4.17.20` | high | 4 | not imported | 4.17.20 -> 4.18.0 (override) |
+| P2 | `lodash@4.17.21` | high | 2 | not imported | 4.17.21 -> 4.18.0 (override) |
+| P2 | `mime@1.2.11` | high | 1 | test code only | 1.2.11 -> 1.4.1 (override) |
+| P2 | `minimatch@3.0.4` | high | 4 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimatch@3.0.4` | high | 4 | test code only | 3.0.4 -> 3.1.4 (override) |
+| P2 | `minimatch@0.3.0` | high | 5 | not imported | 0.3.0 -> 3.1.4 (major upgrade) (override) |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.2` | high | 4 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `moment@2.24.0` | high | 2 | not imported | 2.24.0 -> 2.31.0 (override) |
+| P2 | `nconf@0.6.9` | high | 1 | not imported | 0.6.9 -> 0.11.4 (major upgrade) (override) |
+| P2 | `nconf@0.10.0` | high | 1 | not imported | 0.10.0 -> 0.11.4 (major upgrade) (override) |
+| P2 | `npm@3.10.10` | high | 5 | not imported | 3.10.10 -> 6.14.6 (major upgrade) (override) |
+| P2 | `npm-user-validate@0.1.5` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `qs@5.2.1` | high | 4 | not imported | 5.2.1 -> 6.16.1 (major upgrade) (override) |
+| P2 | `qs@6.2.1` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `qs@6.3.2` | high | 3 | not imported | 6.3.2 -> 6.16.1 (override) |
+| P2 | `qs@0.6.6` | high | 5 | test code only | 0.6.6 -> 6.16.1 (major upgrade) (override) |
+| P2 | `semver@5.7.0` | high | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `semver@5.3.0` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `semver@5.3.0` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `shelljs@0.3.0` | high | 2 | not imported | 0.3.0 -> 0.8.5 (major upgrade) (override) |
+| P2 | `sshpk@1.10.1` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `tmp@0.1.0` | high | 2 | not imported | 0.1.0 -> 0.2.7 (major upgrade) (override) |
+| P2 | `tmp@0.0.24` | high | 2 | test code only | 0.0.24 -> 0.2.7 (major upgrade) (override) |
+| P2 | `tough-cookie@2.2.2` | high | 3 | not imported | 2.2.2 -> 4.1.3 (major upgrade) (override) |
+| P2 | `tough-cookie@2.3.1` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `trim-newlines@1.0.0` | high | 1 | not imported | 1.0.0 -> 3.0.1 (major upgrade) (override) |
+| P2 | `websocket-extensions@0.1.3` | high | 1 | not imported | 0.1.3 -> 0.1.4 (override) |
+| P2 | `ws@1.1.5` | high | 1 | test code only | 1.1.5 -> 5.2.5 (major upgrade) (override) |
+| P2 | `y18n@3.2.1` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `y18n@3.2.1` | high | 1 | not imported | 3.2.1 -> 3.2.2 (override) |
+| P2 | `express@4.16.4` | moderate | 2 | imported by your code | 4.16.4 -> 4.20.0 |
+| P3 | `ajv@6.10.0` | moderate | 2 | not imported | 6.10.0 -> 6.14.0 (override) |
+| P3 | `bl@1.0.3` | moderate | 1 | not imported | 1.0.3 -> 1.2.3 (override) |
+| P3 | `bl@1.1.2` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `extend@3.0.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `got@6.7.1` | moderate | 1 | not imported | 6.7.1 -> 11.8.5 (major upgrade) (override) |
+| P3 | `helmet-csp@1.2.2` | moderate | 1 | not imported | 1.2.2 -> 2.9.1 (major upgrade) (override) |
+| P3 | `hosted-git-info@2.7.1` | moderate | 1 | not imported | 2.7.1 -> 2.8.9 (override) |
+| P3 | `hosted-git-info@2.1.5` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `hosted-git-info@2.1.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `is-my-json-valid@2.15.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `jsonpointer@4.0.1` | moderate | 1 | not imported | 4.0.1 -> 5.0.0 (major upgrade) (override) |
+| P3 | `jsonpointer@4.0.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `micromatch@3.1.10` | moderate | 1 | not imported | 3.1.10 -> 4.0.8 (major upgrade) (override) |
+| P3 | `micromatch@3.1.10` | moderate | 1 | not imported | 3.1.10 -> 4.0.8 (major upgrade) (override) |
+| P3 | `micromatch@2.3.11` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | 0.7.1 -> 2.0.0 (major upgrade) (override) |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | 0.7.1 -> 2.0.0 (major upgrade) (override) |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `path-parse@1.0.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `randomatic@1.1.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `request@2.88.0` | moderate | 1 | not imported | no fixed version published |
+| P3 | `request@2.67.0` | moderate | 2 | not imported | no fixed version published |
+| P3 | `request@2.75.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `request@2.79.0` | moderate | 1 | not imported | no fixed version published |
+| P3 | `request@2.36.0` | moderate | 2 | test code only | no fixed version published |
+| P3 | `stringstream@0.0.5` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `tough-cookie@2.4.3` | moderate | 1 | not imported | 2.4.3 -> 4.1.3 (major upgrade) (override) |
+| P3 | `tough-cookie@2.3.4` | moderate | 1 | test code only | 2.3.4 -> 4.1.3 (major upgrade) (override) |
+| P3 | `tunnel-agent@0.4.3` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `tunnel-agent@0.4.3` | moderate | 1 | test code only | 0.4.3 -> 0.6.0 (major upgrade) (override) |
+| P3 | `undefsafe@2.0.2` | moderate | 1 | not imported | 2.0.2 -> 2.0.3 (override) |
+| P3 | `uuid@3.3.2` | moderate | 1 | not imported | 3.3.2 -> 11.1.1 (major upgrade) (override) |
+| P3 | `xml2js@0.4.4` | moderate | 1 | test code only | 0.4.4 -> 0.5.0 (major upgrade) (override) |
+| P3 | `yargs-parser@2.4.1` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `chownr@1.0.1` | low | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `cookie@0.3.1` | low | 1 | pulled in by an imported dependency | 0.3.1 -> 0.7.0 (major upgrade) (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@4.1.1` | low | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `es5-ext@0.10.12` | low | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `on-headers@1.0.1` | low | 1 | pulled in by an imported dependency | 1.0.1 -> 1.1.0 (override) |
+| P3 | `send@0.16.2` | low | 1 | pulled in by an imported dependency | 0.16.2 -> 0.19.0 (major upgrade) (override) |
+| P3 | `serve-static@1.13.2` | low | 1 | pulled in by an imported dependency | 1.13.2 -> 1.16.0 (override) |
+
+## Changes applied
+
+- `npm install underscore@1.13.8 body-parser@1.20.9 marked@4.0.10 mongodb@3.1.13 --save-exact --ignore-scripts --save-prod`
+- `package.json overrides: "bson": "1.1.4"`
+- `package.json overrides: "optimist" > "minimist": "0.2.4"`
+- `package.json overrides: "proxy-addr": "2.0.8"`
+- `package.json overrides: "express" > "body-parser": "1.20.9"`
+- `package.json overrides: "path-to-regexp": "0.1.13"`
+- `package.json overrides: "cross-spawn" > "semver": "5.7.2"`
+- `package.json overrides: "editorconfig" > "semver": "5.7.2"`
+- `package.json overrides: "grunt-jsbeautifier" > "semver": "5.7.2"`
+- `package.json overrides: "nodemon" > "semver": "5.7.2"`
+- `package.json overrides: "normalize-package-data" > "semver": "5.7.2"`
+- `package.json overrides: "package-json" > "semver": "5.7.2"`
+- `package.json overrides: "read-installed" > "semver": "5.7.2"`
+- `package.json overrides: "require_optional" > "semver": "5.7.2"`
+- `package.json overrides: "semver-diff" > "semver": "5.7.2"`
+- `package.json overrides: "swig" > "uglify-js": "2.6.0"`
+- `package-lock.json: re-resolve body-parser@1.18.3 at node_modules/express/node_modules/body-parser`
+
+## Needs a manual upgrade
+
+An npm override would change more than these copies, so `fix` left them as they are:
+
+- `qs@6.5.2` -> 6.16.1: the override "request" &gt; "qs" would also change qs@0.6.6 at node\_modules/zaproxy/node\_modules/qs
+
+## Project tests (`npm test`)
+
+**Not run — changes applied but UNVERIFIED** (disabled with --no-tests).
+
+## After
+170 vulnerable packages (P1: 2, P2: 122, P3: 46).
+
+| Priority | Package | Severity | Advisories | Reachability | Fix |
+|---|---|---|---|---|---|
+| P1 | `qs@6.5.2` | high | 3 | pulled in by an imported dependency | 6.5.2 -> 6.16.1 (override) |
+| P1 | `swig@1.4.2` | high | 1 | imported by your code | no fixed version published |
+| P2 | `babel-traverse@6.11.4` | critical | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `form-data@2.3.3` | critical | 2 | not imported | 2.3.3 -> 2.5.6 (override) |
+| P2 | `form-data@2.1.4` | critical | 2 | not imported | 2.1.4 -> 2.5.6 (override) |
+| P2 | `form-data@1.0.1` | critical | 2 | not imported | 1.0.1 -> 2.5.6 (major upgrade) (override) |
+| P2 | `form-data@2.0.0` | critical | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `form-data@0.1.4` | critical | 2 | test code only | 0.1.4 -> 2.5.6 (major upgrade) (override) |
+| P2 | `fsevents@1.2.9` | critical | 2 | not imported | 1.2.9 -> 1.2.11 (override) |
+| P2 | `getobject@0.1.0` | critical | 1 | not imported | 0.1.0 -> 1.0.0 (major upgrade) (override) |
+| P2 | `growl@1.9.2` | critical | 1 | not imported | 1.9.2 -> 1.10.0 (override) |
+| P2 | `handlebars@4.0.5` | critical | 20 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `json-schema@0.2.3` | critical | 1 | not imported | 0.2.3 -> 0.4.0 (major upgrade) (override) |
+| P2 | `json-schema@0.2.3` | critical | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `lodash@4.17.11` | critical | 6 | test code only | 4.17.11 -> 4.18.0 (override) |
+| P2 | `lodash@4.13.1` | critical | 9 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `lodash@2.4.2` | critical | 4 | test code only | 2.4.2 -> 4.18.0 (major upgrade) (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | 0.0.8 -> 0.2.4 (major upgrade) (override) |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `minimist@0.0.8` | critical | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `minimist@1.2.5` | critical | 1 | not imported | 1.2.5 -> 1.2.6 (override) |
+| P2 | `minimist@1.2.0` | critical | 2 | not imported | 1.2.0 -> 1.2.6 (override) |
+| P2 | `mixin-deep@1.3.1` | critical | 1 | not imported | 1.3.1 -> 1.3.2 (override) |
+| P2 | `set-value@2.0.0` | critical | 2 | not imported | 2.0.0 -> 2.0.1 (override) |
+| P2 | `set-value@0.4.3` | critical | 2 | not imported | 0.4.3 -> 2.0.1 (major upgrade) (override) |
+| P2 | `tar@4.4.8` | critical | 18 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `tar@2.2.1` | critical | 16 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `underscore@1.8.3` | critical | 2 | not imported | 1.8.3 -> 1.13.8 (override) |
+| P2 | `websocket-driver@0.7.0` | critical | 2 | not imported | 0.7.0 -> 0.7.5 (override) |
+| P2 | `adm-zip@0.4.4` | high | 8 | test code only | 0.4.4 -> 0.6.1 (major upgrade) (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `ansi-regex@3.0.0` | high | 1 | not imported | 3.0.0 -> 3.0.1 (override) |
+| P2 | `async@2.6.1` | high | 1 | test code only | 2.6.1 -> 2.6.4 |
+| P2 | `async@2.6.1` | high | 1 | not imported | 2.6.1 -> 2.6.4 (override) |
+| P2 | `brace-expansion@1.1.11` | high | 8 | test code only | 1.1.11 -> 1.1.21 (override) |
+| P2 | `brace-expansion@1.1.11` | high | 8 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `brace-expansion@1.1.6` | high | 9 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `braces@2.3.2` | high | 1 | not imported | 2.3.2 -> 3.0.3 (major upgrade) (override) |
+| P2 | `braces@2.3.2` | high | 1 | not imported | 2.3.2 -> 3.0.3 (major upgrade) (override) |
+| P2 | `braces@1.8.5` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `cross-spawn@7.0.3` | high | 1 | not imported | 7.0.3 -> 7.0.5 (override) |
+| P2 | `cross-spawn@4.0.2` | high | 1 | not imported | 4.0.2 -> 6.0.6 (major upgrade) (override) |
+| P2 | `cross-spawn@6.0.5` | high | 1 | not imported | 6.0.5 -> 6.0.6 (override) |
+| P2 | `cross-spawn@5.1.0` | high | 1 | not imported | 5.1.0 -> 6.0.6 (major upgrade) (override) |
+| P2 | `cross-spawn@4.0.0` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `debug@2.2.0` | high | 2 | not imported | 2.2.0 -> 2.6.9 (override) |
+| P2 | `debug@2.2.0` | high | 2 | not imported | 2.2.0 -> 2.6.9 (override) |
+| P2 | `debug@2.2.0` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `debug@2.2.0` | high | 2 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `decode-uri-component@0.2.0` | high | 3 | not imported | 0.2.0 -> 0.5.1 (major upgrade) (override) |
+| P2 | `diff@1.4.0` | high | 2 | not imported | 1.4.0 -> 3.5.1 (major upgrade) (override) |
+| P2 | `dot-prop@4.2.0` | high | 1 | not imported | 4.2.0 -> 4.2.1 (override) |
+| P2 | `extract-zip@1.6.7` | high | 2 | not imported | no fixed version published |
+| P2 | `fstream@1.0.10` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `grunt@1.0.3` | high | 3 | not imported | 1.0.3 -> 1.5.3 |
+| P2 | `hawk@3.1.3` | high | 1 | not imported | 3.1.3 -> 9.0.1 (major upgrade) (override) |
+| P2 | `hawk@3.1.3` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `hawk@1.0.0` | high | 2 | test code only | 1.0.0 -> 9.0.1 (major upgrade) (override) |
+| P2 | `hoek@2.16.3` | high | 2 | not imported | no fixed version published |
+| P2 | `hoek@2.16.3` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `hoek@0.9.1` | high | 2 | test code only | no fixed version published |
+| P2 | `i@0.3.6` | high | 1 | not imported | 0.3.6 -> 0.3.7 (override) |
+| P2 | `ini@1.3.5` | high | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `ini@1.3.5` | high | 1 | not imported | 1.3.5 -> 1.3.6 (override) |
+| P2 | `ini@1.3.4` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `js-yaml@3.6.1` | high | 7 | not imported | 3.6.1 -> 3.15.2 (override) |
+| P2 | `js-yaml@3.5.5` | high | 7 | not imported | 3.5.5 -> 3.15.2 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `kind-of@6.0.2` | high | 1 | not imported | 6.0.2 -> 6.0.3 (override) |
+| P2 | `lodash@4.17.21` | high | 2 | not imported | 4.17.21 -> 4.18.0 (override) |
+| P2 | `lodash@4.17.20` | high | 4 | not imported | 4.17.20 -> 4.18.0 (override) |
+| P2 | `lodash@4.17.21` | high | 2 | not imported | 4.17.21 -> 4.18.0 (override) |
+| P2 | `mime@1.2.11` | high | 1 | test code only | 1.2.11 -> 1.4.1 (override) |
+| P2 | `minimatch@3.0.4` | high | 4 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `minimatch@3.0.4` | high | 4 | test code only | 3.0.4 -> 3.1.4 (override) |
+| P2 | `minimatch@0.3.0` | high | 5 | not imported | 0.3.0 -> 3.1.4 (major upgrade) (override) |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.3` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `minimatch@3.0.2` | high | 4 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `moment@2.24.0` | high | 2 | not imported | 2.24.0 -> 2.31.0 (override) |
+| P2 | `nconf@0.6.9` | high | 1 | not imported | 0.6.9 -> 0.11.4 (major upgrade) (override) |
+| P2 | `nconf@0.10.0` | high | 1 | not imported | 0.10.0 -> 0.11.4 (major upgrade) (override) |
+| P2 | `npm@3.10.10` | high | 5 | not imported | 3.10.10 -> 6.14.6 (major upgrade) (override) |
+| P2 | `npm-user-validate@0.1.5` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `qs@5.2.1` | high | 4 | not imported | 5.2.1 -> 6.16.1 (major upgrade) (override) |
+| P2 | `qs@6.2.1` | high | 4 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `qs@6.3.2` | high | 3 | not imported | 6.3.2 -> 6.16.1 (override) |
+| P2 | `qs@0.6.6` | high | 5 | test code only | 0.6.6 -> 6.16.1 (major upgrade) (override) |
+| P2 | `semver@5.7.0` | high | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P2 | `semver@5.3.0` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `semver@5.3.0` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `shelljs@0.3.0` | high | 2 | not imported | 0.3.0 -> 0.8.5 (major upgrade) (override) |
+| P2 | `sshpk@1.10.1` | high | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `tmp@0.1.0` | high | 2 | not imported | 0.1.0 -> 0.2.7 (major upgrade) (override) |
+| P2 | `tmp@0.0.24` | high | 2 | test code only | 0.0.24 -> 0.2.7 (major upgrade) (override) |
+| P2 | `tough-cookie@2.2.2` | high | 3 | not imported | 2.2.2 -> 4.1.3 (major upgrade) (override) |
+| P2 | `tough-cookie@2.3.1` | high | 2 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P2 | `trim-newlines@1.0.0` | high | 1 | not imported | 1.0.0 -> 3.0.1 (major upgrade) (override) |
+| P2 | `websocket-extensions@0.1.3` | high | 1 | not imported | 0.1.3 -> 0.1.4 (override) |
+| P2 | `ws@1.1.5` | high | 1 | test code only | 1.1.5 -> 5.2.5 (major upgrade) (override) |
+| P2 | `y18n@3.2.1` | high | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P2 | `y18n@3.2.1` | high | 1 | not imported | 3.2.1 -> 3.2.2 (override) |
+| P2 | `express@4.16.4` | moderate | 2 | imported by your code | 4.16.4 -> 4.20.0 |
+| P3 | `ajv@6.10.0` | moderate | 2 | not imported | 6.10.0 -> 6.14.0 (override) |
+| P3 | `bl@1.0.3` | moderate | 1 | not imported | 1.0.3 -> 1.2.3 (override) |
+| P3 | `bl@1.1.2` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `extend@3.0.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `got@6.7.1` | moderate | 1 | not imported | 6.7.1 -> 11.8.5 (major upgrade) (override) |
+| P3 | `helmet-csp@1.2.2` | moderate | 1 | not imported | 1.2.2 -> 2.9.1 (major upgrade) (override) |
+| P3 | `hosted-git-info@2.7.1` | moderate | 1 | not imported | 2.7.1 -> 2.8.9 (override) |
+| P3 | `hosted-git-info@2.1.5` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `hosted-git-info@2.1.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `is-my-json-valid@2.15.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `jsonpointer@4.0.1` | moderate | 1 | not imported | 4.0.1 -> 5.0.0 (major upgrade) (override) |
+| P3 | `jsonpointer@4.0.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `micromatch@3.1.10` | moderate | 1 | not imported | 3.1.10 -> 4.0.8 (major upgrade) (override) |
+| P3 | `micromatch@3.1.10` | moderate | 1 | not imported | 3.1.10 -> 4.0.8 (major upgrade) (override) |
+| P3 | `micromatch@2.3.11` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | 0.7.1 -> 2.0.0 (major upgrade) (override) |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | 0.7.1 -> 2.0.0 (major upgrade) (override) |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `ms@0.7.1` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `path-parse@1.0.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `randomatic@1.1.5` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `request@2.88.0` | moderate | 1 | not imported | no fixed version published |
+| P3 | `request@2.67.0` | moderate | 2 | not imported | no fixed version published |
+| P3 | `request@2.75.0` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `request@2.79.0` | moderate | 1 | not imported | no fixed version published |
+| P3 | `request@2.36.0` | moderate | 2 | test code only | no fixed version published |
+| P3 | `stringstream@0.0.5` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `tough-cookie@2.4.3` | moderate | 1 | not imported | 2.4.3 -> 4.1.3 (major upgrade) (override) |
+| P3 | `tough-cookie@2.3.4` | moderate | 1 | test code only | 2.3.4 -> 4.1.3 (major upgrade) (override) |
+| P3 | `tunnel-agent@0.4.3` | moderate | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `tunnel-agent@0.4.3` | moderate | 1 | test code only | 0.4.3 -> 0.6.0 (major upgrade) (override) |
+| P3 | `undefsafe@2.0.2` | moderate | 1 | not imported | 2.0.2 -> 2.0.3 (override) |
+| P3 | `uuid@3.3.2` | moderate | 1 | not imported | 3.3.2 -> 11.1.1 (major upgrade) (override) |
+| P3 | `xml2js@0.4.4` | moderate | 1 | test code only | 0.4.4 -> 0.5.0 (major upgrade) (override) |
+| P3 | `yargs-parser@2.4.1` | moderate | 1 | not imported | bundled in nyc@7.1.0: upgrade nyc |
+| P3 | `chownr@1.0.1` | low | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `cookie@0.3.1` | low | 1 | pulled in by an imported dependency | 0.3.1 -> 0.7.0 (major upgrade) (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@4.1.1` | low | 1 | not imported | bundled in fsevents@1.2.9: upgrade fsevents |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `debug@3.2.6` | low | 1 | not imported | 3.2.6 -> 3.2.7 (override) |
+| P3 | `es5-ext@0.10.12` | low | 1 | not imported | bundled in npm@3.10.10: upgrade npm |
+| P3 | `on-headers@1.0.1` | low | 1 | pulled in by an imported dependency | 1.0.1 -> 1.1.0 (override) |
+| P3 | `send@0.16.2` | low | 1 | pulled in by an imported dependency | 0.16.2 -> 0.19.0 (major upgrade) (override) |
+| P3 | `serve-static@1.13.2` | low | 1 | pulled in by an imported dependency | 1.13.2 -> 1.16.0 (override) |
+
+## Limits
+
+- Reachability is import-level: "imported" means the code loads the package, not that the vulnerable function is proven to run.
+- Results reflect the advisory database at scan time. Zero findings is not a security certification.
+npm ls invalid entries after fix: 0
