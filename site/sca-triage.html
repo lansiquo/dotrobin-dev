@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests"><link rel="canonical" href="https://dotrobin.dev/sca-triage.html"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><meta name="description" content="A captured SCA remediation workflow: scan an intentionally vulnerable npm app, apply four dependency upgrades, run tests and confirm a clean rescan."><title>sca-triage · dotrobin</title><meta property="og:type" content="website"><meta property="og:site_name" content="dotrobin.dev"><meta property="og:title" content="sca-triage · dotrobin"><meta property="og:description" content="A captured SCA remediation workflow: scan an intentionally vulnerable npm app, apply four dependency upgrades, run tests and confirm a clean rescan."><meta property="og:url" content="https://dotrobin.dev/sca-triage.html"><meta property="og:image" content="https://dotrobin.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Robin Lansiquot, application security portfolio"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="portfolio.css?v=nav-1"><link rel="stylesheet" href="reading.css?v=nav-1"><script src="reading.js?v=continuous-1" defer></script><link rel="stylesheet" href="detail-header.css?v=nav-1"><link rel="stylesheet" href="collection.css?v=nav-1"><link rel="stylesheet" href="project-links.css?v=source-actions-2"><link rel="stylesheet" href="sca-workflow.css?v=workflow-4"><link rel="stylesheet" href="contact.css?v=1"><script src="contact.js?v=1" defer></script></head><body class="detail-page"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><nav class="site-nav" aria-label="Main"><a href="index.html#projects" aria-current="true">Projects</a><a href="index.html#writeups">Writeups</a><a href="Robin_Lansiquot_Resume.pdf" target="_blank" rel="noopener">Résumé</a><a href="#contact">Contact</a></nav></header><div class="shell"><main id="main" tabindex="-1"><div class="content article sca-article"><header class="detail-heading"><div class="detail-identity"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 21 6v6c0 5-9 10-9 10S3 17 3 12V6Z"/><path d="m9 9-3 3 3 3m6-6 3 3-3 3m-2-7-2 9"/></svg><div><span class="detail-kind">FEATURED PROJECT</span><h1>sca-triage</h1></div></div></header><p class="lead">I built <code>sca-triage</code>, an npm SCA scanner that ranks vulnerabilities by whether your code loads the vulnerable package, applies the smallest safe upgrades and checks them with the project’s tests. This lab takes one app from four vulnerable dependencies to a clean rescan.</p><section class="project-resources project-resources--paired" aria-label="sca-triage source and demo"><div class="resource-heading">Explore the project</div><div class="resource-actions"><a class="project-link project-link--demo" href="demos/sca.html"><svg class="resource-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 8h18m-11 3 5 3-5 3z"/></svg><span class="resource-copy"><strong class="resource-title">Try interactive demo</strong><span class="resource-meta">Step through a recorded run</span></span></a><a class="project-link project-link--source" href="https://github.com/lansiquo/sca-triage" target="_blank" rel="noopener" aria-label="View sca-triage source on GitHub (opens in a new tab)"><svg class="resource-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M6 7.5v9M18 8.5v2a5 5 0 0 1-5 5H6"/></svg><span class="resource-copy"><strong class="resource-title">Version 1.1 on GitHub</strong><span class="resource-meta">CLI · GitHub Action · Runnable lab</span></span></a></div></section><p class="notice"><strong>Version 1.0</strong> runs locally and as a GitHub Action. The demo replays a recorded run; the terminal output below is from the real CLI.</p>
 <div class="reading-layout">
-<div class="reading-toc"><details class="contents-menu" open><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="On this page"><a href="#scope">The problem</a><a href="#workflow">Scan, fix, rescan</a><a href="#report">Generated report</a><a href="#outcome">What changed</a><a href="#decision">How it works</a><a href="#verification">What has been verified</a><a href="#limits">Scope and limits</a><a href="#run">Run it yourself</a></nav></details></div>
+<div class="reading-toc"><details class="contents-menu" open><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="On this page"><a href="#scope">The problem</a><a href="#workflow">Scan, fix, rescan</a><a href="#report">Generated report</a><a href="#outcome">What changed</a><a href="#decision">How it works</a><a href="#nodegoat">On a real project</a><a href="#verification">What has been verified</a><a href="#limits">Scope and limits</a><a href="#run">Run it yourself</a></nav></details></div>
 <div class="reading-body">
 <h2 id="scope">The problem</h2>
 <p><code>npm audit</code> gives every advisory the same urgency. <code>sca-triage</code> adds triage: what to fix first, the upgrade for each, and test evidence that the fix didn’t break the app.</p>
@@ -151,9 +151,59 @@ _No known vulnerabilities in the installed versions._
 <p>Each fix is the smallest non-prerelease version outside every advisory range, including advisories that only affect newer versions, preferring the same release line; major upgrades are flagged. Direct dependencies are pinned with <code>--save-exact</code>; transitive ones get scoped npm <code>overrides</code>. All priorities are fixed by default; the gate only decides whether a scan fails.</p>
 <p>Built on Node.js built-ins with no third-party dependencies, it reads <code>package-lock.json</code> v2/v3 plus GitHub Advisory Database data from the npm registry, and runs as a CLI or a <a href="https://github.com/lansiquo/sca-triage/blob/main/action.yml">GitHub Action</a>. Source: <a href="https://github.com/lansiquo/sca-triage/blob/main/src/triage.js">ranking and version selection</a> · <a href="https://github.com/lansiquo/sca-triage/blob/main/src/fix.js">upgrade and evidence workflow</a>.</p>
 
+<h2 id="nodegoat">On a real project</h2>
+<p>Beyond the lab, I scanned <a href="https://github.com/OWASP/NodeGoat">OWASP NodeGoat</a>, a deliberately vulnerable Node.js app with 1,479 locked packages. The scan matches 437 advisories across 180 vulnerable packages and narrows “fix now” to 13 P1 packages the app loads, each with its import location and the smallest safe upgrade. <code>swig</code> has no fixed release, so it needs replacing rather than upgrading.</p>
+<section class="sca-output-card" aria-label="NodeGoat scan output"><p class="sca-output-title"><strong>NodeGoat scan</strong><small>1,479 packages · 180 vulnerable · 13 P1</small></p><pre class="sca-output-preview" tabindex="0" role="region" aria-label="NodeGoat scan output"><code>$ node bin/sca-triage.js scan NodeGoat
+owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 13, P2: 123, P3: 44)
+
+[P1] bson@1.0.9  CRITICAL, 2 advisories
+     reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     fix: 1.0.9 -&gt; 1.1.4 (override)
+[P1] minimist@0.0.10  CRITICAL, 2 advisories
+     reachability: pulled in by an imported dependency (via swig (server.js:9))
+     fix: 0.0.10 -&gt; 0.2.4 (major upgrade) (override)
+[P1] proxy-addr@2.0.4  CRITICAL, 1 advisory
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     fix: 2.0.4 -&gt; 2.0.8 (override)
+[P1] underscore@1.9.1  CRITICAL, 2 advisories
+     reachability: imported by your code (config/config.js:1)
+     fix: 1.9.1 -&gt; 1.13.8
+[P1] body-parser@1.18.3  HIGH, 3 advisories
+     reachability: imported by your code (server.js:5)
+     fix: 1.18.3 -&gt; 1.20.9
+[P1] debug@2.2.0  HIGH, 2 advisories
+     reachability: pulled in by an imported dependency (via helmet (server.js:10))
+     fix: 2.2.0 -&gt; 2.6.9 (override)
+[P1] marked@0.3.5  HIGH, 6 advisories
+     reachability: imported by your code (server.js:13)
+     fix: 0.3.5 -&gt; 4.0.10 (major upgrade)
+[P1] mongodb@2.2.36  HIGH, 1 advisory
+     reachability: imported by your code (artifacts/db-reset.js:9, server.js:11)
+     fix: 2.2.36 -&gt; 3.1.13 (major upgrade)
+[P1] path-to-regexp@0.1.7  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via express (app/routes/tutorial.js:1))
+     fix: 0.1.7 -&gt; 0.1.13 (override)
+[P1] qs@6.5.2  HIGH, 3 advisories
+     reachability: pulled in by an imported dependency (via body-parser (server.js:5), via express (app/routes/tutorial.js:1))
+     fix: 6.5.2 -&gt; 6.16.1 (override)
+[P1] semver@5.6.0  HIGH, 1 advisory
+     reachability: pulled in by an imported dependency (via mongodb (artifacts/db-reset.js:9))
+     fix: 5.6.0 -&gt; 5.7.2 (override)
+[P1] swig@1.4.2  HIGH, 1 advisory
+     reachability: imported by your code (server.js:9)
+     fix: no fixed version published
+[P1] uglify-js@2.4.24  HIGH, 1 advisory
+     reachability: pulled in by an imported dependency (via swig (server.js:9))
+     fix: 2.4.24 -&gt; 2.6.0 (override)
+
+… 123 P2 and 44 P3 findings, and each finding’s advisory list, trimmed
+
+Gate (--fail-on P1): FAIL</code></pre></section>
+<p class="sca-output-context">NodeGoat commit <code>c5cb68a</code>, scanned with sca-triage <code>984903c</code>. Only the lockfile and source are read; nothing from NodeGoat is installed or run. The <a href="https://github.com/lansiquo/sca-triage#on-a-real-project-owasp-nodegoat">README</a> has the commands to repeat it.</p>
+
 <h2 id="verification">What has been verified</h2>
 <p class="evidence-note">Checked on commit <a href="https://github.com/lansiquo/sca-triage/commit/984903c"><code>984903c</code></a> (v1.1.0): <code>npm test</code> passed all 54 tests, and <code>npm run lab</code> completed with 4 vulnerable packages before the fix and 0 after.</p>
-<dl class="verification-grid"><div><dt>54 unit tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning and reports.</dd></div><div><dt>CI</dt><dd>Unit tests on Node 20 and 22, plus a lab gate on every push and pull request: the baseline scan and security test must fail, the fixed copy must pass both, and <code>npm run lab</code> must complete.</dd></div><div><dt>A real project</dt><dd>On OWASP NodeGoat (1,479 packages), it narrowed 437 advisories across 180 vulnerable packages to 13 P1 packages.</dd></div></dl>
+<dl class="verification-grid"><div><dt>54 unit tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning and reports.</dd></div><div><dt>CI</dt><dd>Unit tests on Node 20 and 22, plus a lab gate on every push and pull request: the baseline scan and security test must fail, the fixed copy must pass both, and <code>npm run lab</code> must complete.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat, scanned at a pinned commit with the output above, so anyone can repeat the run.</dd></div></dl>
 <h2 id="limits">Scope and limits</h2>
 <ul><li>The lab is an intentionally vulnerable learning app with invented data.</li><li>It covers npm projects (<code>package-lock.json</code> v2/v3) and known advisories; pair it with code review for exploitability.</li><li>Reachability is import-level: “imported” means the package is loaded, not that the vulnerable function runs. It lowers priority but never hides a finding.</li></ul>
 <h2 id="run">Run it yourself</h2>
