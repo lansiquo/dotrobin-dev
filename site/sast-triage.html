@@ -4,7 +4,7 @@
 <div class="reading-body">
 <h2 id="scope">The problem</h2>
 <p>A Semgrep step in a repository’s own CI reports every finding with the same urgency, including ones the pull request didn’t introduce, and the pull request can edit that step. <code>sast-triage</code> uses its own rules and separates what a change introduced from what was already there.</p>
-<p><a href="https://github.com/OWASP/NodeGoat">OWASP NodeGoat</a> is a deliberately vulnerable Express and MongoDB app for learning the OWASP Top 10. At commit <code>c5cb68a</code> the rules find 9 issues in its 44 source files, 6 of them P1. Its last two pull requests introduced none of them.</p>
+<p><a href="https://github.com/OWASP/NodeGoat">OWASP NodeGoat</a> is a deliberately vulnerable Express and MongoDB app for learning the OWASP Top 10. At its latest commit (<code>c5cb68a</code>, June 2023) the rules find 9 issues in its 44 source files, 6 of them P1. Its last two pull requests introduced none of them.</p>
 
 <h2 id="workflow">Scan the project, then its pull requests</h2>
 <p>Each step is one command, shown with its output.</p>
@@ -90,7 +90,7 @@ Changes since 5e71697~1 (2 files): SUCCESS
 
 <h2 id="verification">What has been verified</h2>
 <p class="evidence-note">Checked on sast-triage v2.0.0 (<a href="https://github.com/lansiquo/sast-triage/commit/120750e"><code>120750e</code></a>): <code>make check</code> passed all 168 tests and the self-check, and the NodeGoat runs above were made with the same scanner code.</p>
-<dl class="verification-grid"><div><dt>168 offline tests</dt><dd>Run with outbound HTTP blocked and GitHub and Docker calls mocked, covering diff labelling, ranking, the gate, the scanner checks, the webhook and the durable queue.</dd></div><div><dt>CI</dt><dd><code>make check</code> on Python 3.11–3.14, plus a run of the GitHub Action that must fail on a planted P1, on every push to main and every pull request.</dd></div><div><dt>29 service-owned rules</dt><dd>Each has a positive and a negative test, and all pass the scanner validation, including suppression resistance.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat at a pinned commit, scanned whole and by pull request with the output above, so anyone can repeat the run.</dd></div></dl>
+<dl class="verification-grid"><div><dt>168 offline tests</dt><dd>Run with outbound HTTP blocked and GitHub and Docker calls mocked, covering diff labelling, ranking, the gate, the scanner checks, the webhook and the durable queue.</dd></div><div><dt>CI</dt><dd><code>make check</code> on Python 3.11–3.14, plus a run of the GitHub Action that must fail on a planted P1, on every push to main and every pull request.</dd></div><div><dt>29 service-owned rules</dt><dd>Each has a positive and a negative test, and all pass the scanner validation, including suppression resistance.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat, scanned whole and by pull request with the output above, so anyone can repeat the run.</dd></div></dl>
 <h2 id="limits">Scope and limits</h2>
 <ul><li>Covers Python, JavaScript and TypeScript with 29 pattern rules. They match within one file, so a value passed through another function or module before a dangerous call isn’t traced.</li><li>Pre-existing means untouched, not unrelated: a change elsewhere can make an untouched line match, and that finding doesn’t fail the gate.</li><li>The GitHub App’s live deployment (Linux image audit, rootless container boundaries and authenticated GitHub delivery) is prepared but not complete.</li><li>HTML templates aren’t scanned. Pair it with <a href="sca-triage.html">sca-triage</a> for npm dependencies and with other tools for secrets and infrastructure.</li></ul>
 <h2 id="run">Run it yourself</h2>
@@ -99,7 +99,6 @@ Changes since 5e71697~1 (2 files): SUCCESS
 python3 -m venv sast-venv
 sast-venv/bin/pip install -r sast-triage/requirements-cli.txt
 git clone https://github.com/OWASP/NodeGoat.git
-git -C NodeGoat checkout c5cb68a
 sast-venv/bin/python sast-triage/scan_repo.py NodeGoat
 sast-venv/bin/python sast-triage/scan_repo.py NodeGoat --base 5e71697~1</code></pre>
 <p>Both scans only parse files and run none of NodeGoat’s code. The whole-project scan exits with code 1 because the P1 gate fails; the pull request scan exits with 0. To gate your own pull requests, add the GitHub Action to a workflow that runs on <code>pull_request</code>:</p>
