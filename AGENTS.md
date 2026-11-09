@@ -1,10 +1,10 @@
 # Portfolio contribution guidance
 
-## Lab write-ups
+## Lab writeups
 
-- Call these pages **Write-ups**, not penetration-testing reports, pentesting reports, or formal assessments. Update the page title, heading, description and cards consistently when adding a page. Formal reports are separate deliverables.
-- Use `class="content article writeup"` and `writeups.css` for every lab write-up. Preserve the dark portfolio design, favicon, navigation and unrelated project content.
-- Keep every write-up on the same layout: a `reading-layout` with the `reading-toc` "On this page" sidebar, a `class="environment"` target list, numbered `<h2>` sections, an `attack-path` diagram, and a `defense-panel` findings section. Match this structure when adding a page.
+- Call these pages **Writeups**, not penetration-testing reports, pentesting reports, or formal assessments. Update the page title, heading, description and cards consistently when adding a page. Formal reports are separate deliverables.
+- Use `class="content article writeup"` and `writeups.css` for every lab writeup. Preserve the dark portfolio design, favicon, navigation and unrelated project content.
+- Keep every writeup on the same layout: a `reading-layout` with the `reading-toc` "On this page" sidebar, a `class="environment"` target list, numbered `<h2>` sections, an `attack-path` diagram, and a `defense-panel` findings section. Match this structure when adding a page.
 - Wrap every screenshot in `<figure class="evidence">` (styled frame and caption) with an inner `.evidence-scroll` region — never a bare `<figure>`, which `writeups.css` does not style. The figure may hold either a scrollable `<img>` or an `<a>` linking the full-size capture.
 - Use high-contrast semantic `<pre><code>` panels for actual commands/output, with `tabindex="0"`, an accessible label, horizontal overflow and readable monospace text. Mark inline commands, account identities and paths with `<code>`.
 - Preserve observed versus expected/reconstructed evidence. A screenshot of an elevated identity does not prove the entire exploitation mechanism. Never invent commands, results, screenshots, client work, or remediation that was performed.

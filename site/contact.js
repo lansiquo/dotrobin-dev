@@ -38,7 +38,7 @@
     el('p', { class: 'contact-open' }, el('span', { class: 'contact-dot', 'aria-hidden': 'true' }),
       'Open to application security and product security roles, Toronto.'),
     el('p', { class: 'contact-why' },
-      'Hiring, or want a walkthrough of sast-triage, sca-triage or one of the lab write-ups? Email is the fastest way to reach me.'),
+      'Hiring, or want a walkthrough of sast-triage, sca-triage or one of the lab writeups? Email is the fastest way to reach me.'),
     ...rows, status);
   document.body.append(dialog);
 
