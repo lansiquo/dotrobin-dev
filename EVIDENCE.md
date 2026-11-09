@@ -63,7 +63,7 @@ The external transcripts establish the standard lab images' architecture; they a
 
 ## sca-triage case study
 
-`site/sca-triage.html` shows terminal output as text rather than screenshots. The output comes from one local run of the lab commands, supplied by the owner. It is split into four steps; the `git clone` progress lines, a `rm -rf` cleanup command and the report's generation timestamp were trimmed. Paths are limited to `/tmp/lab-copy` and `/tmp/lab-evidence`; no passwords, tokens, cookies or private keys appear.
+`site/sca-triage.html` shows terminal output as text rather than screenshots. The four lab steps come from one run of the commands they show, on a fresh clone of sca-triage at `bd01be6` (v1.2.0) in a Linux environment. They replace an earlier v1.1.0 run supplied by the owner; apart from the `fix` change list, the report's change list and test counts, and npm's install time, every line matches that run. The `git clone` progress lines, a `rm -rf` cleanup command and the report's generation timestamp were trimmed. Paths are limited to `/tmp/lab-copy` and `/tmp/lab-evidence`; no passwords, tokens, cookies or private keys appear. `npm test` (66 tests) and `npm run lab` also passed on `bd01be6`.
 
 ## sast-triage case study
 
