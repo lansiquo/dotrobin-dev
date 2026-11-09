@@ -64,3 +64,8 @@ The external transcripts establish the standard lab images' architecture; they a
 ## sca-triage case study
 
 `site/sca-triage.html` shows terminal output as text rather than screenshots. The output comes from one local run of the lab commands, supplied by the owner. It is split into four steps; the `git clone` progress lines, a `rm -rf` cleanup command and the report's generation timestamp were trimmed. Paths are limited to `/tmp/lab-copy` and `/tmp/lab-evidence`; no passwords, tokens, cookies or private keys appear.
+
+## sast-triage case study
+
+The four output blocks on `site/sast-triage.html` ("Run it: test, triage, report") are text from one local `make check` run on the owner's Mac, supplied by the owner. Trimmed: `git clone` progress, pip's install lines, the test warning's details (a Starlette deprecation notice with a local path), the priority legend lines, and three of the five annotations. Nothing else was edited. The triage lines match an independent run on `main`.
+
