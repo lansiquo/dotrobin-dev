@@ -63,12 +63,4 @@ The external transcripts establish the standard lab images' architecture; they a
 
 ## sca-triage case study
 
-These 3 PNGs back `site/sca-triage.html`. They are terminal captures of the owner's own sca-triage remediation lab (`lansiquo-sca-remediation-lab`, an intentionally vulnerable npm app), not the offline penetration-testing lab. Each holds only IHDR/IDAT/IEND chunks; ancillary metadata is absent. Original capture timestamps were not recorded in this repository and are not invented here; the report capture shows its own generation time.
-
-| Public image | Original capture timestamp | Content |
-| --- | --- | --- |
-| sca-lab-install.png | Supplied by the owner; capture time not recorded | Fresh `git clone` and `npm run lab:install`: 33 packages added, npm deprecation warning for tar 6.1.0 |
-| sca-baseline-scan.png | Supplied by the owner; capture time not recorded | `npm run lab:scan`: 33 packages, 4 vulnerable (P1 3, P2 1) with import locations and fix versions; P1 gate fails |
-| sca-plan-apply.png | Supplied by the owner; capture time not recorded | `npm run lab:plan` dry run, then `fix --apply` on a copy: four pinned upgrades with `--ignore-scripts`, passing `npm test`, 0 vulnerable packages, evidence directory |
-
-The captures show the workstation prompt (`dotrobin@macbook` or `dotrobin@mac`) and local project paths under `~/Development/projects/`; the bottom row of `sca-lab-install.png` and `sca-plan-apply.png` was cropped to remove a partial next prompt; no passwords, tokens, cookies or private keys are visible.
+`site/sca-triage.html` shows terminal output as text rather than screenshots. The output comes from one local run of the lab commands, supplied by the owner. It is split into four steps; the `git clone` progress lines, a `rm -rf` cleanup command and the report's generation timestamp were trimmed. Paths are limited to `/tmp/lab-copy` and `/tmp/lab-evidence`; no passwords, tokens, cookies or private keys appear.
