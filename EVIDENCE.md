@@ -35,7 +35,7 @@ Academy selected PNGs preserve original IHDR/IDAT pixel data, stripping ancillar
 - academy-cron.png — 20261023115310: UID=0 executes backup.sh.
 - academy-root.png — 20261023115735: modified script uses 8080 and callback confirms root.
 
-Reporting.md's later example listener ports 4444 and 5555 differ from the captures; article explicitly distinguishes them and uses captured commands for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
+Reporting.md's later example listener ports 4444 and 5555 differ from the captures; the article uses only the captured ports (1234 and 8080) for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
 
 ## Dev
 
