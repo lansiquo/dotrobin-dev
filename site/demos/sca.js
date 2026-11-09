@@ -223,6 +223,11 @@
       render();
     });
 
+    // A refresh starts over like a first visit; an opened link (#after/security) still applies.
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type === 'reload' && location.hash) {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
     const initial = readHash();
     if (initial) ({ side, view } = initial);
     render();
