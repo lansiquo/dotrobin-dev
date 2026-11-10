@@ -6,7 +6,7 @@ Robin Lansiquot's security portfolio: a static site in `site/`, served by GitHub
 
 | Project | What it does | Links |
 |---|---|---|
-| **sca-triage** v1.2.3 | npm SCA scanner (CLI on npm, and GitHub Action). Ranks vulnerable dependencies by whether your code imports them, applies the smallest safe upgrades, runs your tests and rescans. | [Case study](https://dotrobin.dev/sca-triage.html) · [Repo](https://github.com/lansiquo/sca-triage) · [npm](https://www.npmjs.com/package/sca-triage) |
+| **sca-triage** v1.2.4 | npm SCA scanner (CLI on npm, and GitHub Action). Ranks vulnerable dependencies by whether your code imports them, applies the smallest safe upgrades, runs your tests and rescans. | [Case study](https://dotrobin.dev/sca-triage.html) · [Repo](https://github.com/lansiquo/sca-triage) · [npm](https://www.npmjs.com/package/sca-triage) |
 | **sast-triage** v2.0 | Semgrep reviewer for Python, JavaScript and TypeScript (CLI and GitHub Action; GitHub App service prepared, not yet live). Labels findings new or pre-existing from the diff, ranks them P1–P3 and fails only on new P1s. | [Case study](https://dotrobin.dev/sast-triage.html) · [Repo](https://github.com/lansiquo/sast-triage) |
 
 ## Lab writeups
