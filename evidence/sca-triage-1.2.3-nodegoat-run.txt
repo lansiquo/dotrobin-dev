@@ -1,5 +1,5 @@
-# Log of the "NodeGoat run" step, GitHub Actions run 42722845659 (lansiquo/sca-triage), 2026-11-09.
-# sca-triage at 3fb8391: fix/audit-followups (b0b823c, version 1.2.3) plus a commit that only adds this workflow.
+# Log of the "NodeGoat run" step, GitHub Actions run 42734460563 (lansiquo/sca-triage), 2026-11-10.
+# sca-triage at 07c1a85: main (9c963de, version 1.2.3) plus a commit that only adds this workflow.
 # GitHub's per-line timestamps are removed; nothing else is changed.
 ##[group]Run set +e
 [36;1mset +e[0m
@@ -17,7 +17,7 @@
 [36;1mecho "npm ls invalid entries after fix: $(cd NodeGoat-fixed && npm ls --all 2>&1 | grep -c invalid)"[0m
 shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
 ##[endgroup]
-sca-triage 3fb8391, node v22.23.4, npm 10.9.9
+sca-triage 07c1a85, node v22.23.4, npm 10.9.9
 NodeGoat c5cb68a
 $ node sca-triage/bin/sca-triage.js scan NodeGoat
 owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 12, P2: 122, P3: 46)
@@ -1103,7 +1103,7 @@ semver: 5.6.0 -> 5.7.2
 uglify-js: 2.4.24 -> 2.6.0
     overrides: "swig" > "uglify-js": "2.6.0"
 swig@1.4.2: no fixed version published yet
-Needs a manual upgrade (an npm override would change more than these copies):
+Needs a manual upgrade (fix can't change only these copies):
   qs 6.5.2 -> 6.16.1: the override "request" > "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
 
 Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
@@ -1128,7 +1128,7 @@ Verified 10 of 10 upgrade target(s):
   package.json overrides: "semver-diff" > "semver": "5.7.2"
   package.json overrides: "swig" > "uglify-js": "2.6.0"
   package-lock.json: re-resolve body-parser@1.18.3 at node_modules/express/node_modules/body-parser
-Needs a manual upgrade (an npm override would change more than these copies):
+Needs a manual upgrade (fix can't change only these copies):
   qs 6.5.2 -> 6.16.1: the override "request" > "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
 Tests: not run — changes applied but UNVERIFIED (disabled with --no-tests)
 After: 170 vulnerable packages (P1: 2, P2: 122, P3: 46)
@@ -2134,7 +2134,7 @@ Gate (--fail-on P1): FAIL
 $ cat evidence/REPORT.md
 # Remediation evidence: owasp-nodejs-goat
 
-Generated 2026-11-09T23:44:35.579Z by sca-triage. Advisory data: GitHub Advisory Database via the npm registry.
+Generated 2026-11-10T01:15:44.474Z by sca-triage. Advisory data: GitHub Advisory Database via the npm registry.
 
 ## Before
 180 vulnerable packages (P1: 12, P2: 122, P3: 46).
@@ -2344,7 +2344,7 @@ Generated 2026-11-09T23:44:35.579Z by sca-triage. Advisory data: GitHub Advisory
 
 ## Needs a manual upgrade
 
-An npm override would change more than these copies, so `fix` left them as they are:
+`fix` can't change only these copies, so it left them as they are:
 
 - `qs@6.5.2` -> 6.16.1: the override "request" &gt; "qs" would also change qs@0.6.6 at node\_modules/zaproxy/node\_modules/qs
 
