@@ -43,15 +43,15 @@ Full scan (44 files): FAILURE
 </li>
 <li class="sca-workflow-step">
 <div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">02</span><h3>Scan its last two pull requests</h3><span class="sca-step-status sca-step-status--pass">Gate: pass</span></div>
-<p><code>--base</code> scans only what changed since a git ref and labels findings the way the gate labels a pull request. Pull request <a href="https://github.com/OWASP/NodeGoat/pull/233">#233</a> moved the tutorial routes out of <code>app/routes/index.js</code>, and #290 only edited an HTML view. The open redirect is in a file #233 changed, but not on a line it changed, so it is pre-existing. The other eight findings are in files neither touched, so they aren’t scanned.</p>
+<p><code>--base</code> scans only what changed since a git ref and labels findings the way the gate labels a pull request. <code>HEAD~2</code> is the commit just before NodeGoat’s last two pull requests: <a href="https://github.com/OWASP/NodeGoat/pull/233">#233</a> moved the tutorial routes out of <code>app/routes/index.js</code>, and #290 only edited an HTML view.</p>
 <section class="sca-output-card" aria-label="Pull request scan output">
 <p class="sca-output-title"><strong>Pull request scan</strong><small>2 files · 1 pre-existing P2 · gate passes</small></p>
-<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Pull request scan output"><code>$ sast-venv/bin/python sast-triage/scan_repo.py NodeGoat --base 5e71697~1
-sast-triage scan of NodeGoat, changes since 5e71697~1
+<pre class="sca-output-preview" tabindex="0" role="region" aria-label="Pull request scan output"><code>$ sast-venv/bin/python sast-triage/scan_repo.py NodeGoat --base HEAD~2
+sast-triage scan of NodeGoat, changes since HEAD~2
 A finding is new when it covers a line changed since the base; only a new P1 fails.
 2 changed Python, JavaScript and TypeScript files, 29 service-owned rules.
 
-Changes since 5e71697~1 (2 files): SUCCESS
+Changes since HEAD~2 (2 files): SUCCESS
   [P2, pre-existing] app/routes/index.js:72  js-open-redirect
 ### sast-triage — Semgrep summary
 
@@ -63,6 +63,7 @@ Changes since 5e71697~1 (2 files): SUCCESS
 | P2 | 0 | 1 |
 | P3 | 0 | 0 |</code></pre>
 </section>
+<p><strong>Why this passes when step 01 fails.</strong> The gate fails only on a finding that is both new and P1, and these pull requests introduced none. The open redirect is in a file #233 changed, but not on a line it changed, so it is pre-existing, and it is P2, which never fails the gate. The other eight findings, including all six P1s, are in files neither pull request touched, so they aren’t scanned. The six P1s are still in the project; they just aren’t these pull requests’ doing, so they don’t block them.</p>
 </li>
 </ol>
 <p class="sca-output-context">Output from one run of these commands on NodeGoat <code>c5cb68a</code>, with the skipped-folders line, the repeated P1 list and the closing priority legend trimmed.</p>
@@ -100,7 +101,7 @@ python3 -m venv sast-venv
 sast-venv/bin/pip install -r sast-triage/requirements-cli.txt
 git clone https://github.com/OWASP/NodeGoat.git
 sast-venv/bin/python sast-triage/scan_repo.py NodeGoat
-sast-venv/bin/python sast-triage/scan_repo.py NodeGoat --base 5e71697~1</code></pre>
+sast-venv/bin/python sast-triage/scan_repo.py NodeGoat --base HEAD~2</code></pre>
 <p>Both scans only parse files and run none of NodeGoat’s code. The whole-project scan exits with code 1 because the P1 gate fails; the pull request scan exits with 0. To gate your own pull requests, add the GitHub Action to a workflow that runs on <code>pull_request</code>:</p>
 <pre tabindex="0" role="region" aria-label="GitHub Action steps"><code>- uses: actions/checkout@v4
   with:
