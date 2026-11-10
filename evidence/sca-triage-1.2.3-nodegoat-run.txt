@@ -1,25 +1,25 @@
-# Log of the "NodeGoat run" step, GitHub Actions run 42734460563 (lansiquo/sca-triage), 2026-11-10.
-# sca-triage at 07c1a85: main (9c963de, version 1.2.3) plus a commit that only adds this workflow.
+# Log of the "NodeGoat run" step, GitHub Actions run 42737443859 (lansiquo/sca-triage), 2026-11-10.
+# sca-triage 1.2.3 as published on npm, run with npx. The temporary branch only added this workflow.
 # GitHub's per-line timestamps are removed; nothing else is changed.
 ##[group]Run set +e
 [36;1mset +e[0m
-[36;1mecho "sca-triage $(git -C sca-triage rev-parse --short HEAD), node $(node -v), npm $(npm -v)"[0m
+[36;1mecho "sca-triage $(npx -y sca-triage --version) from npm, node $(node -v), npm $(npm -v)"[0m
 [36;1mgit clone -q https://github.com/OWASP/NodeGoat.git[0m
 [36;1mgit -C NodeGoat checkout -q c5cb68a[0m
 [36;1mecho "NodeGoat $(git -C NodeGoat rev-parse --short HEAD)"[0m
 [36;1mstep() { echo "\$ $*"; "$@" 2>&1; echo "[exit $?]"; }[0m
-[36;1mstep node sca-triage/bin/sca-triage.js scan NodeGoat[0m
-[36;1mstep node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1[0m
+[36;1mstep npx sca-triage scan NodeGoat[0m
+[36;1mstep npx sca-triage plan NodeGoat --min-priority P1[0m
 [36;1mecho '$ cp -r NodeGoat NodeGoat-fixed'; cp -r NodeGoat NodeGoat-fixed[0m
-[36;1mstep node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence[0m
-[36;1mstep node sca-triage/bin/sca-triage.js scan NodeGoat-fixed[0m
+[36;1mstep npx sca-triage fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence[0m
+[36;1mstep npx sca-triage scan NodeGoat-fixed[0m
 [36;1mecho '$ cat evidence/REPORT.md'; cat evidence/REPORT.md[0m
 [36;1mecho "npm ls invalid entries after fix: $(cd NodeGoat-fixed && npm ls --all 2>&1 | grep -c invalid)"[0m
 shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
 ##[endgroup]
-sca-triage 07c1a85, node v22.23.4, npm 10.9.9
+sca-triage 1.2.3 from npm, node v22.23.4, npm 10.9.9
 NodeGoat c5cb68a
-$ node sca-triage/bin/sca-triage.js scan NodeGoat
+$ npx sca-triage scan NodeGoat
 owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 12, P2: 122, P3: 46)
 
 [P1] bson@1.0.9  CRITICAL, 2 advisories
@@ -1072,7 +1072,7 @@ owasp-nodejs-goat: 1479 packages scanned, 180 vulnerable (P1: 12, P2: 122, P3: 4
 
 Gate (--fail-on P1): FAIL
 [exit 1]
-$ node sca-triage/bin/sca-triage.js plan NodeGoat --min-priority P1
+$ npx sca-triage plan NodeGoat --min-priority P1
 bson: 1.0.9 -> 1.1.4
     overrides: "bson": "1.1.4"
 minimist: 0.0.10 -> 0.2.4  (major upgrade: review release notes)
@@ -1109,7 +1109,7 @@ Needs a manual upgrade (fix can't change only these copies):
 Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
 [exit 0]
 $ cp -r NodeGoat NodeGoat-fixed
-$ node sca-triage/bin/sca-triage.js fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence
+$ npx sca-triage fix NodeGoat-fixed --min-priority P1 --no-tests --evidence evidence
 Verified 10 of 10 upgrade target(s):
   npm install underscore@1.13.8 body-parser@1.20.9 marked@4.0.10 mongodb@3.1.13 --save-exact --ignore-scripts --save-prod
   package.json overrides: "bson": "1.1.4"
@@ -1134,7 +1134,7 @@ Tests: not run — changes applied but UNVERIFIED (disabled with --no-tests)
 After: 170 vulnerable packages (P1: 2, P2: 122, P3: 46)
 Evidence: /home/runner/work/sca-triage/sca-triage/evidence
 [exit 0]
-$ node sca-triage/bin/sca-triage.js scan NodeGoat-fixed
+$ npx sca-triage scan NodeGoat-fixed
 owasp-nodejs-goat: 1511 packages scanned, 170 vulnerable (P1: 2, P2: 122, P3: 46)
 
 [P1] qs@6.5.2  HIGH, 3 advisories
@@ -2134,7 +2134,7 @@ Gate (--fail-on P1): FAIL
 $ cat evidence/REPORT.md
 # Remediation evidence: owasp-nodejs-goat
 
-Generated 2026-11-10T01:15:44.474Z by sca-triage. Advisory data: GitHub Advisory Database via the npm registry.
+Generated 2026-11-10T01:40:49.388Z by sca-triage. Advisory data: GitHub Advisory Database via the npm registry.
 
 ## Before
 180 vulnerable packages (P1: 12, P2: 122, P3: 46).
