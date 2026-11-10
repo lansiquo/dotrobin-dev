@@ -30,10 +30,10 @@
 Primary source: owner's Obsidian Academy/Reporting.md, cross-checked against its linked lab captures. Butler/Reporting.md was also reviewed; the existing complete Butler article already reflects it and was not duplicated.
 
 Academy selected PNGs preserve original IHDR/IDAT pixel data, stripping ancillary metadata:
-- academy-ftp.png — 20261022091244: anonymous login and note retrieval.
-- academy-foothold.png — 20261022101923: captured listener uses 1234; www-data identity.
-- academy-cron.png — 20261023115310: UID=0 executes backup.sh.
-- academy-root.png — 20261023115735: modified script uses 8080 and callback confirms root.
+- academy-ftp.png (20261022091244): anonymous login and note retrieval.
+- academy-foothold.png (20261022101923): captured listener uses 1234; www-data identity.
+- academy-cron.png (20261023115310): UID=0 executes backup.sh.
+- academy-root.png (20261023115735): modified script uses 8080 and callback confirms root.
 
 Reporting.md's later example listener ports 4444 and 5555 differ from the captures; the article uses only the captured ports (1234 and 8080) for those stages. Expected Nmap/output examples are not represented as captured evidence. No credential/hash material was copied. Excluded config, note and cracking screenshots carry credentials or hashes; external cheat-sheet capture is not evidence of an executed command. Permission/listing, upload exchange, full LinPEAS output and exact cracking transcript remain evidence gaps. No performed remediation/retest claimed.
 
@@ -42,10 +42,10 @@ Reporting.md's later example listener ports 4444 and 5555 differ from the captur
 Primary source: owner's Obsidian Dev/Reporting.md. Cross-checked linked scanning notes plus contemporaneous captures. The report's SSH `user` is explicitly treated as a placeholder; an earlier captured jp attempt failed, whereas later captures show jeanpaul. The exact successful login command is not retained. The report's expected id output is not claimed as observed.
 
 Selected authentic PNGs (original pixel payloads; metadata stripped):
-- dev-nfs.png — 20261023123203: export listing.
-- dev-archive.png — 20261023123947: archive extraction, filenames only.
-- dev-sudo.png — 20261023161749: NOPASSWD /usr/bin/zip for jeanpaul.
-- dev-root.png — 20261023162559: actual sudo ZIP invocation, root identity and dev hostname.
+- dev-nfs.png (20261023123203): export listing.
+- dev-archive.png (20261023123947): archive extraction, filenames only.
+- dev-sudo.png (20261023161749): NOPASSWD /usr/bin/zip for jeanpaul.
+- dev-root.png (20261023162559): actual sudo ZIP invocation, root identity and dev hostname.
 
 Excluded: 20261023124042 exposes an OpenSSH private key; 20261023174827 exposes the recovered archive password. Generated diagrams/flag explanations are not used as terminal evidence. No passwords, credential hashes or private-key contents were copied. Generic user template preserved; root result directly captured. Technique cross-check: https://gtfobins.org/gtfobins/zip/ .
 
