@@ -1,8 +1,9 @@
-// "Contact" opens a panel instead of jumping to the footer.
-// Without JavaScript the link still goes to the footer links.
+// "Contact" and the Email links open a panel instead of jumping to the footer or a mail app.
+// Without JavaScript the links still go to the footer links or open the mail app.
 (() => {
   'use strict';
-  const triggers = [...document.querySelectorAll('a[href="#contact"]')];
+  // Collected before the panel is built, so its own "Write an email" link stays a plain mailto.
+  const triggers = [...document.querySelectorAll('a[href="#contact"], a[href^="mailto:"]')];
   const footer = document.getElementById('contact');
   if (!triggers.length || !footer || typeof HTMLDialogElement !== 'function') return;
 
