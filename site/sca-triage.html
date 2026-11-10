@@ -102,7 +102,7 @@ semver: 5.6.0 -&gt; 5.7.2
 uglify-js: 2.4.24 -&gt; 2.6.0
     overrides: "swig" &gt; "uglify-js": "2.6.0"
 swig@1.4.2: no fixed version published yet
-Needs a manual upgrade (an npm override would change more than these copies):
+Needs a manual upgrade (fix can't change only these copies):
   qs 6.5.2 -&gt; 6.16.1: the override "request" &gt; "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
 
 Dry run: nothing was changed. Run "sca-triage fix" to apply these upgrades.
@@ -126,7 +126,7 @@ Verified 10 of 10 upgrade target(s):
   package.json overrides: "semver-diff" &gt; "semver": "5.7.2"
   package.json overrides: "swig" &gt; "uglify-js": "2.6.0"
   package-lock.json: re-resolve body-parser@1.18.3 at node_modules/express/node_modules/body-parser
-Needs a manual upgrade (an npm override would change more than these copies):
+Needs a manual upgrade (fix can't change only these copies):
   qs 6.5.2 -&gt; 6.16.1: the override "request" &gt; "qs" would also change qs@0.6.6 at node_modules/zaproxy/node_modules/qs
 Tests: not run — changes applied but UNVERIFIED (disabled with --no-tests)
 After: 170 vulnerable packages (P1: 2, P2: 122, P3: 46)
@@ -203,7 +203,7 @@ Gate (--fail-on P1): FAIL</code></pre>
 
 ## Needs a manual upgrade
 
-An npm override would change more than these copies, so `fix` left them as they are:
+`fix` can't change only these copies, so it left them as they are:
 
 - `qs@6.5.2` -&gt; 6.16.1: the override "request" &amp;gt; "qs" would also change qs@0.6.6 at node\_modules/zaproxy/node\_modules/qs
 
@@ -249,13 +249,13 @@ An npm override would change more than these copies, so `fix` left them as they 
 <h2 id="decision">How it works</h2>
 <p>Ranking combines advisory severity with static import evidence:</p>
 <ul><li><strong>P1:</strong> high or critical, and the code imports the package directly or through an imported dependency.</li><li><strong>P2:</strong> high or critical without that evidence, or moderate with it.</li><li><strong>P3:</strong> everything else.</li></ul>
-<p>Import detection covers <code>require()</code>, <code>import</code>, <code>export … from</code> and <code>createRequire()</code> across JavaScript, TypeScript, Vue, Svelte and Astro files, following workspaces, peer dependencies and npm aliases. Commented-out code doesn’t count.</p>
+<p>Import detection covers <code>require()</code>, <code>import</code>, <code>export … from</code> and <code>createRequire()</code> across JavaScript, TypeScript, Vue, Svelte and Astro files, following workspaces, peer dependencies and npm aliases. Commented-out code doesn’t count, and syntax the scanner can’t read reliably counts as loaded.</p>
 <p>Each fix is the smallest non-prerelease version outside every advisory range, including advisories that only affect newer versions, preferring the same release line; major upgrades are flagged. Direct dependencies are pinned with <code>--save-exact</code>, keeping their dependency type; transitive ones get scoped npm <code>overrides</code>. An override is written only when it reaches nothing outside the plan; anything else is listed for a manual upgrade. After installing, <code>fix</code> checks the new lockfile, and if an install fails or produced anything other than the plan, the manifests and lockfile are put back. All priorities are fixed by default; the gate only decides whether a scan fails.</p>
 <p>Built on Node.js built-ins with no third-party dependencies, it reads <code>package-lock.json</code> v2/v3 plus GitHub Advisory Database data from the npm registry, and runs as a CLI or a <a href="https://github.com/lansiquo/sca-triage/blob/main/action.yml">GitHub Action</a>. Source: <a href="https://github.com/lansiquo/sca-triage/blob/main/src/triage.js">ranking and version selection</a> · <a href="https://github.com/lansiquo/sca-triage/blob/main/src/fix.js">upgrade and evidence workflow</a> · <a href="https://github.com/lansiquo/sca-triage/blob/main/ARCHITECTURE.md">architecture</a>.</p>
 
 <h2 id="verification">What has been verified</h2>
-<p class="evidence-note">Checked on sca-triage v1.2.3 (<a href="https://github.com/lansiquo/sca-triage/tree/v1.2.3"><code>v1.2.3</code></a>): <code>npm test</code> passed all 101 tests, and the NodeGoat output above is from one GitHub Actions run of these commands. After the fix, <code>npm ls --all</code> reported no invalid entries.</p>
-<dl class="verification-grid"><div><dt>101 tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning, registry retries, rollback and reports, plus <code>fix</code> runs with real npm against a local registry.</dd></div><div><dt>CI</dt><dd>Tests on Node 20, 22 and 24 on Linux, macOS and Windows, plus a check of the packed npm package, on every push to main and every pull request.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat, scanned, fixed and rescanned with the output above, so anyone can repeat the run.</dd></div></dl>
+<p class="evidence-note">Checked on sca-triage v1.2.3 (<a href="https://github.com/lansiquo/sca-triage/tree/v1.2.3"><code>v1.2.3</code></a>): <code>npm test</code> passed all 96 tests, and the NodeGoat output above is from one GitHub Actions run of these commands. After the fix, <code>npm ls --all</code> reported no invalid entries.</p>
+<dl class="verification-grid"><div><dt>96 tests</dt><dd>Run offline with <code>npm test</code>, covering version matching, lockfiles, reachability, ranking, fix planning, registry retries, rollback and reports, plus <code>fix</code> runs with real npm against a local registry.</dd></div><div><dt>CI</dt><dd>Tests on Node 20, 22 and 24 on Linux, macOS and Windows, a check of the packed npm package, and a run of the GitHub Action itself, on every push to main and every pull request.</dd></div><div><dt>A real project</dt><dd>OWASP NodeGoat, scanned, fixed and rescanned with the output above, so anyone can repeat the run.</dd></div></dl>
 <h2 id="limits">Scope and limits</h2>
 <ul><li>It covers npm projects (<code>package-lock.json</code> v2/v3) and known advisories; pair it with code review for exploitability.</li><li>Reachability is import-level: “imported” means the package is loaded, not that the vulnerable function runs. It lowers priority but never hides a finding.</li><li>An upgrade is only as verified as the project’s tests. NodeGoat has none, so its upgrades are unverified.</li><li>Bundled dependencies ship inside another package, so overrides can’t change them; <code>scan</code>, <code>plan</code> and <code>fix</code> name the package to upgrade.</li><li>An npm override reaches every version of its parent and everything below it. When one would also change other copies, as with NodeGoat’s <code>qs</code>, <code>fix</code> lists the upgrade for you instead of applying it.</li></ul>
 <h2 id="run">Run it yourself</h2>
