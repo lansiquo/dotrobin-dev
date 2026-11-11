@@ -1,13 +1,13 @@
 /* A readable sequence, not evidence of an otherwise unrecorded exploit step. */
 /* Narrow, centred box; each label stacks under its own centred circle. */
-.writeup .vertical-path{max-width:420px;margin:0 auto;padding:24px 20px;border:1px solid #b56f79;border-left:3px solid #944f58;border-radius:0 8px 8px 0;background:#f3eaf1}
+.writeup .vertical-path{max-width:420px;margin:0 auto;padding:24px 20px;border:1px solid #98555f;border-left:3px solid #bd747c;border-radius:0 8px 8px 0;background:#1c161b}
 .writeup .vertical-path ol{list-style:none;counter-reset:attack-step;margin:0;padding:0}
-.writeup .vertical-path li{position:relative;counter-increment:attack-step;margin:0;padding:34px 0 0;text-align:center;line-height:1.5;color:#251f2b;font-size:15px;display:block}
+.writeup .vertical-path li{position:relative;counter-increment:attack-step;margin:0;padding:34px 0 0;text-align:center;line-height:1.5;color:#e5deef;font-size:15px;display:block}
 .writeup .vertical-path li:first-child{padding-top:0}
 /* numbered circle, centred above its label */
-.vertical-path li::before{content:counter(attack-step,decimal-leading-zero);display:grid;place-items:center;width:28px;height:28px;margin:0 auto;border:1px solid #a36973;border-radius:50%;background:#ecd8e2;color:#572a31;font:10px/1 ui-monospace,monospace}
+.vertical-path li::before{content:counter(attack-step,decimal-leading-zero);display:grid;place-items:center;width:28px;height:28px;margin:0 auto;border:1px solid #9b626c;border-radius:50%;background:#2e2027;color:#edb4bb;font:10px/1 ui-monospace,monospace}
 /* downward connector sitting in the gap above each circle (not the first) */
-.vertical-path li:not(:first-child)::after{content:"\2193";position:absolute;top:8px;left:0;right:0;text-align:center;color:#944f58;font:13px/1 ui-monospace,monospace;pointer-events:none}
+.vertical-path li:not(:first-child)::after{content:"\2193";position:absolute;top:8px;left:0;right:0;text-align:center;color:#bd747c;font:13px/1 ui-monospace,monospace;pointer-events:none}
 .vertical-path li>span{display:block;padding-top:8px;min-width:0;overflow-wrap:anywhere}
 @media(max-width:480px){.writeup .vertical-path{padding:20px 16px}.writeup .vertical-path li{font-size:14px}}
-.writeup mark.attack-key{color:#2d2040;background:#dfd9ed;border:2px solid #7f5db8;border-radius:4px;padding:0 .18em;font:inherit;white-space:nowrap;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.writeup mark.attack-key{color:#e3d4ff;background:#282332;border:2px solid #b391f1;border-radius:4px;padding:0 .18em;font:inherit;white-space:nowrap;box-decoration-break:clone;-webkit-box-decoration-break:clone}
