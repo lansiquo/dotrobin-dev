@@ -29,6 +29,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 .github/scripts/build_pulse.py site
+      # Writes the current versions into the labels the pages mark with data-release:
+      # sast-triage from the pulse data above, sca-triage from the npm registry. A label
+      # that cannot be filled is deployed with its committed text.
+      - name: Fill the version labels
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python3 .github/scripts/build_versions.py site
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: site
