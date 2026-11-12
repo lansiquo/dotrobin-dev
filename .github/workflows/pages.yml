@@ -2,6 +2,8 @@ name: Deploy static portfolio
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "17 * * * *"
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      # Rebuilds site/data/pulse.json from the published releases of sast-triage and
+      # sca-triage. If that cannot be done, the committed file is deployed as it is.
+      - name: Build the release pulse data
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/build_pulse.py site
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: site

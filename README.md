@@ -13,6 +13,14 @@ Robin Lansiquot's security portfolio: a static site in `site/`, served by GitHub
 
 Academy, Blackpearl, Blue, Butler and Dev: isolated offline lab machines, each with an attack path, evidence screenshots and defensive findings. Evidence sources are tracked in [EVIDENCE.md](EVIDENCE.md).
 
+## Release pulse data
+
+The release pulse in the homepage header reads `site/data/pulse.json`. Every deploy rebuilds that file from the published releases of sast-triage and sca-triage, so the committed copy is only the fallback for a deploy that cannot reach GitHub. To rebuild it locally:
+
+```bash
+python3 .github/scripts/build_pulse.py site
+```
+
 ## Local preview
 
 ```bash
