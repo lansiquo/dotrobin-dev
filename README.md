@@ -23,7 +23,7 @@ python3 .github/scripts/build_pulse.py site
 
 ## Version labels
 
-Every deploy also writes the current versions into the pages it publishes, so the site needs no change after a release. It fills each element marked with `data-release` and `data-release-format`: the version on the two homepage project cards and, on the sast-triage page, the two "Version X.Y" labels and the version in the GitHub Action example.
+Every deploy also writes the current versions into the pages it publishes, so the site needs no change after a release. It fills each element marked with `data-release` and `data-release-format`, six labels in all: on the homepage, the version on the two project cards and the version in the sast-triage card's GitHub Action snippet, and, on the sast-triage page, the two "Version X.Y" labels and the version in the GitHub Action example.
 
 | Tool | Version shown | Read from |
 |---|---|---|

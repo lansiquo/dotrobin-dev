@@ -30,7 +30,7 @@
   if (linkedin) rows.push(el('a', { class: 'contact-action', href: linkedin.href, target: '_blank', rel: 'noopener' },
     'Message me on LinkedIn', el('span', { 'aria-hidden': 'true' }, '↗')));
   if (resume) rows.push(el('a', { class: 'contact-action', href: resume.href, target: '_blank', rel: 'noopener' },
-    'Download my résumé (PDF)', el('span', { 'aria-hidden': 'true' }, '↓')));
+    'Download my resume (PDF)', el('span', { 'aria-hidden': 'true' }, '↓')));
 
   const close = el('button', { type: 'button', class: 'contact-close', 'aria-label': 'Close' }, '×');
   const dialog = el('dialog', { class: 'contact-dialog', 'aria-labelledby': 'contact-title' },
