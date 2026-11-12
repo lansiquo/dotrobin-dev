@@ -10,6 +10,9 @@
 /* Hero: outlined eyebrow pill, very large name, intro, then actions and certifications in one row. */
 .hero{max-width:940px;padding:56px 0 70px}
 .hero-eyebrow{display:inline-block;margin:0;padding:6px 14px;border:1px solid var(--pill-line);border-radius:99px;color:var(--violet);font-size:13px;line-height:1.4;letter-spacing:.06em}
+/* The eyebrow has a short form for narrow screens, where the full text does not fit on one line. Below 375px it is also set slightly smaller. The short span carries the hidden attribute, so only the full text shows if this stylesheet is missing or stale. */
+@media(max-width:480px){.hero-eyebrow-full{display:none}.hero-eyebrow-short{display:inline}}
+@media(max-width:374px){.hero-eyebrow{padding:6px 12px;font-size:12px;letter-spacing:.02em}}
 .hero h1{margin:26px 0 calc(26px - .14em);padding-bottom:.14em;color:var(--ink);font-size:clamp(44px,7.5vw,96px);line-height:1;font-weight:600;letter-spacing:-.04em}
 @supports ((-webkit-background-clip:text) or (background-clip:text)){.hero h1{background:linear-gradient(180deg,#fff,#b7b2d6);-webkit-background-clip:text;background-clip:text;color:transparent}}
 @media(forced-colors:active){.hero h1{background:none;color:CanvasText}}
