@@ -16,3 +16,7 @@ jobs:
           persist-credentials: false
       - name: Check HTML, links, images and sitemap
         run: python3 .github/scripts/check_site.py site
+      - name: Run the unit tests of the site scripts
+        run: |
+          python3 .github/scripts/test_check_site.py
+          python3 .github/scripts/test_build_pulse.py
