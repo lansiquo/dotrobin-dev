@@ -46,24 +46,38 @@
 .bento-card .bento-stack{margin-top:14px;font-size:14px}
 .bento-main:hover h3{color:var(--violet)}
 .bento-command{display:block;margin-top:22px;padding:14px;overflow-x:auto;border:1px solid var(--card-line);border-radius:10px;background:#0a0910;color:var(--violet);font:14px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
-.bento-command span{-webkit-user-select:none;user-select:none}
+.bento-command span[aria-hidden]{-webkit-user-select:none;user-select:none}
+/* The sast-triage snippet is wider than its card at some sizes. It wraps after "lansiquo/" or before "@", never inside the name. */
+.bento-sast .bento-command{white-space:normal}
+.bento-nowrap{white-space:nowrap}
+/* One result line above the snippet. */
+.bento-card .bento-result{margin-top:14px;font-size:14px}
+.bento-result code{color:var(--soft);font:13px ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
 .bento-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:18px}
 .bento-version{color:var(--soft);font-size:13px}
 .bento-link{padding-bottom:2px;border-bottom:1px solid #6a5f9a;color:var(--violet);font-size:14px}
 .bento-link:hover{border-color:var(--violet);color:#fff}
-/* The featured card is the tall one: its command and links sit at the bottom, over a soft glow. */
+/* The featured card is the tall one: a scan result takes its spare height, and its command and links sit at the bottom, over a soft glow. */
 .bento-featured{background:radial-gradient(110% 46% at 50% 100%,rgba(139,92,246,.17),transparent 72%),linear-gradient(180deg,#14121d,#0d0c14)}
-.bento-featured .bento-command{margin-top:auto}
 .bento-featured .bento-main{flex:none;margin-bottom:22px}
+/* The scan result: three figures, four output lines and where they come from. An output line that does not fit wraps between its columns, inside the block, indented under the package name. */
+.bento-proof{display:flex;flex:1;flex-direction:column;justify-content:center;gap:18px;min-width:0}
+.bento-figures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none;color:var(--muted);font-size:13px;line-height:1.4}
+.bento-figures strong{display:block;color:var(--ink);font-size:30px;line-height:1.2;font-weight:600}
+.bento-output{margin:0;padding:14px;border:1px solid var(--card-line);border-radius:10px;background:#0a0910;color:var(--soft);font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.bento-output code{font:inherit}
+.bento-output span{display:block;padding-left:5ch;text-indent:-5ch}
+.bento-output span span{display:inline-block;max-width:100%;padding:0;text-indent:0;vertical-align:top}
+.bento-card .bento-source{font-size:14px}
 .bento-stat{display:block;margin-top:4px;color:var(--ink);font-size:44px;line-height:1.28;font-weight:600}
 
-/* Lab writeups: one row per writeup, name then summary, topics at the end of the row. */
+/* Lab writeups: one row per writeup, name above its summary, topics at the end of the row. */
 .lab-list{margin:14px 0 0;padding:0;list-style:none}
 .lab-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:4px 24px;padding:12px 0;border-top:1px solid var(--card-line);color:inherit}
 .lab-row:focus-visible{outline-offset:2px}
-.lab-row h3{display:inline;margin:0;color:var(--soft);font-size:15px;line-height:1.5;font-weight:500}
-.lab-row p{display:inline;color:var(--dim);font-size:15px;line-height:1.5}
-.lab-row p::before{content:" — "}
+.lab-text{display:contents}
+.lab-row h3{margin:0;color:var(--soft);font-size:15px;line-height:1.5;font-weight:500}
+.lab-row p{grid-column:1/-1;grid-row:2;color:var(--dim);font-size:15px;line-height:1.5}
 .lab-row:hover h3{color:#fff}
 .lab-tags{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none;color:var(--dim);font-size:13px;line-height:1.5}
 .lab-tags li+li::before{content:"·";margin:0 7px}
@@ -73,6 +87,8 @@
 .bento{grid-template-columns:1.4fr 1fr 1fr}
 .bento-featured .bento-main h3{font-size:36px}
 .bento-featured .bento-main p:not(.bento-stack){font-size:17px}
+.bento-proof{gap:26px}
+.bento-figures strong{font-size:36px}
 .bento-impact{grid-column:3;grid-row:1}
 @supports (grid-template-rows:subgrid){
 .bento-projects{grid-column:1/-1;grid-row:1/3;grid-template-columns:subgrid;grid-template-rows:subgrid}
@@ -92,4 +108,4 @@
 @media(max-width:1199px){.homepage{--gutter:48px}}
 @media(max-width:800px){.homepage{--gutter:24px;background-image:radial-gradient(440px 280px at 78% 8%,rgba(139,92,246,.32),transparent),radial-gradient(360px 260px at 6% 34%,rgba(56,189,248,.16),transparent)}.hero{padding:48px 0 44px}.hero-lead{font-size:18px}.hero-actions{margin-top:28px}.bento{padding-bottom:56px}}
 @media(max-width:700px){.lab-row{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:480px){.hero-lead{font-size:17px}.bento-card{padding:22px}.bento-main h3{font-size:26px}.hero-contact{gap:0 22px}}
+@media(max-width:480px){.hero-lead{font-size:17px}.bento-card{padding:22px}.bento-main h3{font-size:26px}.bento-figures strong{font-size:26px}.bento-output{padding:12px;font-size:12px}.hero-contact{gap:0 22px}}

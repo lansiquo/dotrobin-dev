@@ -116,11 +116,14 @@
       svg('circle', { class: 'pulse-ring', cx: view.end, cy: view.base, r: 12 }),
       svg('circle', { class: 'pulse-dot', cx: view.end, cy: view.base, r: 5, filter: 'url(#pulse-glow)' }));
 
+    // Tap areas. Each beat owns the strip nearer to it than to its neighbours, at most 22px to either side, so a tap picks the beat under the finger.
+    // Neighbours share one rounded edge, so the strips never overlap. A beat with 24px or more to each neighbour is at least 24px wide, at the
+    // left edge of the stage too; beats closer than that get all the room between them.
+    const edges = view.beats.map((b, i) => i ? round((view.beats[i - 1].x + b.x) / 2) : 0).concat(w);
     const buttons = view.beats.map((b, i) => {
-      const before = view.beats[i - 1], after = view.beats[i + 1];
-      const left = Math.max(before ? (before.x + b.x) / 2 : 0, b.x - 22, 0), right = Math.min(after ? (b.x + after.x) / 2 : w, b.x + 22, w);
+      const left = Math.max(edges[i], round(b.x - 22)), right = Math.min(edges[i + 1], Math.max(round(b.x + 22), left + 24));
       const button = el('button', { type: 'button', class: 'pulse-beat', tabindex: i === view.beats.length - 1 ? '0' : '-1', 'aria-label': `${b.tool} ${b.version}, released ${stamp.format(b.time)}` });
-      button.style.left = round(left) + 'px';
+      button.style.left = left + 'px';
       button.style.width = round(right - left) + 'px';
       button.style.height = (view.base + 16) + 'px';
       button.addEventListener('mouseenter', () => show(i));
