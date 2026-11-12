@@ -13,6 +13,30 @@ Robin Lansiquot's security portfolio: a static site in `site/`, served by GitHub
 
 Academy, Blackpearl, Blue, Butler and Dev: isolated offline lab machines, each with an attack path, evidence screenshots and defensive findings. Evidence sources are tracked in [EVIDENCE.md](EVIDENCE.md).
 
+## Release pulse data
+
+The release pulse in the homepage header reads `site/data/pulse.json`. Every deploy rebuilds that file from the published releases of sast-triage and sca-triage, so the committed copy is only the fallback for a deploy that cannot reach GitHub. To rebuild it locally:
+
+```bash
+python3 .github/scripts/build_pulse.py site
+```
+
+## Version labels
+
+Every deploy also writes the current versions into the pages it publishes, so the site needs no change after a release. It fills each element marked with `data-release` and `data-release-format`: the version on the two homepage project cards and, on the sast-triage page, the two "Version X.Y" labels and the version in the GitHub Action example.
+
+| Tool | Version shown | Read from |
+|---|---|---|
+| sast-triage | The highest published GitHub release tagged `vX.Y.Z`, without drafts and prereleases | `site/data/pulse.json`, which the same deploy has just rebuilt |
+| sca-triage | `dist-tags.latest` on npm, the version `npx sca-triage` runs | `https://registry.npmjs.org/sca-triage` |
+
+Only the deployed copy changes, never the repository. The committed text is the fallback: a label keeps it when its version cannot be read or is lower than the committed one, and the deploy goes on with one warning. Text without the two attributes, such as a note that says which version something was checked on, is never rewritten. To fill a local copy:
+
+```bash
+python3 .github/scripts/build_pulse.py site
+python3 .github/scripts/build_versions.py site
+```
+
 ## Local preview
 
 ```bash
