@@ -5,8 +5,8 @@ Usage: python3 .github/scripts/test_build_versions.py
 
 FakeNpm answers the script's request the way registry.npmjs.org does, and the
 pulse data is a file the test writes the way build_pulse.py does. Most tests
-run the script on a small site with the same five labels as the real one. The
-last class runs it on a copy of the committed pages.
+run the script on a small site with five labels written like the real ones. The
+last class runs it on a copy of the committed pages, which hold six.
 """
 import contextlib
 import email.message
@@ -523,16 +523,19 @@ class FailureTest(Case):
 class CommittedSiteTest(Case):
     """The pages of this repository, so a change that drops a marker fails here before it deploys."""
 
-    EXPECTED = sorted([("index.html", SAST, "X.Y.Z"), ("index.html", SCA, "X.Y.Z"),
+    # The homepage sast-triage card holds two: its version label and the Action snippet.
+    EXPECTED = sorted([("index.html", SAST, "X.Y.Z"), ("index.html", SAST, "X.Y.Z"), ("index.html", SCA, "X.Y.Z"),
                        ("sast-triage.html", SAST, "X.Y"), ("sast-triage.html", SAST, "X.Y"),
                        ("sast-triage.html", SAST, "X.Y.Z")])
+    # build_versions.SPOTS lists five of them. The card's Action snippet is marked and filled, but not listed there.
+    NOT_IN_SPOTS = [("index.html", SAST, "X.Y.Z")]
     LABEL = re.compile(r'(<([a-z]+)\b[^<>]*\bdata-release="([a-z-]+)" data-release-format="X\.Y(\.Z)?">[^<>0-9]*)'
                        r"[0-9]+(?:\.[0-9]+)+([^<>0-9]*</\2>)")
 
     def committed(self):
         return {page.relative_to(SITE).as_posix(): page.read_bytes() for page in sorted(SITE.rglob("*.html"))}
 
-    def test_the_five_labels_are_marked_and_each_holds_one_version(self):
+    def test_the_six_labels_are_marked_and_each_holds_one_version(self):
         found = []
         for name, content in self.committed().items():
             text, labels, problems, changed = build_versions.fill(name, content.decode("utf-8"), {})
@@ -540,8 +543,8 @@ class CommittedSiteTest(Case):
             self.assertEqual((text, changed), (content.decode("utf-8"), 0))
             found += [(name, label.tool, label.shown) for label in labels]
         self.assertEqual(sorted(found), self.EXPECTED)
-        self.assertEqual(sorted((name, tool, shown) for name, tool, shown, count in build_versions.SPOTS
-                                for _ in range(count)), self.EXPECTED)
+        self.assertEqual(sorted([(name, tool, shown) for name, tool, shown, count in build_versions.SPOTS
+                                 for _ in range(count)] + self.NOT_IN_SPOTS), self.EXPECTED)
 
     def test_the_committed_versions_are_filled_without_a_change_or_a_warning(self):
         committed, shown = self.committed(), {}
@@ -553,7 +556,7 @@ class CommittedSiteTest(Case):
         result = run(committed, pulse=pulse_file(shown[SAST]), npm=FakeNpm(shown[SCA]))
         self.assert_filled(result, committed, 0)
 
-    def test_a_release_changes_the_five_labels_and_nothing_else(self):
+    def test_a_release_changes_the_six_labels_and_nothing_else(self):
         committed = self.committed()
         result = run(committed, pulse=pulse_file("98.76.54"), npm=FakeNpm("87.65.43"))
 
@@ -565,8 +568,8 @@ class CommittedSiteTest(Case):
         for name, content in committed.items():
             text, replaced = self.LABEL.subn(version, content.decode("utf-8"))
             expected[name], count = text.encode("utf-8"), count + replaced
-        self.assertEqual(count, 5)
-        self.assert_filled(result, expected, 5)
+        self.assertEqual(count, 6)
+        self.assert_filled(result, expected, 6)
         for name in ("sast-triage.html", "sca-triage.html"):
             notes = re.findall(rb'<p class="evidence-note">.*?</p>', committed[name], re.S)
             self.assertTrue(notes and all(b"Checked on" in note for note in notes), name)

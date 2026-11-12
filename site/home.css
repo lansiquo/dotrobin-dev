@@ -33,7 +33,7 @@
 .hero-contact a i{font-style:normal;color:var(--dim)}
 .hero-contact a:hover{color:#fff}
 
-/* Bento grid: a tall featured project, a second project, an impact figure, and one wide card for the lab writeups. */
+/* Bento grid: a tall featured project, a second project, and one wide card for the lab writeups. */
 .bento{display:grid;gap:16px;padding:20px 0 90px}
 .bento-projects{display:grid;gap:16px;min-width:0}
 .bento-projects,.bento-labs{scroll-margin-top:24px}
@@ -69,7 +69,6 @@
 .bento-output span{display:block;padding-left:5ch;text-indent:-5ch}
 .bento-output span span{display:inline-block;max-width:100%;padding:0;text-indent:0;vertical-align:top}
 .bento-card .bento-source{font-size:14px}
-.bento-stat{display:block;margin-top:4px;color:var(--ink);font-size:44px;line-height:1.28;font-weight:600}
 
 /* Lab writeups: one row per writeup, name above its summary, topics at the end of the row. */
 .lab-list{margin:14px 0 0;padding:0;list-style:none}
@@ -82,26 +81,24 @@
 .lab-tags{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none;color:var(--dim);font-size:13px;line-height:1.5}
 .lab-tags li+li::before{content:"·";margin:0 7px}
 
-/* Three columns from 1080px. The projects section is a subgrid of the bento, so its cards and the writeups card share one set of tracks. */
+/* Two columns from 1080px: the featured project beside the second project and the writeups. The projects section is a subgrid of the bento, so its cards and the writeups card share one set of tracks. */
 @media(min-width:1080px){
-.bento{grid-template-columns:1.4fr 1fr 1fr}
+.bento{grid-template-columns:1.4fr 2fr}
 .bento-featured .bento-main h3{font-size:36px}
 .bento-featured .bento-main p:not(.bento-stack){font-size:17px}
 .bento-proof{gap:26px}
 .bento-figures strong{font-size:36px}
-.bento-impact{grid-column:3;grid-row:1}
 @supports (grid-template-rows:subgrid){
 .bento-projects{grid-column:1/-1;grid-row:1/3;grid-template-columns:subgrid;grid-template-rows:subgrid}
 .bento-featured{grid-column:1;grid-row:1/3}
 .bento-sast{grid-column:2;grid-row:1}
-.bento-impact,.bento-labs{position:relative;z-index:1}
-.bento-labs{grid-column:2/4;grid-row:2}
+.bento-labs{position:relative;z-index:1;grid-column:2;grid-row:2}
 /* "Writeups" in the menu moves that section first (section-order.js): its card takes the top row. */
 .bento-labs:first-child{grid-row:1}
-.bento-labs:first-child+.bento-projects>.bento-sast,.bento-labs:first-child~.bento-impact{grid-row:2}
+.bento-labs:first-child+.bento-projects>.bento-sast{grid-row:2}
 }
 @supports not (grid-template-rows:subgrid){
-.bento-projects{grid-column:1/3;grid-template-columns:1.4fr 1fr}
+.bento-projects{grid-column:1/-1;grid-template-columns:1.4fr 2fr;align-items:start}
 .bento-labs{grid-column:1/-1}
 }
 }
