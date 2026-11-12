@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-12T08:47:46Z",
+  "generated": "2026-11-12T13:31:57Z",
   "releases": [
     {
       "published": "2025-09-21T14:39:18Z",
@@ -90,6 +90,16 @@
       "published": "2026-11-12T08:43:09Z",
       "tool": "sast-triage",
       "version": "2.4.0"
+    },
+    {
+      "published": "2026-11-12T13:17:21Z",
+      "tool": "sast-triage",
+      "version": "2.4.1"
+    },
+    {
+      "published": "2026-11-12T13:29:15Z",
+      "tool": "sca-triage",
+      "version": "1.3.0"
     }
   ]
 }
