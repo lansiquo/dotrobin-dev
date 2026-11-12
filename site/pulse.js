@@ -92,6 +92,32 @@
     moveTo(Math.min(Math.max(next, 0), last));
   }
 
+  // Touch: sliding a finger along the line picks the beat nearest to it, so beats too close together to tap apart can still be reached.
+  // The slide starts after 6px sideways and ends on the beat it reached; the tap the browser would add on the beat the finger first
+  // touched is cancelled. A plain tap is left to the click handler, and a finger moving up or down scrolls the page: the browser then
+  // cancels the pointer (touch-action in pulse.css).
+  let slide = null, slid = false;
+  function nearest(x) {
+    let best = -1;
+    view.beats.forEach((b, i) => { if (best < 0 || Math.abs(b.x - x) < Math.abs(view.beats[best].x - x)) best = i; });
+    return best;
+  }
+  function onPointer(event) {
+    if (event.pointerType !== 'touch') return;
+    if (event.type === 'pointerdown') { slid = false; slide = { id: event.pointerId, x: event.clientX, on: false }; return; }
+    if (!slide || slide.id !== event.pointerId) return;
+    if (event.type === 'pointermove') {
+      if (!slide.on && Math.abs(event.clientX - slide.x) < 6) return;
+      slide.on = true;
+      const i = nearest(event.clientX - stage.getBoundingClientRect().left);
+      if (i >= 0 && i !== shown) show(i);
+      return;
+    }
+    if (event.type === 'pointerup' && slide.on && shown >= 0) { const i = shown; slid = true; moveTo(i); show(i); }
+    slide = null;
+  }
+  function onTouchEnd(event) { if (slid) { slid = false; event.preventDefault(); } }
+
   function now() { return Math.max(Date.now(), data.generated, data.latest ? data.latest.time : 0); }
   function label() { latest.textContent = data.latest ? `${data.latest.version} · ${ago(now() - data.latest.time)}` : ''; }
 
@@ -116,11 +142,14 @@
       svg('circle', { class: 'pulse-ring', cx: view.end, cy: view.base, r: 12 }),
       svg('circle', { class: 'pulse-dot', cx: view.end, cy: view.base, r: 5, filter: 'url(#pulse-glow)' }));
 
+    // Tap areas. Each beat owns the strip nearer to it than to its neighbours, at most 22px to either side, so a tap picks the beat under the finger.
+    // Neighbours share one rounded edge, so the strips never overlap. A beat with 24px or more to each neighbour is at least 24px wide, at the
+    // left edge of the stage too; beats closer than that get all the room between them.
+    const edges = view.beats.map((b, i) => i ? round((view.beats[i - 1].x + b.x) / 2) : 0).concat(w);
     const buttons = view.beats.map((b, i) => {
-      const before = view.beats[i - 1], after = view.beats[i + 1];
-      const left = Math.max(before ? (before.x + b.x) / 2 : 0, b.x - 22, 0), right = Math.min(after ? (b.x + after.x) / 2 : w, b.x + 22, w);
+      const left = Math.max(edges[i], round(b.x - 22)), right = Math.min(edges[i + 1], Math.max(round(b.x + 22), left + 24));
       const button = el('button', { type: 'button', class: 'pulse-beat', tabindex: i === view.beats.length - 1 ? '0' : '-1', 'aria-label': `${b.tool} ${b.version}, released ${stamp.format(b.time)}` });
-      button.style.left = round(left) + 'px';
+      button.style.left = left + 'px';
       button.style.width = round(right - left) + 'px';
       button.style.height = (view.base + 16) + 'px';
       button.addEventListener('mouseenter', () => show(i));
@@ -132,6 +161,8 @@
     });
     const nextGroup = el('div', { class: 'pulse-beats', role: 'group', 'aria-label': `${countText(view.beats.length)}. Left and right arrow keys move between releases.` }, ...buttons);
     nextGroup.addEventListener('keydown', onKey);
+    for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) nextGroup.addEventListener(type, onPointer);
+    nextGroup.addEventListener('touchend', onTouchEnd);
 
     hide();
     if (art) art.remove();
