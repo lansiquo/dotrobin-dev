@@ -5,8 +5,8 @@ Usage: python3 .github/scripts/test_build_versions.py
 
 FakeNpm answers the script's request the way registry.npmjs.org does, and the
 pulse data is a file the test writes the way build_pulse.py does. Most tests
-run the script on a small site with five labels written like the real ones. The
-last class runs it on a copy of the committed pages, which hold six.
+run the script on a small site with six labels written like the real ones. The
+last class runs it on a copy of the committed pages, which hold the same six.
 """
 import contextlib
 import email.message
@@ -33,10 +33,12 @@ SAST, SCA = "sast-triage", "sca-triage"
 TOKEN = "token-that-must-not-be-printed"
 WARNING = re.compile(r"\Awarning: version labels not all filled, the committed text stays where one was not: .+\Z")
 
-# The five labels, written the way the site writes them.
+# The six labels, written the way the site writes them.
 CARD_SCA = '<span class="bento-version" data-release="sca-triage" data-release-format="X.Y.Z">Version {card_sca}</span>'
 CARD_SAST = ('<span class="bento-version" data-release="sast-triage" data-release-format="X.Y.Z">'
              'Version {card_sast}</span>')
+SNIPPET = ('uses: lansiquo/<wbr><span class="bento-nowrap">sast-triage</span><wbr>@v'
+           '<span data-release="sast-triage" data-release-format="X.Y.Z">{snippet}</span>')
 LINK = ('<strong class="resource-title" data-release="sast-triage" data-release-format="X.Y">'
         'Version {link} on GitHub</strong>')
 NOTICE = '<strong data-release="sast-triage" data-release-format="X.Y">Version {notice}</strong>'
@@ -44,12 +46,13 @@ ACTION = ('- uses: lansiquo/sast-triage@v<span data-release="sast-triage" data-r
           '{action}</span>')
 SPOTS = {"card_sca": ("index.html", CARD_SCA), "card_sast": ("index.html", CARD_SAST),
          "link": ("sast-triage.html", LINK), "notice": ("sast-triage.html", NOTICE),
-         "action": ("sast-triage.html", ACTION)}
+         "action": ("sast-triage.html", ACTION), "snippet": ("index.html", SNIPPET)}
 MARKER = re.compile(r' data-release="[a-z-]+" data-release-format="[XYZ.]+"')
 INDEX = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Home</title></head><body>'
          '<article><code class="bento-command">$ npx sca-triage</code><div class="bento-actions">' + CARD_SCA
          + '<a class="bento-link" href="https://www.npmjs.com/package/sca-triage">npm</a></div></article>'
-         '<article><p>Python · Semgrep 1.79.0</p><div class="bento-actions">' + CARD_SAST
+         '<article><p>Python · Semgrep 1.79.0</p><code class="bento-command">' + SNIPPET
+         + '</code><div class="bento-actions">' + CARD_SAST
          + '</div></article></body></html>\n')
 SAST_PAGE = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>sast-triage</title></head><body>'
              '<a href="https://github.com/lansiquo/sast-triage">' + LINK + '</a><p class="notice">' + NOTICE
@@ -62,13 +65,15 @@ SCA_PAGE = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>s
             'sca-triage/tree/v1.2.4"><code>v1.2.4</code></a>: all 96 tests pass.</p>\n</body></html>\n')
 
 
-def site_pages(card_sca="1.2.4", card_sast="2.5.0", link="2.5", notice="2.5", action="2.5.0", change=None):
-    """The pages of the small site, as bytes, with these versions in the five labels.
+def site_pages(card_sca="1.2.4", card_sast="2.5.0", link="2.5", notice="2.5", action="2.5.0", snippet="2.5.0",
+               change=None):
+    """The pages of the small site, as bytes, with these versions in the six labels.
 
     `change` maps the name of a label (a key of SPOTS) to a function that
     rewrites its markup, to build a page whose label is not as expected.
     """
-    shown = {"card_sca": card_sca, "card_sast": card_sast, "link": link, "notice": notice, "action": action}
+    shown = {"card_sca": card_sca, "card_sast": card_sast, "link": link, "notice": notice, "action": action,
+             "snippet": snippet}
     pages = {"index.html": INDEX, "sast-triage.html": SAST_PAGE, "sca-triage.html": SCA_PAGE}
     for spot, rewrite in (change or {}).items():
         name, markup = SPOTS[spot]
@@ -226,12 +231,12 @@ class FillTest(Case):
                       b"2.5.0</span></code></pre>", result.pages["sast-triage.html"])
         self.assertIn(b"- uses: actions/checkout@v4\n", result.pages["sast-triage.html"])
 
-    def test_all_five_labels_are_filled_in_one_run_and_nothing_else_changes(self):
-        result = run(site_pages("1.2.3", "2.4.1", "2.4", "2.4", "2.4.1"),
+    def test_all_six_labels_are_filled_in_one_run_and_nothing_else_changes(self):
+        result = run(site_pages("1.2.3", "2.4.1", "2.4", "2.4", "2.4.1", "2.4.1"),
                      pulse=pulse_file("2.4.1", "3.10.2"), npm=FakeNpm("1.3.0"))
-        self.assert_filled(result, site_pages("1.3.0", "3.10.2", "3.10", "3.10", "3.10.2"), 5)
+        self.assert_filled(result, site_pages("1.3.0", "3.10.2", "3.10", "3.10", "3.10.2", "3.10.2"), 6)
         self.assertEqual(result.output.split(": ", 1)[1],
-                         "5 of 5 version labels changed (sast-triage 3.10.2, sca-triage 1.3.0)\n")
+                         "6 of 6 version labels changed (sast-triage 3.10.2, sca-triage 1.3.0)\n")
 
     def test_statements_about_a_checked_version_are_never_rewritten(self):
         result = run(pulse=pulse_file("9.9.9"), npm=FakeNpm("9.9.9"))
@@ -246,9 +251,9 @@ class FillTest(Case):
                                   (("2.5.0", "10.0.0", "9.9.9"), "10.0.0")):
             with self.subTest(versions=versions):
                 result = run(site_pages(card_sast="2.4.1"), pulse=pulse_file(*versions))
-                self.assert_filled(result, site_pages(card_sast=highest, action=highest,
+                self.assert_filled(result, site_pages(card_sast=highest, action=highest, snippet=highest,
                                                       link=highest.rsplit(".", 1)[0],
-                                                      notice=highest.rsplit(".", 1)[0]), "[1-4]")
+                                                      notice=highest.rsplit(".", 1)[0]), "[1-5]")
 
     def test_releases_of_the_other_tool_and_entries_that_do_not_validate_are_skipped(self):
         data = json.loads(pulse_file("2.5.0"))
@@ -309,10 +314,10 @@ class NeverLowerTest(Case):
                            "sast-triage.html line 6: sast-triage 2.4.9 is lower than the committed 2.5.0")
 
     def test_versions_are_compared_as_numbers(self):
-        raised = run(site_pages("1.9.0", "2.9.0", "2.9", "2.9", "2.9.9"),
+        raised = run(site_pages("1.9.0", "2.9.0", "2.9", "2.9", "2.9.9", "2.9.9"),
                      pulse=pulse_file("2.10.0"), npm=FakeNpm("1.10.0"))
-        self.assert_filled(raised, site_pages("1.10.0", "2.10.0", "2.10", "2.10", "2.10.0"), 5)
-        committed = site_pages("1.10.0", "2.10.0", "2.10", "2.10", "2.10.0")
+        self.assert_filled(raised, site_pages("1.10.0", "2.10.0", "2.10", "2.10", "2.10.0", "2.10.0"), 6)
+        committed = site_pages("1.10.0", "2.10.0", "2.10", "2.10", "2.10.0", "2.10.0")
         kept = run(committed, pulse=pulse_file("2.9.9"), npm=FakeNpm("1.9.9"))
         self.assert_warned(kept, committed, "sast-triage 2.9.9 is lower than the committed 2.10.0",
                            "sast-triage 2.9 is lower than the committed 2.10",
@@ -323,12 +328,13 @@ class NeverLowerTest(Case):
 
     def test_a_patch_release_leaves_the_major_and_minor_labels_as_they_are(self):
         result = run(pulse=pulse_file("2.5.0", "2.5.3"))
-        self.assert_filled(result, site_pages(card_sast="2.5.3", action="2.5.3"), 2)
+        self.assert_filled(result, site_pages(card_sast="2.5.3", action="2.5.3", snippet="2.5.3"), 3)
 
     def test_each_label_is_compared_with_its_own_committed_text(self):
-        committed = site_pages(card_sast="2.6.0", link="2.4", notice="2.6", action="2.4.1")
+        committed = site_pages(card_sast="2.6.0", link="2.4", notice="2.6", action="2.4.1", snippet="2.5.3")
         result = run(committed, pulse=pulse_file("2.5.3"))
-        self.assert_warned(result, site_pages(card_sast="2.6.0", link="2.5", notice="2.6", action="2.5.3"),
+        self.assert_warned(result, site_pages(card_sast="2.6.0", link="2.5", notice="2.6", action="2.5.3",
+                                              snippet="2.5.3"),
                            "index.html line 1: sast-triage 2.5.3 is lower than the committed 2.6.0",
                            "sast-triage.html line 1: sast-triage 2.5 is lower than the committed 2.6")
 
@@ -410,20 +416,21 @@ class FailureTest(Case):
         result = run(committed, pulse=None, npm=FakeNpm(instead=http_error(429)))
         self.assert_warned(result, committed, "pulse.json cannot be read as pulse data",
                            "the npm registry answered HTTP 429 for sca-triage (rate limit reached)")
-        self.assertIn(": 0 of 5 version labels changed (no version read)\n", result.output)
+        self.assertIn(": 0 of 6 version labels changed (no version read)\n", result.output)
 
     def test_the_first_line_names_the_version_that_was_read_when_the_other_was_not(self):
         committed = site_pages("1.2.3", "2.4.1", "2.4", "2.4", "2.4.1")
         without_npm = run(committed, npm=FakeNpm(instead=http_error(503)))
-        self.assertIn(": 4 of 5 version labels changed (sast-triage 2.5.0)\n", without_npm.output)
+        self.assertIn(": 4 of 6 version labels changed (sast-triage 2.5.0)\n", without_npm.output)
         without_pulse = run(committed, pulse=None)
-        self.assertIn(": 1 of 5 version labels changed (sca-triage 1.2.4)\n", without_pulse.output)
+        self.assertIn(": 1 of 6 version labels changed (sca-triage 1.2.4)\n", without_pulse.output)
 
     def test_a_label_that_lost_its_marker_is_reported_and_keeps_its_text(self):
-        old = dict(card_sca="1.2.3", card_sast="2.4.1", link="2.4", notice="2.4", action="2.4.1")
-        new = dict(card_sca="1.2.4", card_sast="2.5.0", link="2.5", notice="2.5", action="2.5.0")
+        old = dict(card_sca="1.2.3", card_sast="2.4.1", link="2.4", notice="2.4", action="2.4.1", snippet="2.4.1")
+        new = dict(card_sca="1.2.4", card_sast="2.5.0", link="2.5", notice="2.5", action="2.5.0", snippet="2.5.0")
         reasons = {"card_sca": "index.html: 0 of 1 sca-triage X.Y.Z label(s) carry the data-release marker",
-                   "card_sast": "index.html: 0 of 1 sast-triage X.Y.Z label(s) carry the data-release marker",
+                   "card_sast": "index.html: 1 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
+                   "snippet": "index.html: 1 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
                    "link": "sast-triage.html: 1 of 2 sast-triage X.Y label(s) carry the data-release marker",
                    "notice": "sast-triage.html: 1 of 2 sast-triage X.Y label(s) carry the data-release marker",
                    "action": "sast-triage.html: 0 of 1 sast-triage X.Y.Z label(s) carry the data-release marker"}
@@ -439,7 +446,7 @@ class FailureTest(Case):
         filled = site_pages()
         del filled["index.html"]
         self.assert_warned(run(pages), filled,
-                           "index.html: 0 of 1 sast-triage X.Y.Z label(s) carry the data-release marker",
+                           "index.html: 0 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
                            "index.html: 0 of 1 sca-triage X.Y.Z label(s) carry the data-release marker")
 
     def test_a_label_that_is_not_marked_as_expected_keeps_its_text(self):
@@ -527,8 +534,6 @@ class CommittedSiteTest(Case):
     EXPECTED = sorted([("index.html", SAST, "X.Y.Z"), ("index.html", SAST, "X.Y.Z"), ("index.html", SCA, "X.Y.Z"),
                        ("sast-triage.html", SAST, "X.Y"), ("sast-triage.html", SAST, "X.Y"),
                        ("sast-triage.html", SAST, "X.Y.Z")])
-    # build_versions.SPOTS lists five of them. The card's Action snippet is marked and filled, but not listed there.
-    NOT_IN_SPOTS = [("index.html", SAST, "X.Y.Z")]
     LABEL = re.compile(r'(<([a-z]+)\b[^<>]*\bdata-release="([a-z-]+)" data-release-format="X\.Y(\.Z)?">[^<>0-9]*)'
                        r"[0-9]+(?:\.[0-9]+)+([^<>0-9]*</\2>)")
 
@@ -543,8 +548,8 @@ class CommittedSiteTest(Case):
             self.assertEqual((text, changed), (content.decode("utf-8"), 0))
             found += [(name, label.tool, label.shown) for label in labels]
         self.assertEqual(sorted(found), self.EXPECTED)
-        self.assertEqual(sorted([(name, tool, shown) for name, tool, shown, count in build_versions.SPOTS
-                                 for _ in range(count)] + self.NOT_IN_SPOTS), self.EXPECTED)
+        self.assertEqual(sorted((name, tool, shown) for name, tool, shown, count in build_versions.SPOTS
+                                for _ in range(count)), self.EXPECTED)
 
     def test_the_committed_versions_are_filled_without_a_change_or_a_warning(self):
         committed, shown = self.committed(), {}

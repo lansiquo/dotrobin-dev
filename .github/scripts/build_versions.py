@@ -62,7 +62,7 @@ FORMATS = {"X.Y.Z": 3, "X.Y": 2}
 SHOWN = {name: re.compile(r"\.".join([NUMBER] * count)) for name, count in FORMATS.items()}
 DOTTED = re.compile(r"[0-9]+(?:\.[0-9]+)*")  # every run of numbers and dots in a label's text
 # The labels the site has now: page, tool, format, how many. A page with fewer is reported.
-SPOTS = (("index.html", SAST, "X.Y.Z", 1), ("index.html", SCA, "X.Y.Z", 1),
+SPOTS = (("index.html", SAST, "X.Y.Z", 2), ("index.html", SCA, "X.Y.Z", 1),
          ("sast-triage.html", SAST, "X.Y", 2), ("sast-triage.html", SAST, "X.Y.Z", 1))
 
 
