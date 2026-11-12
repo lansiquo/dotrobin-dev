@@ -37,6 +37,10 @@ python3 .github/scripts/build_pulse.py site
 python3 .github/scripts/build_versions.py site
 ```
 
+## Site checks
+
+Every pull request and every push to `main` runs the Site checks workflow. Besides checking the pages and running the scripts' unit tests, it scans the site's code, the JavaScript in `site/` and the Python scripts in `.github/scripts/`, with [sast-triage](https://github.com/lansiquo/sast-triage), pinned to the full commit of a release. A pull request is compared with its base branch and fails only on a P1 finding it adds. A push to `main` scans every file, and any P1 finding fails that run.
+
 ## Local preview
 
 ```bash
