@@ -1,0 +1,92 @@
+/* Homepage, "Midnight": near-black page, soft violet and cyan glows behind the hero, and a bento grid of cards. */
+.homepage{--gutter:80px;--pill-line:#746d9c;--control-line:#8a82b5;--card-line:#23202f;--soft:#cfcbe6;--dim:#8f8aa8;--kicker:#8b80c9;--violet:#c4b5fd;background-color:var(--bg);background-image:radial-gradient(600px 320px at 70% 10%,rgba(139,92,246,.35),transparent),radial-gradient(500px 300px at 15% 30%,rgba(56,189,248,.18),transparent);background-repeat:no-repeat;background-size:100% 720px}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+
+/* Header and content share one gutter, so the brand lines up with the hero. */
+.homepage .top{max-width:1440px;margin:0 auto;padding-left:var(--gutter);padding-right:var(--gutter);border-bottom:0}
+.homepage .site-nav{margin-right:-12px}
+.homepage .content{max-width:1440px;margin:0 auto;padding:0 var(--gutter)}
+
+/* Hero: outlined eyebrow pill, very large name, intro, then actions and certifications in one row. */
+.hero{max-width:940px;padding:56px 0 70px}
+.hero-eyebrow{display:inline-block;margin:0;padding:6px 14px;border:1px solid var(--pill-line);border-radius:99px;color:var(--violet);font-size:13px;line-height:1.4;letter-spacing:.06em}
+.hero h1{margin:26px 0 calc(26px - .14em);padding-bottom:.14em;color:var(--ink);font-size:clamp(44px,7.5vw,96px);line-height:1;font-weight:600;letter-spacing:-.04em}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){.hero h1{background:linear-gradient(180deg,#fff,#b7b2d6);-webkit-background-clip:text;background-clip:text;color:transparent}}
+@media(forced-colors:active){.hero h1{background:none;color:CanvasText}}
+.hero-lead{max-width:720px;margin:0;color:var(--muted);font-size:20px;line-height:1.6}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:34px}
+.button{display:inline-flex;align-items:center;gap:6px;min-height:48px;padding:0 22px;border:1px solid var(--control-line);border-radius:10px;color:var(--ink);font-size:16px;line-height:1}
+.button i{font-style:normal}
+.button:hover{border-color:var(--violet);background:rgba(196,181,253,.1)}
+.button-primary{border-color:#fff;background:#fff;color:#07070b;font-weight:600}
+.button-primary:hover{border-color:#dcd7f2;background:#dcd7f2}
+.cert-pills{display:flex;flex-wrap:wrap;gap:12px;margin:0;padding:0;list-style:none}
+.cert-pill{padding:6px 12px;border:1px solid var(--pill-line);border-radius:99px;color:var(--soft);font-size:13px;line-height:1.4}
+.cert-pill-progress{border-style:dashed;color:var(--dim)}
+.hero-contact{display:flex;flex-wrap:wrap;align-items:center;gap:0 26px;margin-top:26px}
+.hero-contact .k{color:var(--kicker);font-size:12px;letter-spacing:.12em}
+.hero-contact a{display:inline-flex;align-items:center;gap:9px;min-height:44px;color:var(--soft);font-size:15px}
+.hero-contact svg{width:17px;height:17px;flex:none;color:var(--accent)}
+.hero-contact a i{font-style:normal;color:var(--dim)}
+.hero-contact a:hover{color:#fff}
+
+/* Bento grid: a tall featured project, a second project, an impact figure, and one wide card for the lab writeups. */
+.bento{display:grid;gap:16px;padding:20px 0 90px}
+.bento-projects{display:grid;gap:16px;min-width:0}
+.bento-projects,.bento-labs{scroll-margin-top:24px}
+.bento-card{display:flex;flex-direction:column;min-width:0;padding:28px;border:1px solid var(--card-line);border-radius:18px;background:linear-gradient(180deg,#14121d,#0d0c14)}
+.bento-projects .bento-card:hover{border-color:#3a3550}
+.bento-kind{display:block;margin:0;color:var(--kicker);font-size:12px;line-height:1.5;font-weight:400;letter-spacing:.12em;text-transform:uppercase}
+.bento-main{display:flex;flex:1;flex-direction:column;min-width:0;color:inherit}
+.bento-main h3{margin:14px 0 10px;color:var(--ink);font-size:30px;line-height:1.2;font-weight:700;overflow-wrap:anywhere}
+.bento-card p{margin:0;color:var(--muted);font-size:16px;line-height:1.6}
+.bento-card .bento-stack{margin-top:14px;font-size:14px}
+.bento-main:hover h3{color:var(--violet)}
+.bento-command{display:block;margin-top:22px;padding:14px;overflow-x:auto;border:1px solid var(--card-line);border-radius:10px;background:#0a0910;color:var(--violet);font:14px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+.bento-command span{-webkit-user-select:none;user-select:none}
+.bento-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:18px}
+.bento-version{color:var(--soft);font-size:13px}
+.bento-link{padding-bottom:2px;border-bottom:1px solid #6a5f9a;color:var(--violet);font-size:14px}
+.bento-link:hover{border-color:var(--violet);color:#fff}
+/* The featured card is the tall one: its command and links sit at the bottom, over a soft glow. */
+.bento-featured{background:radial-gradient(110% 46% at 50% 100%,rgba(139,92,246,.17),transparent 72%),linear-gradient(180deg,#14121d,#0d0c14)}
+.bento-featured .bento-command{margin-top:auto}
+.bento-featured .bento-main{flex:none;margin-bottom:22px}
+.bento-stat{display:block;margin-top:4px;color:var(--ink);font-size:44px;line-height:1.28;font-weight:600}
+
+/* Lab writeups: one row per writeup, name then summary, topics at the end of the row. */
+.lab-list{margin:14px 0 0;padding:0;list-style:none}
+.lab-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:4px 24px;padding:12px 0;border-top:1px solid var(--card-line);color:inherit}
+.lab-row:focus-visible{outline-offset:2px}
+.lab-row h3{display:inline;margin:0;color:var(--soft);font-size:15px;line-height:1.5;font-weight:500}
+.lab-row p{display:inline;color:var(--dim);font-size:15px;line-height:1.5}
+.lab-row p::before{content:" — "}
+.lab-row:hover h3{color:#fff}
+.lab-tags{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none;color:var(--dim);font-size:13px;line-height:1.5}
+.lab-tags li+li::before{content:"·";margin:0 7px}
+
+/* Three columns from 1080px. The projects section is a subgrid of the bento, so its cards and the writeups card share one set of tracks. */
+@media(min-width:1080px){
+.bento{grid-template-columns:1.4fr 1fr 1fr}
+.bento-featured .bento-main h3{font-size:36px}
+.bento-featured .bento-main p:not(.bento-stack){font-size:17px}
+.bento-impact{grid-column:3;grid-row:1}
+@supports (grid-template-rows:subgrid){
+.bento-projects{grid-column:1/-1;grid-row:1/3;grid-template-columns:subgrid;grid-template-rows:subgrid}
+.bento-featured{grid-column:1;grid-row:1/3}
+.bento-sast{grid-column:2;grid-row:1}
+.bento-impact,.bento-labs{position:relative;z-index:1}
+.bento-labs{grid-column:2/4;grid-row:2}
+/* "Writeups" in the menu moves that section first (section-order.js): its card takes the top row. */
+.bento-labs:first-child{grid-row:1}
+.bento-labs:first-child+.bento-projects>.bento-sast,.bento-labs:first-child~.bento-impact{grid-row:2}
+}
+@supports not (grid-template-rows:subgrid){
+.bento-projects{grid-column:1/3;grid-template-columns:1.4fr 1fr}
+.bento-labs{grid-column:1/-1}
+}
+}
+@media(max-width:1199px){.homepage{--gutter:48px}}
+@media(max-width:800px){.homepage{--gutter:24px;background-image:radial-gradient(440px 280px at 78% 8%,rgba(139,92,246,.32),transparent),radial-gradient(360px 260px at 6% 34%,rgba(56,189,248,.16),transparent)}.hero{padding:48px 0 44px}.hero-lead{font-size:18px}.hero-actions{margin-top:28px}.bento{padding-bottom:56px}}
+@media(max-width:700px){.lab-row{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.hero-lead{font-size:17px}.bento-card{padding:22px}.bento-main h3{font-size:26px}.hero-contact{gap:0 22px}}

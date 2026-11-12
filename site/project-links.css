@@ -1,5 +1,5 @@
 /* Project resource actions: shared by case studies and standalone demos. */
-.project-resources{container-type:inline-size;max-width:800px;margin:26px 0;color:#f4f0ff;font-family:Arial,Helvetica,sans-serif}
+.project-resources{container-type:inline-size;max-width:800px;margin:26px 0;color:#f4f0ff;font-family:var(--font)}
 .project-resources .resource-heading{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:#cbb7ed;font:600 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1.7px;text-transform:uppercase}
 .project-resources .resource-heading::after{content:"";height:1px;flex:1;background:#393140}
 .project-resources .resource-actions{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
