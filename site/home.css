@@ -8,7 +8,7 @@
 .homepage .content{max-width:1440px;margin:0 auto;padding:0 var(--gutter)}
 
 /* Hero: outlined eyebrow pill, very large name, intro, then actions and certifications in one row. */
-.hero{max-width:940px;padding:80px 0 70px}
+.hero{max-width:940px;padding:56px 0 70px}
 .hero-eyebrow{display:inline-block;margin:0;padding:6px 14px;border:1px solid var(--pill-line);border-radius:99px;color:var(--violet);font-size:13px;line-height:1.4;letter-spacing:.06em}
 .hero h1{margin:26px 0 calc(26px - .14em);padding-bottom:.14em;color:var(--ink);font-size:clamp(44px,7.5vw,96px);line-height:1;font-weight:600;letter-spacing:-.04em}
 @supports ((-webkit-background-clip:text) or (background-clip:text)){.hero h1{background:linear-gradient(180deg,#fff,#b7b2d6);-webkit-background-clip:text;background-clip:text;color:transparent}}

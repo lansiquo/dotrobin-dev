@@ -1,0 +1,27 @@
+/* Release pulse in the homepage header: a heartbeat line, one beat per release in the last 7 days. It draws once, then holds still. */
+.top-with-pulse{height:auto;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:28px;padding-top:8px;padding-bottom:8px}
+.pulse{min-width:0;width:100%;margin:0}
+.pulse-stage{position:relative;height:132px}
+.pulse-fallback,.pulse-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pulse[data-ready] .pulse-fallback{display:none}
+.pulse-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:pulse-draw 2s cubic-bezier(.45,0,.2,1) forwards}
+.pulse-still .pulse-line{animation:none;stroke-dashoffset:0}
+@keyframes pulse-draw{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.pulse-line{animation:none;stroke-dashoffset:0}}
+.pulse-grid{stroke:#6e6a85;stroke-opacity:.16}
+.pulse-day{fill:#a6a3bd;font:10px ui-monospace,SFMono-Regular,Consolas,monospace}
+.pulse-dot{fill:#4ade80}
+.pulse-ring{fill:none;stroke:#4ade80;stroke-opacity:.35}
+.pulse-count,.pulse-latest{position:absolute;margin:0;font:11px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+.pulse-count{top:2px;left:0;color:#a6a3bd}
+.pulse-latest{top:calc(var(--pulse-base,82px) + 20px);right:0;width:112px;color:#4ade80;text-align:center}
+.pulse-beats{position:absolute;inset:0}
+.pulse-beat{position:absolute;top:0;padding:0;border:0;border-radius:4px;background:none;cursor:pointer}
+.pulse-beat:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}
+.pulse-tip{position:absolute;z-index:2;padding:7px 10px;border:1px solid #3a3550;border-radius:8px;background:#14121d;color:#f4f0ff;font:12px/1.45 var(--font);white-space:nowrap;pointer-events:none;transform:translateX(-50%)}
+.pulse-tip[hidden]{display:none}
+.pulse-tip b{display:block;font-weight:600}
+.pulse-tip span{color:#aaa7b7}
+/* Below 1000px the line takes its own row under the brand and menu. */
+@media(max-width:1000px){.top-with-pulse{grid-template-columns:1fr auto;gap:0 12px}.top-with-pulse .pulse{grid-column:1/-1;grid-row:2}}
+@media(max-width:650px){.top-with-pulse{padding-top:12px;padding-bottom:4px}.top-with-pulse .brand{grid-column:1;grid-row:1}.top-with-pulse .site-nav{grid-column:1/-1;grid-row:2}.top-with-pulse .pulse{grid-row:3}.pulse-stage{height:116px}}
