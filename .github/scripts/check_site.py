@@ -6,8 +6,9 @@ Usage: python3 .github/scripts/check_site.py [site_dir]
 Fails (exit 1) on: unbalanced HTML, a missing <title> or <html lang>,
 duplicate ids, internal links or assets that do not exist, links to
 #anchors that do not exist, images without alt text or width/height,
-sitemap entries without a page, and images that still carry EXIF metadata.
-External links are not fetched.
+sitemap entries without a page, and PNG, WebP or JPEG images that still
+carry EXIF, XMP or PNG text metadata, or that cannot be read in full to
+check. External links are not fetched.
 """
 import pathlib
 import sys
@@ -21,6 +22,16 @@ VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
 OPTIONAL_END = {"p", "li", "dt", "dd", "tr", "td", "th", "thead", "tbody",
                 "tfoot", "option", "colgroup", "caption", "rt", "rp", "optgroup"}
 SITE_HOST = "dotrobin.dev"
+# An image larger than this is reported, not read: a file that was not read
+# in full cannot be shown to be free of metadata.
+MAX_IMAGE_BYTES = 32 * 1024 * 1024
+PNG_METADATA = {b"eXIf": "EXIF metadata",
+                b"tEXt": "text metadata (tEXt chunk)",
+                b"zTXt": "text metadata (zTXt chunk)",
+                b"iTXt": "text metadata (iTXt chunk)"}
+WEBP_METADATA = {b"EXIF": "EXIF metadata", b"XMP ": "XMP metadata"}
+JPEG_METADATA = {b"Exif\x00\x00": "EXIF metadata",
+                 b"http://ns.adobe.com/xap/1.0/\x00": "XMP metadata"}
 
 
 class Page(HTMLParser):
@@ -80,15 +91,49 @@ class Page(HTMLParser):
                 self.errors.append(f"line {line}: <{tag}> is never closed")
 
 
-def has_exif(path):
-    data = path.read_bytes()[:65536]
-    if path.suffix.lower() in (".jpg", ".jpeg"):
-        return b"Exif\x00\x00" in data
-    if path.suffix.lower() == ".png":
-        return b"eXIf" in data
-    if path.suffix.lower() == ".webp":
-        return b"EXIF" in data
-    return False
+def image_problems(path):
+    """Lists what is wrong with an image's metadata; empty if nothing is.
+
+    The whole file is read, so metadata is found wherever it sits. PNG and
+    WebP files are walked chunk by chunk to the last byte, and JPEG files are
+    searched from end to end for the EXIF and XMP markers. The format comes
+    from the file's first bytes, not its name. A file that cannot be read to
+    the end this way is reported too, because the bytes left unread could
+    hold metadata.
+    """
+    with path.open("rb") as f:
+        data = f.read(MAX_IMAGE_BYTES + 1)
+    if len(data) > MAX_IMAGE_BYTES:
+        return [f"image is larger than {MAX_IMAGE_BYTES} bytes, too large to check for metadata"]
+    found, unread = [], None
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        pos = 8
+        while pos < len(data):
+            # A chunk is a 4-byte length, a 4-letter type, the data and a 4-byte checksum.
+            length, kind = int.from_bytes(data[pos:pos + 4], "big"), data[pos + 4:pos + 8]
+            if not kind.isalpha() or pos + 12 + length > len(data):
+                unread = f"the PNG data at byte {pos} is not a complete chunk"
+                break
+            found.append(PNG_METADATA.get(kind))
+            pos += 12 + length
+    elif data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        pos = 12
+        while pos < len(data):
+            # A chunk is a 4-byte type, a 4-byte length and the data, padded to an even length.
+            kind, length = data[pos:pos + 4], int.from_bytes(data[pos + 4:pos + 8], "little")
+            if pos + 8 + length > len(data):
+                unread = f"the WebP data at byte {pos} is not a complete chunk"
+                break
+            found.append(WEBP_METADATA.get(kind))
+            pos += 8 + length + length % 2
+    elif data.startswith(b"\xff\xd8"):
+        found = [name for marker, name in JPEG_METADATA.items() if marker in data]
+    else:
+        unread = "it is not a PNG, WebP or JPEG file"
+    problems = [f"image still has {name}" for name in dict.fromkeys(found) if name]
+    if unread:
+        problems.append(f"image cannot be checked for metadata: {unread}")
+    return problems
 
 
 def main():
@@ -149,8 +194,8 @@ def main():
                 problems.append(f"sitemap.xml: {loc.text.strip()} has no page")
 
     for img in sorted(site.rglob("*")):
-        if img.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp") and has_exif(img):
-            problems.append(f"{img.relative_to(site)}: image still has EXIF metadata")
+        if img.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp"):
+            problems += [f"{img.relative_to(site)}: {problem}" for problem in image_problems(img)]
 
     for line in problems:
         print(line)
