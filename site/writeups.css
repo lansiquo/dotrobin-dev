@@ -28,3 +28,8 @@
 .writeup .environment li{display:flex;align-items:center}.writeup .environment-item{min-width:0}
 .command-provenance{margin:1.5rem 0 .4rem;color:var(--muted);font:11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.04em}
 .writeup .command-provenance+pre{margin-top:0}
+
+/* Software factory writeup: the architecture diagram is a narrow vertical figure, centred in the column, that scales down with it. */
+.writeup .factory-diagram{max-width:440px;margin:1.75rem auto 2.25rem}
+.writeup .factory-diagram svg{display:block;width:100%;height:auto}
+.writeup .factory-diagram figcaption{margin-top:.85rem;font-size:.8rem;line-height:1.6;color:#bbb3c8}
