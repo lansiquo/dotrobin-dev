@@ -157,7 +157,7 @@
     if (!w || !h) return;
     const t = now(), keep = focused();
     const week = data.releases.filter(r => r.time > t - WEEK && r.time <= t), [total, types] = countText(week);
-    count.replaceChildren(el('span', {}, types ? total + ':' : total), ...(types ? [' ', el('span', {}, types)] : []));
+    count.replaceChildren(el('span', {}, total));
     view = layout(w, h, t, week, Math.max(22, count.offsetTop + count.offsetHeight + 6));
     const step = view.end / 14, grid = [], days = [];
     for (let k = 0; k <= 14; k++) grid.push(svg('line', { class: 'pulse-grid', x1: round(view.end - k * step), x2: round(view.end - k * step), y1: 8, y2: h - 20 }));
