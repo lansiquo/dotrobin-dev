@@ -10,11 +10,14 @@
 
   const NS = 'http://www.w3.org/2000/svg', DAY = 864e5, WEEK = 7 * DAY;
   const PAD = 56;   // room right of "now" for the label centred under the live dot
-  // x.0.0 is a major, x.y.0 a minor, x.y.z a patch. Only a plain semantic version counts: x.y.z, then optionally "-" and a
-  // pre-release, then optionally "+" and build data, each dot-separated letters, digits and hyphens; its x.y.z part sets the type.
-  // Any other version is skipped, as is a tool name that is not plain letters, digits, dots, hyphens and underscores.
+  // A release record counts only if it is a plain object whose fields are strings of this form; any other record is skipped.
+  // tool: lowercase letters, digits and hyphens, starting with a letter or digit, at most 64 characters.
+  // version: a semantic version, x.y.z then optionally "-" and a pre-release, then optionally "+" and build data, each dot-separated
+  // letters, digits and hyphens. Its x.y.z part sets the type: x.0.0 is a major, x.y.0 a minor, x.y.z a patch.
+  // published: a UTC time such as 2026-11-12T13:29:15Z (optional fraction of a second) that names a real date and time.
+  const TOOL = /^[a-z0-9][a-z0-9-]{0,63}$/;
   const VERSION = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
-  const TOOL = /^[0-9A-Za-z][0-9A-Za-z._-]*$/;
+  const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
   const TYPES = ['major', 'minor', 'patch'], HEIGHT = { major: 1, minor: 2 / 3, patch: 1 / 3 };
   // One beat as [offset, height] pairs, in beat half-widths: small dip, spike, overshoot, back to the baseline.
   const SHAPE = [[-1, 0], [-.67, .08], [-.39, .14], [0, -1], [.39, .16], [.72, .05], [1, 0]];
@@ -28,6 +31,20 @@
   function kind(version) {
     const m = VERSION.exec(version);
     return m ? (+m[3] ? 'patch' : +m[2] ? 'minor' : 'major') : null;
+  }
+  // Milliseconds for a valid TIME string, otherwise NaN. The round trip rejects dates that do not exist, such as 30 February.
+  function utc(value) {
+    if (typeof value !== 'string' || !TIME.test(value)) return NaN;
+    const time = Date.parse(value);
+    return Number.isFinite(time) && new Date(time).toISOString().slice(0, 19) === value.slice(0, 19) ? time : NaN;
+  }
+  // The release, or null to skip it. Every field's type is checked before it is used.
+  function record(r) {
+    if (r === null || typeof r !== 'object' || Array.isArray(r)) return null;
+    const { tool, version, published } = r;
+    if (typeof tool !== 'string' || !TOOL.test(tool) || typeof version !== 'string') return null;
+    const type = kind(version), time = utc(published);
+    return type && Number.isFinite(time) ? { tool, version, type, time } : null;
   }
   // "18 releases this week" and "1 major, 6 minor, 11 patches", leaving out types with no release.
   function countText(beats) {
@@ -192,10 +209,9 @@
   }
 
   fetch('data/pulse.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('pulse data'))).then(json => {
-    const releases = (Array.isArray(json.releases) ? json.releases : [])
-      .map(r => ({ tool: String(r.tool), version: String(r.version), type: kind(String(r.version)), time: Date.parse(r.published) }))
-      .filter(r => r.type && TOOL.test(r.tool) && Number.isFinite(r.time)).sort((a, b) => a.time - b.time);
-    data = { releases, latest: releases[releases.length - 1] || null, generated: Date.parse(json.generated) || 0 };
+    const list = json !== null && typeof json === 'object' && Array.isArray(json.releases) ? json.releases : [];
+    const releases = list.map(record).filter(Boolean).sort((a, b) => a.time - b.time);
+    data = { releases, latest: releases[releases.length - 1] || null, generated: utc(json && json.generated) || 0 };
     stage.append(count, latest, tip);
     root.dataset.ready = '';
     new ResizeObserver(render).observe(stage);
