@@ -1,5 +1,6 @@
 // Release pulse: a heartbeat line in the header. Each beat is one published release of
 // sast-triage or sca-triage in the last 7 days, read from data/pulse.json on this site.
+// A beat's height shows the release type, read from its version: a patch is low, a minor twice as tall, a major full height.
 // The line draws once and then holds still. Without JavaScript the static line in the page stays.
 (() => {
   'use strict';
@@ -9,6 +10,15 @@
 
   const NS = 'http://www.w3.org/2000/svg', DAY = 864e5, WEEK = 7 * DAY;
   const PAD = 56;   // room right of "now" for the label centred under the live dot
+  // A release record counts only if it is a plain object whose fields are strings of this form; any other record is skipped.
+  // tool: lowercase letters, digits and hyphens, starting with a letter or digit, at most 64 characters.
+  // version: a semantic version, x.y.z then optionally "-" and a pre-release, then optionally "+" and build data, each dot-separated
+  // letters, digits and hyphens. Its x.y.z part sets the type: x.0.0 is a major, x.y.0 a minor, x.y.z a patch.
+  // published: a UTC time such as 2026-11-12T13:29:15Z (optional fraction of a second) that names a real date and time.
+  const TOOL = /^[a-z0-9][a-z0-9-]{0,63}$/;
+  const VERSION = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+  const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+  const TYPES = ['major', 'minor', 'patch'], HEIGHT = { major: 1, minor: 2 / 3, patch: 1 / 3 };
   // One beat as [offset, height] pairs, in beat half-widths: small dip, spike, overshoot, back to the baseline.
   const SHAPE = [[-1, 0], [-.67, .08], [-.39, .14], [0, -1], [.39, .16], [.72, .05], [1, 0]];
   const weekday = new Intl.DateTimeFormat('en-GB', { weekday: 'short' });
@@ -18,7 +28,29 @@
   const el = (tag, attrs = {}, ...children) => fill(document.createElement(tag), attrs, children);
   const svg = (tag, attrs = {}, ...children) => fill(document.createElementNS(NS, tag), attrs, children);
   const round = v => Math.round(v * 10) / 10;
-  const countText = n => `${n} release${n === 1 ? '' : 's'} this week`;
+  function kind(version) {
+    const m = VERSION.exec(version);
+    return m ? (+m[3] ? 'patch' : +m[2] ? 'minor' : 'major') : null;
+  }
+  // Milliseconds for a valid TIME string, otherwise NaN. The round trip rejects dates that do not exist, such as 30 February.
+  function utc(value) {
+    if (typeof value !== 'string' || !TIME.test(value)) return NaN;
+    const time = Date.parse(value);
+    return Number.isFinite(time) && new Date(time).toISOString().slice(0, 19) === value.slice(0, 19) ? time : NaN;
+  }
+  // The release, or null to skip it. Every field's type is checked before it is used.
+  function record(r) {
+    if (r === null || typeof r !== 'object' || Array.isArray(r)) return null;
+    const { tool, version, published } = r;
+    if (typeof tool !== 'string' || !TOOL.test(tool) || typeof version !== 'string') return null;
+    const type = kind(version), time = utc(published);
+    return type && Number.isFinite(time) ? { tool, version, type, time } : null;
+  }
+  // "18 releases this week" and "1 major, 6 minor, 11 patches", leaving out types with no release.
+  function countText(beats) {
+    const n = beats.length, types = TYPES.map(type => [type, beats.filter(b => b.type === type).length]).filter(([, k]) => k);
+    return [`${n} release${n === 1 ? '' : 's'} this week`, types.map(([type, k]) => `${k} ${type === 'patch' && k !== 1 ? 'patches' : type}`).join(', ')];
+  }
 
   function ago(ms) {
     const minutes = Math.floor(ms / 6e4);
@@ -37,14 +69,12 @@
   // A fixed faint tremor on the baseline. The same width always gives the same line.
   const tremor = i => { const v = Math.sin(i * 12.9898) * 43758.5453; return (v - Math.floor(v) - .5) * 2.2; };
 
-  function layout(w, h, now, releases) {
-    const end = Math.max(PAD, w - PAD), base = h - 50, top = 22;
+  // top is the highest a spike may reach: just under the count label, which can take two lines on a narrow screen.
+  function layout(w, h, now, releases, top) {
+    const end = Math.max(PAD, w - PAD), base = h - 50;
     // Half-width of one beat. It is also the closest two beats may sit, so releases minutes apart stay separate beats.
     const reach = Math.max(5.5, Math.min(9, end / 60));
-    const beats = releases.filter(r => r.time > now - WEEK && r.time <= now).map(r => {
-      const age = (now - r.time) / WEEK;
-      return { ...r, x: end - age * end, amp: (base - top) * (.3 + .7 * Math.pow(1 - age, 2)) }; // recent beats are taller
-    });
+    const beats = releases.map(r => ({ ...r, x: end - (now - r.time) / WEEK * end, amp: (base - top) * HEIGHT[r.type] }));
     for (let i = 1; i < beats.length; i++) beats[i].x = Math.max(beats[i].x, beats[i - 1].x + reach);
     for (let i = beats.length - 1; i >= 0; i--) beats[i].x = Math.min(beats[i].x, i === beats.length - 1 ? end - reach - 2 : beats[i + 1].x - reach);
     const xs = new Set([end]);
@@ -60,15 +90,15 @@
 
   const count = el('p', { class: 'pulse-count' });
   const latest = el('p', { class: 'pulse-latest' });
-  const tip = el('div', { class: 'pulse-tip', 'aria-hidden': 'true', hidden: '' }, el('b'), el('span'));
+  const tip = el('div', { class: 'pulse-tip', 'aria-hidden': 'true', hidden: '' });
   let data = null, art = null, group = null, view = null, shown = -1;
 
   function show(i) {
     const b = view.beats[i];
     if (!b) return;
     shown = i;
-    tip.firstChild.textContent = `${b.tool} ${b.version}`;
-    tip.lastChild.textContent = stamp.format(b.time);
+    // "<tool> <version> · <type> · <date>". On a narrow screen it may wrap before a "·".
+    tip.replaceChildren(el('b', {}, `${b.tool} ${b.version}`), ' ', el('span', {}, `· ${b.type}`), ' ', el('span', {}, `· ${stamp.format(b.time)}`));
     tip.hidden = false;
     const half = tip.offsetWidth / 2;
     tip.style.top = (view.base + 18) + 'px';
@@ -119,13 +149,16 @@
   function onTouchEnd(event) { if (slid) { slid = false; event.preventDefault(); } }
 
   function now() { return Math.max(Date.now(), data.generated, data.latest ? data.latest.time : 0); }
-  function label() { latest.textContent = data.latest ? `${data.latest.version} · ${ago(now() - data.latest.time)}` : ''; }
+  // A version too long for the line is cut short with an ellipsis on screen; the text itself, the tooltip and the beat's name keep all of it.
+  function label() { latest.replaceChildren(...(data.latest ? [el('span', {}, data.latest.version), el('span', {}, ` · ${ago(now() - data.latest.time)}`)] : [])); }
 
   function render() {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
     const t = now(), keep = focused();
-    view = layout(w, h, t, data.releases);
+    const week = data.releases.filter(r => r.time > t - WEEK && r.time <= t), [total, types] = countText(week);
+    count.replaceChildren(el('span', {}, types ? total + ':' : total), ...(types ? [' ', el('span', {}, types)] : []));
+    view = layout(w, h, t, week, Math.max(22, count.offsetTop + count.offsetHeight + 6));
     const step = view.end / 14, grid = [], days = [];
     for (let k = 0; k <= 14; k++) grid.push(svg('line', { class: 'pulse-grid', x1: round(view.end - k * step), x2: round(view.end - k * step), y1: 8, y2: h - 20 }));
     for (let k = 0; k < 7; k++) days.push(svg('text', { class: 'pulse-day', x: round(view.end - k * step * 2), y: h - 4, 'text-anchor': 'middle' }, weekday.format(t - k * DAY)));
@@ -148,7 +181,7 @@
     const edges = view.beats.map((b, i) => i ? round((view.beats[i - 1].x + b.x) / 2) : 0).concat(w);
     const buttons = view.beats.map((b, i) => {
       const left = Math.max(edges[i], round(b.x - 22)), right = Math.min(edges[i + 1], Math.max(round(b.x + 22), left + 24));
-      const button = el('button', { type: 'button', class: 'pulse-beat', tabindex: i === view.beats.length - 1 ? '0' : '-1', 'aria-label': `${b.tool} ${b.version}, released ${stamp.format(b.time)}` });
+      const button = el('button', { type: 'button', class: 'pulse-beat', tabindex: i === view.beats.length - 1 ? '0' : '-1', 'aria-label': `${b.tool} ${b.version}, ${b.type} release on ${stamp.format(b.time)}` });
       button.style.left = left + 'px';
       button.style.width = round(right - left) + 'px';
       button.style.height = (view.base + 16) + 'px';
@@ -159,7 +192,7 @@
       button.addEventListener('click', () => { moveTo(i); show(i); });
       return button;
     });
-    const nextGroup = el('div', { class: 'pulse-beats', role: 'group', 'aria-label': `${countText(view.beats.length)}. Left and right arrow keys move between releases.` }, ...buttons);
+    const nextGroup = el('div', { class: 'pulse-beats', role: 'group', 'aria-label': `${[total, types].filter(Boolean).join(': ')}. Left and right arrow keys move between releases.` }, ...buttons);
     nextGroup.addEventListener('keydown', onKey);
     for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) nextGroup.addEventListener(type, onPointer);
     nextGroup.addEventListener('touchend', onTouchEnd);
@@ -171,16 +204,14 @@
     stage.prepend(art);
     tip.before(group);
     stage.style.setProperty('--pulse-base', view.base + 'px');
-    count.textContent = countText(view.beats.length);
     label();
     if (keep >= 0 && buttons.length) moveTo(Math.min(keep, buttons.length - 1));
   }
 
   fetch('data/pulse.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('pulse data'))).then(json => {
-    const releases = (Array.isArray(json.releases) ? json.releases : [])
-      .map(r => ({ tool: String(r.tool), version: String(r.version), time: Date.parse(r.published) }))
-      .filter(r => Number.isFinite(r.time)).sort((a, b) => a.time - b.time);
-    data = { releases, latest: releases[releases.length - 1] || null, generated: Date.parse(json.generated) || 0 };
+    const list = json !== null && typeof json === 'object' && Array.isArray(json.releases) ? json.releases : [];
+    const releases = list.map(record).filter(Boolean).sort((a, b) => a.time - b.time);
+    data = { releases, latest: releases[releases.length - 1] || null, generated: utc(json && json.generated) || 0 };
     stage.append(count, latest, tip);
     root.dataset.ready = '';
     new ResizeObserver(render).observe(stage);
