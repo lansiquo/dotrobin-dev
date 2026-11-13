@@ -97,8 +97,8 @@
     const b = view.beats[i];
     if (!b) return;
     shown = i;
-    // "<tool> <version> · <type> · <date>". On a narrow screen it may wrap before a "·".
-    tip.replaceChildren(el('b', {}, `${b.tool} ${b.version}`), ' ', el('span', {}, `· ${b.type}`), ' ', el('span', {}, `· ${stamp.format(b.time)}`));
+    // "<tool> <version> · <date>". On a narrow screen it may wrap before the "·".
+    tip.replaceChildren(el('b', {}, `${b.tool} ${b.version}`), ' ', el('span', {}, `· ${stamp.format(b.time)}`));
     tip.hidden = false;
     const half = tip.offsetWidth / 2;
     tip.style.top = (view.base + 18) + 'px';
