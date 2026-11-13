@@ -10,8 +10,11 @@
 
   const NS = 'http://www.w3.org/2000/svg', DAY = 864e5, WEEK = 7 * DAY;
   const PAD = 56;   // room right of "now" for the label centred under the live dot
-  // x.0.0 is a major, x.y.0 a minor, x.y.z a patch. A pre-release or build suffix counts as its x.y.z part; any other version is skipped.
-  const VERSION = /^(\d+)\.(\d+)\.(\d+)(?=$|[-+])/;
+  // x.0.0 is a major, x.y.0 a minor, x.y.z a patch. Only a plain semantic version counts: x.y.z, then optionally "-" and a
+  // pre-release, then optionally "+" and build data, each dot-separated letters, digits and hyphens; its x.y.z part sets the type.
+  // Any other version is skipped, as is a tool name that is not plain letters, digits, dots, hyphens and underscores.
+  const VERSION = /^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+  const TOOL = /^[0-9A-Za-z][0-9A-Za-z._-]*$/;
   const TYPES = ['major', 'minor', 'patch'], HEIGHT = { major: 1, minor: 2 / 3, patch: 1 / 3 };
   // One beat as [offset, height] pairs, in beat half-widths: small dip, spike, overshoot, back to the baseline.
   const SHAPE = [[-1, 0], [-.67, .08], [-.39, .14], [0, -1], [.39, .16], [.72, .05], [1, 0]];
@@ -129,7 +132,8 @@
   function onTouchEnd(event) { if (slid) { slid = false; event.preventDefault(); } }
 
   function now() { return Math.max(Date.now(), data.generated, data.latest ? data.latest.time : 0); }
-  function label() { latest.textContent = data.latest ? `${data.latest.version} · ${ago(now() - data.latest.time)}` : ''; }
+  // A version too long for the line is cut short with an ellipsis on screen; the text itself, the tooltip and the beat's name keep all of it.
+  function label() { latest.replaceChildren(...(data.latest ? [el('span', {}, data.latest.version), el('span', {}, ` · ${ago(now() - data.latest.time)}`)] : [])); }
 
   function render() {
     const w = stage.clientWidth, h = stage.clientHeight;
@@ -190,7 +194,7 @@
   fetch('data/pulse.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('pulse data'))).then(json => {
     const releases = (Array.isArray(json.releases) ? json.releases : [])
       .map(r => ({ tool: String(r.tool), version: String(r.version), type: kind(String(r.version)), time: Date.parse(r.published) }))
-      .filter(r => r.type && Number.isFinite(r.time)).sort((a, b) => a.time - b.time);
+      .filter(r => r.type && TOOL.test(r.tool) && Number.isFinite(r.time)).sort((a, b) => a.time - b.time);
     data = { releases, latest: releases[releases.length - 1] || null, generated: Date.parse(json.generated) || 0 };
     stage.append(count, latest, tip);
     root.dataset.ready = '';
