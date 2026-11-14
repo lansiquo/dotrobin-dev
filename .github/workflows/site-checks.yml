@@ -33,4 +33,4 @@ jobs:
       # On a pull request the Action compares with the base branch and fails only on a new P1 finding.
       # On a push to main it scans the whole tree, where every finding counts as new.
       - name: Scan the site's code with sast-triage
-        uses: lansiquo/sast-triage@87fede70bba02341afed8c6a6688f50dd1c622b4 # v2.6.0
+        uses: lansiquo/sast-triage@7de5f487e1f936666fbfaec4833dd3dd6f32cf80 # v2.6.2
