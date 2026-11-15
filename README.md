@@ -21,7 +21,7 @@ Academy, Blackpearl, Blue, Butler and Dev: isolated offline lab machines, each w
 
 Each deploy refreshes release data in the published copy, never the repository, so releases need no site change.
 
-- **Release pulse.** The homepage header reads `site/data/pulse.json`. The deploy rebuilds it from the published releases of sast-triage and sca-triage. If GitHub is unreachable, the committed copy stays.
+- **Release pulse.** The pulse in the homepage's Software factory section, under the factory tiles, reads `site/data/pulse.json`. The deploy rebuilds it from the published releases of sast-triage and sca-triage. If GitHub is unreachable, the committed copy stays.
 - **Version labels.** The deploy fills six elements marked `data-release` and `data-release-format`. Homepage: both project-card versions and the sast-triage card's GitHub Action snippet. sast-triage page: the two "Version X.Y" labels and the GitHub Action example.
 - **Sources.** sast-triage: highest published `vX.Y.Z` GitHub release, no drafts or prereleases, from the rebuilt `site/data/pulse.json`. sca-triage: npm `dist-tags.latest` (what `npx sca-triage` runs), from `https://registry.npmjs.org/sca-triage`.
 - **Fallback.** A label keeps its committed text if its version is unreadable or lower than that text. The deploy warns once and goes on. Unmarked text, like a note of which version something was checked on, is never rewritten.
