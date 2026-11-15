@@ -107,7 +107,7 @@
 .lab-tags{display:flex;flex-wrap:wrap;margin:0;padding:0;list-style:none;color:var(--dim);font-size:13px;line-height:1.5}
 .lab-tags li+li::before{content:"·";margin:0 7px}
 
-/* Software factory: one full-width card after the writeups, an intro and four proof tiles. From 1080px the intro sits beside the tiles; below 600px the tiles stack in one column. */
+/* Software factory: one full-width card after the writeups, an intro, four proof tiles and the release pulse (pulse.css). From 1080px the intro sits beside the tiles, which stay two by two, and the pulse takes a full-width row under both; below 1080px the intro, tiles and pulse stack; below 600px the tiles stack in one column. */
 .bento-factory{grid-column:1/-1;display:grid;gap:24px 40px;align-items:center}
 .bento-factory h2{margin:10px 0 12px;color:var(--ink);font-size:28px;line-height:1.2;font-weight:600;letter-spacing:-.01em}
 .bento-card .factory-intro>p{margin-bottom:18px;font-size:15.5px;line-height:1.65}
@@ -117,6 +117,8 @@
 .bento-card .factory-tiles p{margin:8px 0 14px;font-size:14px;line-height:1.5}
 .factory-tiles a{margin-top:auto;padding-bottom:1px;border-bottom:1px solid #6a5f9a;color:var(--violet);font-size:13px;line-height:1.5}
 .factory-tiles a:hover{border-color:var(--violet);color:#fff}
+.bento-factory .pulse{grid-column:1/-1;padding-top:22px;border-top:1px solid var(--card-line)}
+.pulse-caption{margin:0 0 12px;color:var(--soft);font-size:14px;line-height:1.5}
 @media(min-width:1080px){.bento-factory{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr)}}
 @media(max-width:599px){.factory-tiles{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:480px){.bento-factory h2{font-size:26px}.factory-tiles li{padding:18px 20px}.factory-tiles strong{font-size:30px}}
