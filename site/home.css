@@ -45,8 +45,12 @@ ul{padding:0;list-style:none}
 .term-complete:not(:empty){margin-top:.3em}
 .ps{color:var(--fg)}.pu{color:var(--pu)}.pd{color:var(--pd)}
 .b{color:var(--b)}.g{color:var(--g)}.y{color:var(--y)}.r{color:var(--r)}.d{color:var(--dim)}
-.ls-rows li{display:grid;grid-template-columns:190px minmax(0,1fr);gap:8px}
-.ls-rows a,.term-log a{color:var(--b)}
+/* `ls -l projects/`: one small block per project. The name line, then the description, the number and the links, indented. */
+.ls-l li+li{margin-top:.7em}
+.ls-l li>p+p{padding-left:2ch}
+.ls-l li>p:first-child a,.term-log a{color:var(--b)}
+.ls-l .ln a{text-decoration:underline;text-decoration-color:#4a5368;text-underline-offset:3px}
+.ls-l code{font:inherit}
 .ls-files{display:flex;flex-wrap:wrap;gap:0 1ch}
 .ls-files a{color:var(--y)}
 .term-log a.y{color:var(--y)}
@@ -70,7 +74,9 @@ ul{padding:0;list-style:none}
 .rows .nm a{color:var(--fg);font-family:var(--mono)}
 .rows .v{margin-left:6px;color:var(--dim);font:11px/1.6 var(--mono)}
 .rows .os{color:var(--fg)}
-.rows a.ext{color:var(--b)}
+.rows .sub{margin-top:2px;color:var(--dim);font-size:13px}
+.rows .sub a{color:var(--muted);text-decoration:underline;text-decoration-color:#4a5368;text-underline-offset:3px}
+.rows .sub a:hover{color:var(--fg)}
 .contact-row{display:flex;flex-wrap:wrap;gap:8px 28px;padding:11px 0;border-top:1px solid var(--line)}
 .contact-row a{color:var(--fg)}
 .foot{width:calc(100% - 48px);max-width:912px;margin:0 auto;padding:20px 0 32px;border-top:1px solid var(--line);color:var(--dim);font-size:11px;letter-spacing:.04em}
@@ -84,7 +90,6 @@ ul{padding:0;list-style:none}
 .term.live .term-out{min-height:0;max-height:70vh}
 .neo{grid-template-columns:minmax(0,1fr)}
 .neo-art{display:none}
-.ls-rows li{grid-template-columns:minmax(0,1fr);gap:0;margin-bottom:6px}
 .rows li{grid-template-columns:minmax(0,1fr);gap:2px}
 }
 @media(max-width:374px){.top{padding:20px 16px;font-size:12px}.site-nav{gap:10px}.hero,.below{padding-left:16px;padding-right:16px}.foot{width:calc(100% - 32px)}.term-out{padding:16px 14px}}
