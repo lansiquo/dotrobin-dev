@@ -270,7 +270,7 @@
   function neofetch() {
     const tools = [SCA ? `sca-triage v${SCA}` : 'sca-triage', SAST ? `sast-triage v${SAST}` : 'sast-triage'].join(' · ');
     const info = [
-      [['g', 'robin'], ['', '@'], ['g', 'dotrobin']], [['', '--------------']],
+      [['g', 'dotrobin'], ['', '@'], ['g', 'mac']], [['', '------------']],
       [['b', 'Role'], ['', ': application security engineer']],
       [['b', 'Focus'], ['', ': SCA · SAST · vulnerability management']],
       [['b', 'Scale'], ['', ': co-led a CI/CD security pipeline for 60,000+ applications']],
@@ -312,7 +312,7 @@
       const [what, usage] = MAN[name];
       return [text('b', 'NAME'), text('', `     ${name} – ${what}`), text('b', 'SYNOPSIS'), text('', `     ${usage}`)];
     },
-    sudo: () => [text('', 'robin is not in the sudoers file. This incident will be reported.'), text('d', '(nice try: this site is read-only)')],
+    sudo: () => [text('', 'dotrobin is not in the sudoers file. This incident will be reported.'), text('d', '(nice try: this site is read-only)')],
     rm: args => [text('', `rm: ${args.filter(a => !a.startsWith('-'))[0] || 'file'}: Permission denied`), text('d', '(nothing to delete here: this site is read-only)')],
   };
 

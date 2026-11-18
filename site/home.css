@@ -33,7 +33,7 @@ ul{padding:0;list-style:none}
 .term-dots i+i{background:#febc2e}
 .term-dots i+i+i{background:#28c840}
 .term-out{position:relative;padding:18px 22px 22px;overflow-wrap:anywhere}
-.term.live .term-out{min-height:60vh;max-height:78vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#2b3242 transparent}
+.term.live .term-out{min-height:60vh;max-height:90vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#2b3242 transparent}
 .term-out>.cmd{margin-top:1.75em;color:#fff}
 .term-out>.login+.cmd{margin-top:0}
 .term-out>.term-prompt{margin-top:1.75em}
