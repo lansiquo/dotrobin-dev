@@ -1,4 +1,4 @@
-/* Release pulse in the homepage's Software factory section (home.css places it): a heartbeat line, one beat per release in the last 7 days, sized by release type (pulse.js). It draws once, then holds still. */
+/* Release pulse in the summary at the top of the Software factory page (factory-glance.css places it): a heartbeat line, one beat per release in the last 7 days, sized by release type (pulse.js). It draws once, then holds still. */
 .pulse{min-width:0;width:100%;margin:0}
 .pulse-stage{position:relative;height:132px}
 .pulse-fallback,.pulse-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -11,7 +11,7 @@
 .pulse-day{fill:#a6a3bd;font:10px ui-monospace,SFMono-Regular,Consolas,monospace}
 .pulse-dot{fill:#4ade80}
 .pulse-ring{fill:none;stroke:#4ade80;stroke-opacity:.35}
-/* ".pulse" in front keeps these two labels ahead of the card text rule ".bento-card p" in home.css. */
+/* ".pulse" in front keeps these two labels ahead of the page's paragraph rules. */
 .pulse .pulse-count,.pulse .pulse-latest{position:absolute;margin:0;font:11px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace}
 /* The count by type may wrap after "this week:" on a narrow screen; pulse.js then keeps the spikes below it. */
 .pulse .pulse-count{top:2px;left:0;color:#a6a3bd}

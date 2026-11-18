@@ -8,3 +8,15 @@ Instrument Serif Italic by The Instrument Serif Project Authors.
 Source: https://github.com/Instrument/instrument-serif
 Packaged via @fontsource/instrument-serif 5.3.0 (files/instrument-serif-latin-400-italic.woff2)
 Distributed unchanged under SIL Open Font License 1.1; see OFL-Instrument-Serif.txt.
+
+Inter by The Inter Project Authors (Rasmus Andersson).
+Source: https://github.com/rsms/inter
+Release: v4.1 (tag commit e3a3d4c57d5ecc01453a575621882a384c1995a3), asset Inter-4.1.zip (SHA-256 9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e)
+Original assets: web/Inter-Regular.woff2 (inter-regular.woff2), web/Inter-SemiBold.woff2 (inter-semibold.woff2)
+Distributed unchanged under SIL Open Font License 1.1; see OFL-Inter.txt (LICENSE.txt in the release).
+
+JetBrains Mono by The JetBrains Mono Project Authors.
+Source: https://github.com/JetBrains/JetBrainsMono
+Release: v2.304 (tag commit cd5227bd1f61dff3bbd6c814ceaf7ffd95e947d9), asset JetBrainsMono-2.304.zip (SHA-256 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf)
+Original asset: fonts/webfonts/JetBrainsMono-Regular.woff2 (jetbrains-mono-regular.woff2)
+Distributed unchanged under SIL Open Font License 1.1; see OFL-JetBrains-Mono.txt (OFL.txt in the release).

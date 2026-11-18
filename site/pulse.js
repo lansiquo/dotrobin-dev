@@ -1,4 +1,4 @@
-// Release pulse: a heartbeat line in the homepage's Software factory section, under the factory tiles. Each beat is one published release of
+// Release pulse: a heartbeat line in the summary at the top of the Software factory page (factory.html), under the factory tiles. Each beat is one published release of
 // sast-triage or sca-triage in the last 7 days, read from data/pulse.json on this site.
 // A beat's height shows the release type, read from its version: a patch is low, a minor twice as tall, a major full height.
 // The line draws once and then holds still. Without JavaScript the static line in the page stays.
