@@ -318,7 +318,7 @@
 
   // ---- the live prompt ----
   const PS = () => {
-    const ps = el('span', 'ps', span('pu', 'robin@dotrobin'), ' ', span('pd', show(cwd)), ' %');
+    const ps = el('span', 'ps', span('pu', 'dotrobin@mac'), ' ', span('pd', show(cwd)), ' %');
     ps.setAttribute('aria-hidden', 'true');
     return ps;
   };
