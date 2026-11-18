@@ -51,7 +51,8 @@
     echo.append(typed);  // a text node: the typed text is never read as HTML
     log.append(echo);
     if (!name) return;
-    const answer = COMMANDS[name];
+    // Own keys only: a typed word such as constructor or __proto__ must not reach Object.prototype.
+    const answer = Object.hasOwn(COMMANDS, name) ? COMMANDS[name] : null;
     log.append(el('p', {}, ...(answer ? answer() : [span('d', 'command not found: '), typed.trim(), span('d', ' · try help')])));
     if (name === 'resume') window.open(RESUME, '_blank', 'noopener');
   }
