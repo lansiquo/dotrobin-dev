@@ -27,7 +27,7 @@
   };
 
   // ---- versions: read from the page's own data-release labels, which the deploy fills. Read once, before `clear`
-  // can remove the transcript's labels. A PROJECTS row without its own label gets the version as text. ----
+  // can remove the transcript's labels. ----
   const version = tool => {
     const label = document.querySelector(`[data-release="${tool}"][data-release-format="X.Y.Z"]`);
     const text = label ? label.textContent.trim() : '';
@@ -35,10 +35,6 @@
   };
   const SCA = version('sca-triage');
   const SAST = version('sast-triage');
-  for (const slot of document.querySelectorAll('[data-version-of]')) {
-    const ver = slot.dataset.versionOf === 'sca-triage' ? SCA : slot.dataset.versionOf === 'sast-triage' ? SAST : '';
-    if (ver) slot.textContent = `v${ver}`;
-  }
   const v = (text, ver) => (ver ? `${text}${ver}` : '');
 
   // ---- the virtual home folder: every word in a file comes from this site, its case studies or the resume ----
