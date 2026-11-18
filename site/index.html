@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests"><link rel="canonical" href="https://dotrobin.dev/"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Robin Lansiquot, application security and DevSecOps engineer. SCA and SAST triage tools that run in CI/CD, plus hands-on security lab writeups."><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><link rel="preload" href="fonts/inter-semibold.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin><title>Robin Lansiquot · Application Security &amp; DevSecOps · dotrobin</title><meta property="og:type" content="website"><meta property="og:site_name" content="dotrobin.dev"><meta property="og:title" content="Robin Lansiquot · Application Security &amp; DevSecOps"><meta property="og:description" content="Robin Lansiquot, application security and DevSecOps engineer. SCA and SAST triage tools that run in CI/CD, plus hands-on security lab writeups."><meta property="og:url" content="https://dotrobin.dev/"><meta property="og:image" content="https://dotrobin.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Robin Lansiquot, application security portfolio"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="home.css?v=99bf994a"><link rel="stylesheet" href="contact.css?v=383a0f0f"><script src="terminal.js?v=7de06144" defer></script><script src="contact.js?v=8cc9ec6e" defer></script></head><body class="homepage"><a class="skip" href="#main">Skip to content</a>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests"><link rel="canonical" href="https://dotrobin.dev/"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Robin Lansiquot, application security and DevSecOps engineer. SCA and SAST triage tools that run in CI/CD, plus hands-on security lab writeups."><meta name="theme-color" content="#101014"><link rel="icon" href="/favicon.ico?v=snowflake-1" sizes="any"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=snowflake-1"><link rel="preload" href="fonts/inter-semibold.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin><title>Robin Lansiquot · Application Security &amp; DevSecOps · dotrobin</title><meta property="og:type" content="website"><meta property="og:site_name" content="dotrobin.dev"><meta property="og:title" content="Robin Lansiquot · Application Security &amp; DevSecOps"><meta property="og:description" content="Robin Lansiquot, application security and DevSecOps engineer. SCA and SAST triage tools that run in CI/CD, plus hands-on security lab writeups."><meta property="og:url" content="https://dotrobin.dev/"><meta property="og:image" content="https://dotrobin.dev/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Robin Lansiquot, application security portfolio"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="home.css?v=d7547b33"><link rel="stylesheet" href="contact.css?v=383a0f0f"><script src="terminal.js?v=e697f844" defer></script><script src="contact.js?v=8cc9ec6e" defer></script><script src="copy.js?v=6c2f35da" defer></script></head><body class="homepage"><a class="skip" href="#main">Skip to content</a>
 <header class="top"><a class="brand" href="index.html">dotrobin<span>_</span></a><nav class="site-nav" aria-label="Main"><a href="#projects">work</a><a href="#writeups">writeups</a><a href="Robin_Lansiquot_Resume.pdf" target="_blank" rel="noopener">resume</a><a href="#contact">contact</a></nav></header>
 <main id="main" tabindex="-1">
 <div class="hero">
@@ -10,7 +10,7 @@
 <p class="cmd"><span class="ps" aria-hidden="true">$</span> whoami</p>
 <p>Robin Lansiquot · <span class="b">application security engineer</span><br><span class="g">eJPT certified</span> · <span class="y">PNPT in progress</span></p>
 <p class="cmd"><span class="ps" aria-hidden="true">$</span> cat about.txt</p>
-<p>Most findings don’t matter. <span class="y">The reachable ones do.</span> I co-led a CI/CD security pipeline for over 60,000 applications in financial services, and now build open-source tools that find what matters and fix it safely.</p>
+<p id="about-txt">Most findings don’t matter. <span class="y">The reachable ones do.</span> I co-led a CI/CD security pipeline for over 60,000 applications in financial services, and now build open-source tools that find what matters and fix it safely.</p>
 <p class="cmd"><span class="ps" aria-hidden="true">$</span> ls projects/</p>
 <ul class="ls-rows">
 <li><a href="sca-triage.html">sca-triage/</a><span>12 of 180 vulnerable packages to fix now <span class="d" data-release="sca-triage" data-release-format="X.Y.Z">v1.3.0</span></span></li>
@@ -26,20 +26,49 @@
 <p class="hint" hidden>try <code>help</code>, <code>projects</code>, <code>resume</code> or <code>contact</code> · or just scroll</p>
 </div>
 <div class="below">
-<section class="rows" id="projects" aria-labelledby="work-title"><h2 id="work-title">WORK</h2>
-<ul>
-<li class="row"><a class="row-name" href="sca-triage.html">sca-triage</a><span class="row-desc">Ranks npm vulnerabilities by what the code actually loads</span><a class="row-meta" href="https://www.npmjs.com/package/sca-triage" target="_blank" rel="noopener" aria-label="sca-triage on npm (opens in a new tab)">npx sca-triage</a></li>
-<li class="row"><a class="row-name" href="sast-triage.html">sast-triage</a><span class="row-desc">Labels each Semgrep finding new or pre-existing, fails only on new P1s</span><a class="row-meta" href="https://github.com/lansiquo/sast-triage" target="_blank" rel="noopener" aria-label="sast-triage on GitHub (opens in a new tab)">sast-triage@v<span data-release="sast-triage" data-release-format="X.Y.Z">2.6.4</span></a></li>
-<li class="row"><a class="row-name" href="factory.html">Software factory</a><span class="row-desc">How these tools ship: one agent writes a change, a different one tries to break it</span><a class="row-meta" href="factory.html#numbers">Numbers so far</a></li>
+<section class="block" id="projects" aria-labelledby="work-title"><h2 id="work-title">PROJECTS</h2>
+<div class="grid2">
+<article class="card" aria-labelledby="sca-title">
+<div class="ch"><h3 class="nm" id="sca-title">sca-triage</h3><span class="ver">v<span data-release="sca-triage" data-release-format="X.Y.Z">1.3.0</span></span><span class="pill">npm · MIT</span></div>
+<p class="val">Ranks npm vulnerabilities by whether your code loads the vulnerable package, applies the smallest safe upgrades and checks them with the project’s tests.</p>
+<div class="metric"><p class="big">12<small> / 180</small></p><p class="ml">vulnerable packages to fix now<br><em>OWASP NodeGoat · 1,479 packages scanned</em></p></div>
+<figure class="snip"><figcaption>3 of the 12 P1 findings from <code>npx sca-triage scan NodeGoat</code> on OWASP NodeGoat, condensed to one line each</figcaption>
+<pre tabindex="0" role="region" aria-label="3 of the 12 P1 findings, one line each"><code><span class="r">[P1]</span> bson@1.0.9        <span class="y">CRITICAL</span> <span class="d">→ 1.1.4</span>
+<span class="r">[P1]</span> proxy-addr@2.0.4  <span class="y">CRITICAL</span> <span class="d">→ 2.0.8</span>
+<span class="r">[P1]</span> underscore@1.9.1  <span class="y">CRITICAL</span> <span class="d">→ 1.13.8</span></code></pre></figure>
+<p class="tags">JavaScript · Node.js · npm · GitHub Actions · CycloneDX</p>
+<div class="links"><a href="sca-triage.html">Case study <span aria-hidden="true">→</span></a><a href="https://www.npmjs.com/package/sca-triage" target="_blank" rel="noopener" aria-label="sca-triage on npm (opens in a new tab)">npm <span aria-hidden="true">↗</span></a><button class="copy" type="button" data-copy="npx sca-triage" hidden>copy npx sca-triage</button></div>
+</article>
+<article class="card" aria-labelledby="sast-title">
+<div class="ch"><h3 class="nm" id="sast-title">sast-triage</h3><span class="ver">v<span data-release="sast-triage" data-release-format="X.Y.Z">2.6.4</span></span><span class="pill">GitHub Action · MIT</span></div>
+<p class="val">Labels each Semgrep finding new or pre-existing, ranks it P1–P3 and fails only on new P1 findings or incomplete scans.</p>
+<div class="metric"><p class="big">7</p><p class="ml">real P1s in a full scan, and 0 of the last two pull requests blocked<br><em>OWASP NodeGoat</em></p></div>
+<figure class="snip"><figcaption>A GitHub Action step, in a workflow that runs on <code>pull_request</code></figcaption>
+<pre tabindex="0" role="region" aria-label="GitHub Action step"><code>- <span id="sast-uses">uses: <span class="b">lansiquo/sast-triage@v<span data-release="sast-triage" data-release-format="X.Y.Z">2.6.4</span></span></span>
+<span class="d"># NodeGoat full scan → 7 P1</span>
+<span class="d"># last two pull requests → 0 new P1 → </span><span class="g">pass</span></code></pre></figure>
+<p class="tags">Python · Semgrep · GitHub Actions · FastAPI · GitHub API · pytest</p>
+<div class="links"><a href="sast-triage.html">Case study <span aria-hidden="true">→</span></a><a href="https://github.com/lansiquo/sast-triage" target="_blank" rel="noopener" aria-label="sast-triage on GitHub (opens in a new tab)">GitHub <span aria-hidden="true">↗</span></a><button class="copy" type="button" data-copy-from="sast-uses" hidden>copy uses: line</button></div>
+</article>
+</div>
+<article class="card wide" aria-labelledby="factory-title">
+<div class="ch"><h3 class="nm" id="factory-title">Software factory</h3><span class="pill">how these tools ship</span></div>
+<p class="val">Agentic development environments (ADEs) are the future of building software, and teams not using one are already behind. Here's mine: a coordinator picks up the next item on a roadmap I approved. One agent writes the change, a different one tries to break it, and nothing merges until it passes. Product and security decisions stay with me.</p>
+<ul class="stats">
+<li><strong>1 in 3</strong><span>QA runs sent a change back before it could merge.</span></li>
+<li><strong>3 models</strong><span>Builders run on two Claude models, and every change is checked by a third model from a different vendor.</span></li>
+<li><strong>Self-gated</strong><span>sast-triage scans every pull request to this website and both tools.</span></li>
 </ul>
+<div class="links"><a href="factory.html">How it works <span aria-hidden="true">→</span></a><a href="factory.html#numbers">Numbers so far <span aria-hidden="true">→</span></a></div>
+</article>
 </section>
-<section class="rows" id="writeups" aria-labelledby="writeups-title"><h2 id="writeups-title">WRITEUPS</h2>
-<ul>
-<li class="row"><a class="row-name" href="blackpearl.html">Blackpearl</a><span class="row-desc">Outdated web CMS and a misconfigured SUID binary on a Linux web server</span><span class="row-meta">Linux · Outdated CMS · SUID</span></li>
-<li class="row"><a class="row-name" href="academy.html">Academy</a><span class="row-desc">Exposed credentials, an unrestricted file upload and a root-run backup script</span><span class="row-meta">Linux · File upload · Cron job</span></li>
-<li class="row"><a class="row-name" href="dev.html">Dev</a><span class="row-desc">Open NFS share and an overly permissive sudo rule</span><span class="row-meta">Linux · NFS · Sudo</span></li>
-<li class="row"><a class="row-name" href="blue.html">Blue</a><span class="row-desc">Unpatched SMBv1 on Windows 7, checked against MS17-010</span><span class="row-meta">Windows · SMB · MS17-010</span></li>
-<li class="row"><a class="row-name" href="butler.html">Butler</a><span class="row-desc">Exposed Jenkins server and an unquoted service path on Windows 10</span><span class="row-meta">Windows · Jenkins · Service config</span></li>
+<section class="block" id="writeups" aria-labelledby="writeups-title"><h2 id="writeups-title">LAB WRITEUPS</h2>
+<ul class="grid5">
+<li><a class="wu" href="blackpearl.html"><span class="os l">Linux</span><strong>Blackpearl</strong><span>Outdated web CMS → misconfigured SUID binary</span></a></li>
+<li><a class="wu" href="academy.html"><span class="os l">Linux</span><strong>Academy</strong><span>Exposed credentials → unrestricted file upload → root-run backup script</span></a></li>
+<li><a class="wu" href="dev.html"><span class="os l">Linux</span><strong>Dev</strong><span>Open NFS share → overly permissive sudo rule</span></a></li>
+<li><a class="wu" href="blue.html"><span class="os w">Windows</span><strong>Blue</strong><span>Unpatched SMBv1 on Windows 7, checked against MS17-010</span></a></li>
+<li><a class="wu" href="butler.html"><span class="os w">Windows</span><strong>Butler</strong><span>Exposed Jenkins server → unquoted service path</span></a></li>
 </ul>
 </section>
 <section class="rows" aria-labelledby="contact-title"><h2 id="contact-title">CONTACT</h2>
