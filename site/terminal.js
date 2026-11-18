@@ -26,14 +26,19 @@
     return node;
   };
 
-  // ---- versions: read from the page's own data-release labels, which the deploy fills ----
+  // ---- versions: read from the page's own data-release labels, which the deploy fills. Read once, before `clear`
+  // can remove the transcript's labels. A PROJECTS row without its own label gets the version as text. ----
   const version = tool => {
-    const label = document.querySelector(`.card [data-release="${tool}"][data-release-format="X.Y.Z"]`);
+    const label = document.querySelector(`[data-release="${tool}"][data-release-format="X.Y.Z"]`);
     const text = label ? label.textContent.trim() : '';
     return /^[0-9]+\.[0-9]+\.[0-9]+$/.test(text) ? text : '';
   };
   const SCA = version('sca-triage');
   const SAST = version('sast-triage');
+  for (const slot of document.querySelectorAll('[data-version-of]')) {
+    const ver = slot.dataset.versionOf === 'sca-triage' ? SCA : slot.dataset.versionOf === 'sast-triage' ? SAST : '';
+    if (ver) slot.textContent = `v${ver}`;
+  }
   const v = (text, ver) => (ver ? `${text}${ver}` : '');
 
   // ---- the virtual home folder: every word in a file comes from this site, its case studies or the resume ----
@@ -59,7 +64,7 @@
       'sast-triage': dir({
         'README.md': file(lines('# sast-triage',
           'Labels each Semgrep finding new or pre-existing, ranks it P1–P3 and fails only on new P1 findings or incomplete scans.', '',
-          'OWASP NodeGoat: 7 real P1s in a full scan, and 0 of the last two pull requests blocked.',
+          'OWASP NodeGoat: 7 real P1s in a full scan; the last two pull requests added none, so neither was blocked.',
           v('Version ', SAST) ? `${v('Version ', SAST)} · GitHub Action · MIT` : 'GitHub Action · MIT',
           SAST ? `- uses: lansiquo/sast-triage@v${SAST}` : null), 'sast-triage.html',
         [['sast-triage.html', 'case study'], ['https://github.com/lansiquo/sast-triage', 'GitHub']]),
@@ -245,7 +250,7 @@
     } catch { return ''; }
   };
   let tty = 0;
-  const lastLogin = () => el('p', 'd', `Last login: ${stamp(new Date())} on ttys${String(tty++).padStart(3, '0')}`);
+  const lastLogin = () => el('p', 'd login', `Last login: ${stamp(new Date())} on ttys${String(tty++).padStart(3, '0')}`);
 
   const ENV = { USER: 'robin', HOME: '/Users/robin', SHELL: '/bin/zsh', HOST: 'dotrobin.local', LOGNAME: 'robin' };
   const expand = word => word.replace(/\$([A-Z]+)/g, (_, name) => (name === 'PWD' ? `/Users/robin${cwd.length ? `/${cwd.join('/')}` : ''}` : own(ENV, name) ? ENV[name] : ''));
@@ -274,7 +279,7 @@
       [['b', 'Focus'], ['', ': SCA · SAST · vulnerability management']],
       [['b', 'Scale'], ['', ': co-led a CI/CD security pipeline for 60,000+ applications']],
       [['b', 'Tools'], ['', `: ${tools}`]],
-      [['b', 'Certs'], ['', ': eJPT and PNPT in progress']],
+      [['b', 'Certs'], ['', ': eJPT certified · PNPT in progress']],
       [['b', 'Location'], ['', ': Toronto, Canada']],
     ];
     const art = el('div', 'neo-art', ...ART.map(([cls, row]) => el('div', cls, row)));
@@ -335,7 +340,8 @@
   complete.setAttribute('aria-live', 'polite');
 
   term.classList.add('live');
-  out.prepend(lastLogin());
+  const login = out.querySelector('.login');
+  if (login) login.replaceWith(lastLogin()); else out.prepend(lastLogin());
   prompt.before(log);
   prompt.after(complete);
   prompt.replaceChildren(PS(), ...(cursor ? [cursor] : []), label, input);
