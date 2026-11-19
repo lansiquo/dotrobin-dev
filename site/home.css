@@ -15,7 +15,7 @@ ul{list-style:none}
 .skip{position:absolute;top:-80px;left:8px;z-index:9;padding:12px;background:var(--fg);color:var(--bg)}
 .skip:focus{top:8px}
 
-.w{max-width:680px;margin:0 auto;padding:166px 24px 72px}
+.w{max-width:680px;margin:0 auto;padding:96px 24px 72px}
 .name{text-align:center;font-family:var(--serif);font-weight:400;font-size:clamp(44px,14.5vw,62px);letter-spacing:-.01em;line-height:1}
 .role{text-align:center;color:var(--muted);font-size:15px;margin-top:8px}
 .role i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--dot);margin-right:7px;vertical-align:1px}
