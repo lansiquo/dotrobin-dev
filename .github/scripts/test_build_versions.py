@@ -5,8 +5,11 @@ Usage: python3 .github/scripts/test_build_versions.py
 
 FakeNpm answers the script's request the way registry.npmjs.org does, and the
 pulse data is a file the test writes the way build_pulse.py does. Most tests
-run the script on a small site with seven labels written like the real ones. The
-last class runs it on a copy of the committed pages, which hold the same seven.
+run the script on a small site with seven labels written the way the site writes them.
+Its homepage keeps four of them although the real homepage shows no version, so
+the sca-triage labels are still filled and checked; they are not in SPOTS. The
+last class runs it on a copy of the committed pages, which hold three labels,
+all in sast-triage.html.
 """
 import contextlib
 import email.message
@@ -33,8 +36,8 @@ SAST, SCA = "sast-triage", "sca-triage"
 TOKEN = "token-that-must-not-be-printed"
 WARNING = re.compile(r"\Awarning: version labels not all filled, the committed text stays where one was not: .+\Z")
 
-# The seven labels, written the way the site writes them. The homepage holds four: the sca-triage and sast-triage
-# versions in the terminal's `ls projects/` lines and in the PROJECTS list. The two sca-triage ones show one version unless a test says otherwise.
+# The seven labels, written the way the site writes them. The small site's homepage holds four, which build_versions.py
+# fills like any marked label but no longer lists in its SPOTS (the real homepage shows no version). The two sca-triage ones show one version unless a test says otherwise.
 CARD_SCA = '<span class="bento-version" data-release="sca-triage" data-release-format="X.Y.Z">Version {card_sca}</span>'
 CARD_SAST = ('<span class="bento-version" data-release="sast-triage" data-release-format="X.Y.Z">'
              'Version {card_sast}</span>')
@@ -433,11 +436,7 @@ class FailureTest(Case):
     def test_a_label_that_lost_its_marker_is_reported_and_keeps_its_text(self):
         old = dict(card_sca="1.2.3", card_sast="2.4.1", link="2.4", notice="2.4", action="2.4.1", snippet="2.4.1")
         new = dict(card_sca="1.2.4", card_sast="2.5.0", link="2.5", notice="2.5", action="2.5.0", snippet="2.5.0")
-        reasons = {"card_sca": "index.html: 1 of 2 sca-triage X.Y.Z label(s) carry the data-release marker",
-                   "list_sca": "index.html: 1 of 2 sca-triage X.Y.Z label(s) carry the data-release marker",
-                   "card_sast": "index.html: 1 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
-                   "snippet": "index.html: 1 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
-                   "link": "sast-triage.html: 1 of 2 sast-triage X.Y label(s) carry the data-release marker",
+        reasons = {"link": "sast-triage.html: 1 of 2 sast-triage X.Y label(s) carry the data-release marker",
                    "notice": "sast-triage.html: 1 of 2 sast-triage X.Y label(s) carry the data-release marker",
                    "action": "sast-triage.html: 0 of 1 sast-triage X.Y.Z label(s) carry the data-release marker"}
         for spot, reason in reasons.items():
@@ -450,13 +449,13 @@ class FailureTest(Case):
                 self.assert_warned(result, site_pages(**kept, change=change), reason)
 
     def test_a_page_that_is_missing_is_reported(self):
-        pages = site_pages(card_sca="1.2.3", action="2.4.1")
-        del pages["index.html"]
+        pages = site_pages(card_sca="1.2.3", card_sast="2.4.1")
+        del pages["sast-triage.html"]
         filled = site_pages()
-        del filled["index.html"]
+        del filled["sast-triage.html"]
         self.assert_warned(run(pages), filled,
-                           "index.html: 0 of 2 sast-triage X.Y.Z label(s) carry the data-release marker",
-                           "index.html: 0 of 2 sca-triage X.Y.Z label(s) carry the data-release marker")
+                           "sast-triage.html: 0 of 2 sast-triage X.Y label(s) carry the data-release marker",
+                           "sast-triage.html: 0 of 1 sast-triage X.Y.Z label(s) carry the data-release marker")
 
     def test_a_label_that_is_not_marked_as_expected_keeps_its_text(self):
         def swap(old, new):
@@ -539,10 +538,8 @@ class FailureTest(Case):
 class CommittedSiteTest(Case):
     """The pages of this repository, so a change that drops a marker fails here before it deploys."""
 
-    # The homepage holds four: the sca-triage and sast-triage versions in the `ls projects/` lines and in PROJECTS.
-    EXPECTED = sorted([("index.html", SAST, "X.Y.Z"), ("index.html", SAST, "X.Y.Z"),
-                       ("index.html", SCA, "X.Y.Z"), ("index.html", SCA, "X.Y.Z"),
-                       ("sast-triage.html", SAST, "X.Y"), ("sast-triage.html", SAST, "X.Y"),
+    # The homepage shows no version; sast-triage.html holds all three.
+    EXPECTED = sorted([("sast-triage.html", SAST, "X.Y"), ("sast-triage.html", SAST, "X.Y"),
                        ("sast-triage.html", SAST, "X.Y.Z")])
     LABEL = re.compile(r'(<([a-z]+)\b[^<>]*\bdata-release="([a-z-]+)" data-release-format="X\.Y(\.Z)?">[^<>0-9]*)'
                        r"[0-9]+(?:\.[0-9]+)+([^<>0-9]*</\2>)")
@@ -550,7 +547,7 @@ class CommittedSiteTest(Case):
     def committed(self):
         return {page.relative_to(SITE).as_posix(): page.read_bytes() for page in sorted(SITE.rglob("*.html"))}
 
-    def test_the_seven_labels_are_marked_and_each_holds_one_version(self):
+    def test_the_three_labels_are_marked_and_each_holds_one_version(self):
         found = []
         for name, content in self.committed().items():
             text, labels, problems, changed = build_versions.fill(name, content.decode("utf-8"), {})
@@ -562,16 +559,14 @@ class CommittedSiteTest(Case):
                                 for _ in range(count)), self.EXPECTED)
 
     def test_the_committed_versions_are_filled_without_a_change_or_a_warning(self):
-        committed, shown = self.committed(), {}
-        for tool in (SAST, SCA):
-            card = re.search(rf'data-release="{tool}" data-release-format="X\.Y\.Z">[^<>0-9]*([0-9.]+)<',
-                             committed["index.html"].decode("utf-8"))
-            self.assertIsNotNone(card, f"index.html has no marked {tool} X.Y.Z label")
-            shown[tool] = card[1]
-        result = run(committed, pulse=pulse_file(shown[SAST]), npm=FakeNpm(shown[SCA]))
+        committed = self.committed()
+        card = re.search(rf'data-release="{SAST}" data-release-format="X\.Y\.Z">[^<>0-9]*([0-9.]+)<',
+                         committed["sast-triage.html"].decode("utf-8"))
+        self.assertIsNotNone(card, f"sast-triage.html has no marked {SAST} X.Y.Z label")
+        result = run(committed, pulse=pulse_file(card[1]))
         self.assert_filled(result, committed, 0)
 
-    def test_a_release_changes_the_seven_labels_and_nothing_else(self):
+    def test_a_release_changes_the_three_labels_and_nothing_else(self):
         committed = self.committed()
         result = run(committed, pulse=pulse_file("98.76.54"), npm=FakeNpm("87.65.43"))
 
@@ -583,14 +578,14 @@ class CommittedSiteTest(Case):
         for name, content in committed.items():
             text, replaced = self.LABEL.subn(version, content.decode("utf-8"))
             expected[name], count = text.encode("utf-8"), count + replaced
-        self.assertEqual(count, 7)
-        self.assert_filled(result, expected, 7)
+        self.assertEqual(count, 3)
+        self.assert_filled(result, expected, 3)
         for name in ("sast-triage.html", "sca-triage.html"):
             notes = re.findall(rb'<p class="evidence-note">.*?</p>', committed[name], re.S)
             self.assertTrue(notes and all(b"Checked on" in note for note in notes), name)
             self.assertEqual(notes, re.findall(rb'<p class="evidence-note">.*?</p>', result.pages[name], re.S))
         self.assertEqual({name for name in committed if committed[name] != result.pages[name]},
-                         {"index.html", "sast-triage.html"})
+                         {"sast-triage.html"})
         self.assertIn(b"lansiquo/sast-triage@v<span", result.pages["sast-triage.html"])
         self.assertIn(b">98.76.54</span></code></pre>", result.pages["sast-triage.html"])
 

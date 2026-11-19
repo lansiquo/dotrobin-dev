@@ -20,3 +20,15 @@ Source: https://github.com/JetBrains/JetBrainsMono
 Release: v2.304 (tag commit cd5227bd1f61dff3bbd6c814ceaf7ffd95e947d9), asset JetBrainsMono-2.304.zip (SHA-256 6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf)
 Original asset: fonts/webfonts/JetBrainsMono-Regular.woff2 (jetbrains-mono-regular.woff2)
 Distributed unchanged under SIL Open Font License 1.1; see OFL-JetBrains-Mono.txt (OFL.txt in the release).
+
+Instrument Serif Regular by The Instrument Serif Project Authors.
+Source: https://github.com/Instrument/instrument-serif
+Converted from InstrumentSerif-Regular.ttf ("Version 1.000; ttfautohint (v1.8.4.7-5d5b);gftools[0.9.27]", SHA-256 498efd461f6ddfcb7a111bf9a565709d2085d48201d501ead960d93e84ffbb88), supplied by the site owner with the homepage design.
+Converted to instrument-serif-regular.woff2 with fontTools 4.55.3 (pyftsubset API, brotli 1.1.0): Latin subset, the same Unicode ranges as the italic's @fontsource latin file (U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD), all layout features and name records kept; no outlines changed.
+Distributed under SIL Open Font License 1.1; see OFL-Instrument-Serif.txt.
+
+Inter Medium by The Inter Project Authors (Rasmus Andersson).
+Source: https://github.com/rsms/inter
+Release: v4.1, asset Inter-4.1.zip (SHA-256 9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e, the same archive as inter-regular.woff2 above)
+Original asset: web/Inter-Medium.woff2 (inter-medium.woff2)
+Distributed unchanged under SIL Open Font License 1.1; see OFL-Inter.txt (LICENSE.txt in the release).
