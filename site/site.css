@@ -18,7 +18,7 @@ img{max-width:100%;height:auto}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 /* Header: R monogram and name, then four quiet links. */
-.top{max-width:768px;margin:0 auto;padding:36px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;font-size:15px;color:var(--muted)}
+.top{max-width:720px;margin:0 auto;padding:36px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;font-size:15px;color:var(--muted)}
 .home{display:flex;align-items:center;gap:12px;color:var(--fg)}
 .mk{width:30px;height:30px;border-radius:50%;border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;font:italic 17px/1 var(--serif)}
 .site-nav{display:flex;flex-wrap:wrap;gap:0 24px}
@@ -26,7 +26,7 @@ img{max-width:100%;height:auto}
 .site-nav a:hover,.site-nav a[aria-current]{color:var(--fg)}
 
 /* The reading column. */
-.content{max-width:768px;margin:0 auto;padding:56px 24px 0}
+.content{max-width:720px;margin:0 auto;padding:56px 24px 0}
 .content p{margin:14px 0;color:var(--text)}
 .content ul,.content ol{padding-left:22px}
 .content li{margin:6px 0;color:var(--text)}
@@ -54,7 +54,7 @@ main.content>p:last-child{text-align:center}
 .resource-kicker,.resource-meta{font-size:14px;color:var(--muted)}
 .resource-title{font-weight:400;color:var(--fg);border-bottom:1px solid var(--muted);overflow-wrap:anywhere}
 .project-link:hover .resource-title{border-bottom-color:var(--fg)}
-.resource-title code{font:15px var(--mono)}
+.resource-title code{font:14px var(--mono)}
 .stats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:48px 0;padding:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .content .stats li{margin:0;padding:22px 8px;text-align:center}
 .stats b{display:block;font:400 clamp(34px,9vw,44px)/1 var(--serif);color:var(--fg)}
@@ -188,7 +188,7 @@ mark.attack-key{background:none;color:var(--fg);border-bottom:1px solid var(--ac
 @media(max-width:650px){.pulse-stage{height:116px}}
 
 /* Footer: back home and the next page, the contact links, then the name line. */
-.end{max-width:768px;margin:80px auto 0;padding:0 24px 64px}
+.end{max-width:720px;margin:80px auto 0;padding:0 24px 64px}
 .next{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-top:28px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
 .next .back{color:var(--fg)}
 .next .fwd{text-align:right}
