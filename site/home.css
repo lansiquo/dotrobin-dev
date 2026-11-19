@@ -1,4 +1,4 @@
-/* Homepage: one dark, centred column. Name and thesis in Instrument Serif, body in Inter, a static dot chart, then WORK, LAB WRITEUPS and the contact links. No script. */
+/* Homepage: one dark, centred 680px column. Name and thesis in Instrument Serif, body in Inter, a static dot chart, then WORK, LAB WRITEUPS and the contact links. No script. */
 @font-face{font-family:"Instrument Serif";src:url(fonts/instrument-serif-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"Instrument Serif";src:url(fonts/instrument-serif-italic.woff2) format("woff2");font-weight:400;font-style:italic;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
@@ -6,7 +6,7 @@
 :root{color-scheme:dark;--bg:#0c0c0e;--fg:#ecebe6;--muted:#86837b;--line:#1f1f23;--accent:#e0675c;--dot:#4ec27a;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg)}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15.5px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 a{color:inherit;text-decoration:none}
 a:hover{color:var(--fg)}
 a:focus-visible,main:focus-visible{outline:2px solid var(--fg);outline-offset:3px;border-radius:2px}
@@ -15,39 +15,38 @@ ul{list-style:none}
 .skip{position:absolute;top:-80px;left:8px;z-index:9;padding:12px;background:var(--fg);color:var(--bg)}
 .skip:focus{top:8px}
 
-.w{max-width:640px;margin:0 auto;padding:96px 24px 72px}
-.mark{width:40px;height:40px;border-radius:50%;border:1px solid #3a3a40;color:var(--fg);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:22px;margin:0 auto 30px}
-.name{text-align:center;font-family:var(--serif);font-weight:400;font-size:56px;letter-spacing:-.01em;line-height:1}
-.role{text-align:center;color:var(--muted);font-size:14px;margin-top:8px}
+.w{max-width:680px;margin:0 auto;padding:96px 24px 72px}
+.name{text-align:center;font-family:var(--serif);font-weight:400;font-size:clamp(44px,14.5vw,62px);letter-spacing:-.01em;line-height:1}
+.role{text-align:center;color:var(--muted);font-size:15px;margin-top:8px}
 .role i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--dot);margin-right:7px;vertical-align:1px}
-.thesis{text-align:center;font-family:var(--serif);font-weight:400;font-size:40px;line-height:1.15;letter-spacing:-.005em;margin:72px 0 30px}
+.thesis{text-align:center;font-family:var(--serif);font-weight:400;font-size:clamp(30px,9.6vw,44px);line-height:1.15;letter-spacing:-.005em;margin:72px 0 30px}
 .thesis em{font-style:italic;color:var(--accent)}
 
 /* The dot chart: 1,479 packages, 180 vulnerable, 12 that matter. The circles are static SVG in index.html. */
 .field{margin:0 auto;max-width:560px}
 .field svg{display:block}
-.cap{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;font-size:12px;color:var(--muted);margin-top:12px}
+.cap{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;font-size:13px;color:var(--muted);margin-top:12px}
 .cap b{color:var(--accent);font-weight:500}
-.intro{margin-top:56px;font-size:16.5px;color:#b9b6ae;text-align:center}
+.intro{margin-top:56px;font-size:18px;color:#b9b6ae;text-align:center}
 
-.sec{margin-top:80px;font-size:12px;font-weight:400;letter-spacing:.18em;color:var(--muted);text-align:center}
+.sec{margin-top:80px;font-size:13px;font-weight:400;letter-spacing:.18em;color:var(--muted);text-align:center}
 .sec:after{content:"";display:block;width:28px;height:1px;background:var(--fg);margin:14px auto 0}
 
 /* WORK: one row per project. */
 .p{padding:26px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:8px 24px}
-.p h3{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.7;letter-spacing:-.01em}
-.p .m{font-size:13px;color:var(--accent);align-self:center;text-align:right;white-space:nowrap}
-.p p{grid-column:1/-1;color:#a9a69e;font-size:15px}
-.p .l{font-size:13px;color:var(--muted)}
+.p h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.7;letter-spacing:-.01em}
+.p .m{font-size:14px;color:var(--accent);align-self:center;text-align:right;white-space:nowrap}
+.p p{grid-column:1/-1;color:#a9a69e;font-size:16px}
+.p .l{font-size:14px;color:var(--muted)}
 
 /* LAB WRITEUPS: one line per writeup. */
 .wl{margin-top:20px}
-.wr{display:flex;justify-content:space-between;gap:4px 16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
-.wr h3{font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.7}
-.wr span{color:var(--muted);font-size:14px;text-align:right}
+.wr{display:flex;justify-content:space-between;gap:4px 16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:16px}
+.wr h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.7}
+.wr span{color:var(--muted);font-size:15px;text-align:right}
 
-.human{margin-top:80px;text-align:center;font-family:var(--serif);font-style:italic;font-size:22px;color:#a9a69e;line-height:1.4}
-.links{margin-top:44px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 28px;font-size:14px}
+.human{margin-top:80px;text-align:center;font-family:var(--serif);font-style:italic;font-size:24px;color:#a9a69e;line-height:1.4}
+.links{margin-top:44px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 28px;font-size:15px}
 .links a{border-bottom:1px solid #4a4a50;padding-bottom:1px}
 .links a:hover{border-bottom-color:var(--fg)}
-.foot{margin-top:64px;text-align:center;font-size:12px;color:var(--muted)}
+.foot{margin-top:64px;text-align:center;font-size:13px;color:var(--muted)}
