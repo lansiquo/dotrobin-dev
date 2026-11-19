@@ -1,12 +1,12 @@
 /* Lab writeups: overview facts, result, a red attack-path panel and a blue remediation panel. Loaded after site.css on the five writeups only. */
-:root{--blue:#5b9cf0;--red-edge:#a65048;--red-tint:#1a1012;--red-dot:#2a1517;--blue-edge:#3f6fae;--blue-tint:#0f1520;--blue-line:#22324a}
+:root{--red-tint:#1a1012;--red-dot:#2a1517;--blue-edge:#3f6fae;--blue-tint:#0f1520;--blue-line:#22324a}
 .content .environment{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin:24px 0;padding:0}
 .content .environment li{margin:0;padding:14px 0;border-top:1px solid var(--line);font-size:17px;overflow-wrap:anywhere}
 .content .result{display:inline-block;margin:0 0 12px;padding:4px 12px;border:1px solid var(--edge);border-radius:6px;font:14px/1.6 var(--mono);color:var(--accent)}
 mark.attack-key{background:none;color:var(--fg);border-bottom:1px solid var(--accent);padding:0;font:inherit}
 
 /* Attack path: a narrow red panel, numbered circles joined by down arrows. */
-.vertical-path{max-width:420px;margin:28px auto;padding:24px 20px;border:1px solid var(--red-edge);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;background:var(--red-tint)}
+.vertical-path{max-width:420px;margin:28px auto;padding:24px 20px;border:1px solid var(--accent);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;background:var(--red-tint)}
 .vertical-path ol{list-style:none;counter-reset:attack-step;margin:0;padding:0}
 .content .vertical-path li{position:relative;counter-increment:attack-step;margin:0;padding:38px 0 0;text-align:center;line-height:1.5;color:var(--text);font-size:17px}
 .content .vertical-path li:first-child{padding-top:0}

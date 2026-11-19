@@ -4,7 +4,7 @@
 @font-face{font-family:Inter;src:url(fonts/inter-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-medium.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrains-mono-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
-:root{color-scheme:dark;--bg:#0c0c0e;--fg:#ecebe6;--text:#c9c6be;--muted:#86837b;--line:#1f1f23;--edge:#3a3a40;--code:#131316;--accent:#e0675c;--ok:#4ec27a;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
+:root{color-scheme:dark;--bg:#0c0c0e;--fg:#ecebe6;--text:#c9c6be;--muted:#86837b;--line:#1f1f23;--edge:#3a3a40;--code:#131316;--accent:#e0675c;--blue:#5b9cf0;--ok:#4ec27a;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
 *{box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.7 var(--sans);-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
