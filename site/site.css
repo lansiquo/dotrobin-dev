@@ -17,10 +17,9 @@ img{max-width:100%;height:auto}
 .skip:focus{top:8px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-/* Header: R monogram and name, then four quiet links. */
+/* Header: name, then four quiet links. */
 .top{max-width:720px;margin:0 auto;padding:36px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 24px;font-size:15px;color:var(--muted)}
-.home{display:flex;align-items:center;gap:12px;color:var(--fg)}
-.mk{width:30px;height:30px;border-radius:50%;border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;font:italic 17px/1 var(--serif)}
+.home{display:flex;align-items:center;color:var(--fg)}
 .site-nav{display:flex;flex-wrap:wrap;gap:0 24px}
 .site-nav a{display:inline-flex;align-items:center;min-height:44px}
 .site-nav a:hover,.site-nav a[aria-current]{color:var(--fg)}
@@ -101,6 +100,20 @@ pre .flag{color:var(--accent)}
 :not(pre)>code{padding:1px 6px;border-radius:4px;background:var(--code);color:var(--fg);font:14px var(--mono);overflow-wrap:anywhere;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .command-provenance{margin:24px 0 6px;font:13px/1.4 var(--mono);color:var(--muted)}
 .content .command-provenance+pre{margin-top:0}
+/* Long output: the first 10 lines, then a native <details> that shows the rest in the same block. */
+.term{margin:18px 0;background:var(--code);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.term pre{margin:0;border:0;border-radius:0;background:none}
+.term pre:focus-visible{outline-offset:-3px}
+.term>pre{padding-bottom:0}
+.more pre{padding-top:0}
+.more:not([open]){padding-top:14px}
+.more[open]{position:relative;padding-bottom:45px}
+.more[open] summary{position:absolute;left:0;right:0;bottom:0}
+.more summary{display:flex;align-items:center;min-height:44px;padding:0 20px;border-top:1px solid var(--line);font:14px/1.4 var(--sans);color:var(--muted);cursor:pointer;list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary:hover{color:var(--fg)}
+.more summary:focus-visible{outline-offset:-3px}
+.more[open] .more-open,.more:not([open]) .more-close{display:none}
 
 /* Tables: hairlines only; wide ones scroll inside their own box. */
 .table-scroll,.sca-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;margin:24px 0}
@@ -235,5 +248,6 @@ mark.attack-key{background:none;color:var(--fg);border-bottom:1px solid var(--ac
 .factory-tiles{grid-template-columns:minmax(0,1fr)}
 .content .factory-tiles li,.content .factory-tiles li:nth-child(even){padding:20px 0;border-left:0}
 pre{padding:14px 16px}
+.more summary{padding:0 16px}
 }
 @media print{.reading-toc{display:none!important}pre{white-space:pre-wrap;overflow-wrap:anywhere}}
