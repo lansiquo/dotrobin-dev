@@ -69,7 +69,7 @@ Gate (--fail-on P1): <span class="flag">FAIL</span></code></pre></details></div>
 <div class="sca-step-heading"><span class="sca-step-number" aria-hidden="true">02</span><h3>Plan and apply the P1 upgrades</h3><span class="sca-step-status">10 upgrades applied</span></div>
 <p><code>plan</code> is a dry run of 10 upgrades: 4 direct dependencies pinned with <code>npm install</code> and 6 transitive packages fixed with npm <code>overrides</code>, scoped to the packages that pull them in. It leaves two P1 packages for a person:</p>
 <ul><li><code>swig</code> has no fixed release, so it needs replacing.</li><li><code>qs</code> needs a manual upgrade: the override that would reach it (<code>"request" &gt; "qs"</code>) would also force <code>zaproxy</code>’s <code>qs</code> 0.6.6 up to 6.16.1.</li></ul>
-<p><code>fix</code> applies the 10 upgrades to a copy with install scripts disabled and confirms all 10 in the new lockfile. NodeGoat’s <code>npm test</code> runs no tests, so the run uses <code>--no-tests</code> and the upgrades are marked unverified.</p>
+<p><code>fix</code> applies the 10 upgrades to a copy with install scripts disabled and confirms all 10 in the new lockfile. NodeGoat’s <code>npm test</code> runs no tests, so the run uses <code>--no-tests</code>.</p>
 <section class="sca-output-card" aria-label="Plan and fix output">
 <p class="sca-output-title"><strong>Dry-run plan, then fix on a copy</strong><small>10 upgrades · all confirmed · evidence saved</small></p>
 <div class="term"><pre class="sca-output-preview" tabindex="0" role="region" aria-label="Plan and fix output"><code>$ npx sca-triage plan NodeGoat --min-priority P1
