@@ -4,7 +4,7 @@
 @font-face{font-family:Inter;src:url(fonts/inter-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-medium.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrains-mono-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
-:root{color-scheme:dark;--bg:#0c0c0e;--fg:#ecebe6;--text:#c9c6be;--muted:#86837b;--line:#1f1f23;--edge:#3a3a40;--code:#131316;--accent:#e0675c;--ok:#4ec27a;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
+:root{color-scheme:dark;--bg:#0c0c0e;--fg:#ecebe6;--text:#c9c6be;--muted:#86837b;--line:#1f1f23;--edge:#3a3a40;--code:#131316;--accent:#e0675c;--blue:#5b9cf0;--ok:#4ec27a;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
 *{box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.7 var(--sans);-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
@@ -30,7 +30,7 @@ img{max-width:100%;height:auto}
 .content ul,.content ol{padding-left:22px}
 .content li{margin:6px 0;color:var(--text)}
 .content li::marker{color:var(--muted)}
-.content .sca-workflow,.content .stats,.content .factory-tiles,.content .vertical-path ol{padding:0}
+.content .sca-workflow,.content .stats,.content .factory-tiles{padding:0}
 .content strong{color:var(--fg);font-weight:500}
 .content p a,.content li a,.content dd a,.content td a,.content figcaption a{color:var(--fg);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:3px}
 .content p a:hover,.content li a:hover,.content dd a:hover,.content td a:hover,.content figcaption a:hover{text-decoration-color:var(--fg)}
@@ -98,8 +98,6 @@ pre,code{font-variant-ligatures:none}
 pre code{font:inherit;color:inherit;background:none;padding:0;border:0;white-space:inherit}
 pre .flag{color:var(--accent)}
 :not(pre)>code{padding:1px 6px;border-radius:4px;background:var(--code);color:var(--fg);font:14px var(--mono);overflow-wrap:anywhere;box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.command-provenance{margin:24px 0 6px;font:14px/1.4 var(--mono);color:var(--muted)}
-.content .command-provenance+pre{margin-top:0}
 /* Long output: the first 10 lines, then a native <details> that shows the rest in the same block. */
 .term{margin:18px 0;background:var(--code);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .term pre{margin:0;border:0;border-radius:0;background:none}
@@ -132,32 +130,13 @@ pre .flag{color:var(--accent)}
 .verification-grid dt{font:400 24px/1.2 var(--serif);color:var(--fg)}
 .verification-grid dd{margin:6px 0 0;font-size:17px;color:var(--text)}
 
-/* Lab writeups: target list, result, screenshots, attack path, findings. */
-.content .environment{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin:24px 0;padding:0}
-.content .environment li{margin:0;padding:14px 0;border-top:1px solid var(--line);font-size:17px;overflow-wrap:anywhere}
-.content .result{display:inline-block;margin:0 0 12px;padding:4px 12px;border:1px solid var(--edge);border-radius:6px;font:14px/1.6 var(--mono);color:var(--accent)}
+/* Screenshots (lab writeups and project pages). Writeup panels live in writeups.css. */
 figure{margin:28px 0}
 figcaption{margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted)}
 .evidence img{display:block;width:auto;max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px}
 .evidence a{display:block;max-width:100%}
 .evidence-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;border-radius:8px}
 @media(max-width:600px){.evidence-scroll img{max-width:none}}
-.vertical-path{max-width:420px;margin:28px auto;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.vertical-path ol{list-style:none;counter-reset:attack-step;margin:0;padding:0}
-.content .vertical-path li{position:relative;counter-increment:attack-step;margin:0;padding:34px 0 0;text-align:center;line-height:1.5;color:var(--text);font-size:17px}
-.content .vertical-path li:first-child{padding-top:0}
-.vertical-path li::before{content:counter(attack-step,decimal-leading-zero);display:block;font:italic 26px/1.2 var(--serif);color:var(--accent)}
-.vertical-path li:not(:first-child)::after{content:"\2193";position:absolute;top:6px;left:0;right:0;text-align:center;color:var(--muted);font-size:15px;line-height:1}
-.vertical-path li>span{display:block;padding-top:2px;overflow-wrap:anywhere}
-mark.attack-key{background:none;color:var(--fg);border-bottom:1px solid var(--accent);padding:0;font:inherit}
-.defense-panel{margin:0 0 28px}
-.content .defense-status{margin:0 0 18px;font-size:17px;color:var(--muted)}
-.finding-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding:20px 0;border-top:1px solid var(--line)}
-.finding-observation,.finding-defense{min-width:0}
-.pair-label{display:block;margin:0 0 6px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.content .finding-pair h3{margin:0 0 8px;font-size:24px}
-.content .finding-pair p{margin:0;font-size:17px}
-.finding-note{padding-top:16px;border-top:1px solid var(--line)}
 
 /* Software factory: four numbers on hairlines, the release pulse (red on black; these rules recolour what pulse.js draws) and the diagram. */
 .factory-glance{margin:40px 0}
@@ -244,8 +223,7 @@ mark.attack-key{background:none;color:var(--fg);border-bottom:1px solid var(--ac
 .end{padding:0 20px 48px}
 .content .sca-workflow-step{padding-left:40px}
 .sca-step-number{font-size:26px}
-.content .environment,.verification-grid,.finding-pair{grid-template-columns:minmax(0,1fr)}
-.finding-pair{gap:16px}
+.verification-grid{grid-template-columns:minmax(0,1fr)}
 .factory-tiles{grid-template-columns:minmax(0,1fr)}
 .content .factory-tiles li,.content .factory-tiles li:nth-child(even){padding:20px 0;border-left:0}
 pre{padding:14px 16px}
