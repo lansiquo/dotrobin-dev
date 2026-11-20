@@ -33,7 +33,7 @@ img{max-width:100%;height:auto}
 .content .sca-workflow,.content .stats,.content .factory-tiles{padding:0}
 .content strong{color:var(--fg);font-weight:500}
 .content p a,.content li a,.content dd a,.content td a,.content figcaption a{color:var(--fg);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:3px}
-.content p>a[href="index.html#writeups"],.content p>a[href="index.html#projects"],.content>p>a[href="/"]{padding-block:3px}
+.content p>a[href="index.html#writeups"],.content p>a[href="index.html#projects"],.content>p>a[href="/"],.content p>a[href="https://github.com/lansiquo/sast-triage"],.content p>a[href="https://github.com/lansiquo/sca-triage"]{padding-block:3px}
 .content p a:hover,.content li a:hover,.content dd a:hover,.content td a:hover,.content figcaption a:hover{text-decoration-color:var(--fg)}
 .content [id]{scroll-margin-top:24px}
 
@@ -136,7 +136,7 @@ figure{margin:28px 0}
 figcaption{margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted)}
 .evidence img{display:block;width:auto;max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px}
 .evidence a{display:block;max-width:100%}
-.evidence figcaption a{min-height:24px}
+.evidence figcaption a{padding-top:2px;margin-top:-2px}
 .evidence-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;border-radius:8px}
 @media(max-width:600px){.evidence-scroll img{max-width:none}}
 
@@ -148,8 +148,8 @@ figcaption{margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted)}
 .content .factory-tiles li:nth-child(even){padding:22px 0 22px 24px;border-left:1px solid var(--line)}
 .factory-tiles strong{font:400 40px/1.05 var(--serif);color:var(--fg)}
 .factory-tiles li:first-child strong{color:var(--accent)}
-.content .factory-tiles p{margin:8px 0 12px;font-size:17px}
-.content .factory-tiles a{margin-top:auto;font-size:14px;color:var(--muted);padding-block:2px}
+.content .factory-tiles p{margin:8px 0;font-size:17px}
+.content .factory-tiles a{margin-top:auto;font-size:14px;color:var(--muted);padding-top:4px}
 .factory-diagram{max-width:440px;margin:28px auto}
 .factory-diagram svg{display:block;width:100%;height:auto}
 .pulse{min-width:0;width:100%;margin:32px 0 0}
