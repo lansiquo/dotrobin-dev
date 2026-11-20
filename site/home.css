@@ -38,6 +38,7 @@ ul{list-style:none}
 .p .m{font-size:14px;color:var(--accent);align-self:center;text-align:right;white-space:nowrap}
 .p p{grid-column:1/-1;color:#a9a69e;font-size:17px}
 .p .l{font-size:14px;color:var(--muted)}
+.p .l a{padding-block:4px}
 
 /* LAB WRITEUPS: one line per writeup. */
 .wl{margin-top:20px}
