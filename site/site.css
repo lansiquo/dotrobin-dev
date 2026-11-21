@@ -36,6 +36,7 @@ img{max-width:100%;height:auto}
 /* padding-block makes every inline link at least 24px tall without moving the text around it. */
 .content p a,.content li a,.content dd a,.content td a,.content figcaption a{padding-block:4px;color:var(--fg);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:3px}
 .content :is(p,li,dd,td,figcaption) a:is(:hover,:focus-visible){color:var(--blue);text-decoration-color:var(--blue)}
+.content a:is(:hover,:focus-visible)>code,.project-link:is(:hover,:focus-visible) .resource-title code{color:var(--blue)}
 .content [id]{scroll-margin-top:24px}
 
 /* Title block: kicker, title, accent dek, links row, key numbers. */
