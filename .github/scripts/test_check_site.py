@@ -159,5 +159,22 @@ class ImageMetadataTest(unittest.TestCase):
         self.assertEqual(code, 1)
 
 
+class ResumeAccentTest(unittest.TestCase):
+    def test_accented_resume_is_reported_in_any_case(self):
+        for word in ("R\u00e9sum\u00e9", "r\u00e9sum\u00e9", "R\u00c9SUM\u00c9"):
+            with self.subTest(word=word):
+                self.assertEqual(check_site.accent_problems(f"<p>ok</p>\n<a>{word}</a>"),
+                                 ["line 2: write 'Resume' without accents"])
+
+    def test_plain_resume_passes(self):
+        self.assertEqual(check_site.accent_problems("<a>Resume</a> <a>resume</a>"), [])
+
+    def test_no_page_under_site_has_accented_resume(self):
+        site = pathlib.Path(__file__).resolve().parents[2] / "site"
+        for page in sorted(site.rglob("*.html")):
+            with self.subTest(page=str(page.relative_to(site))):
+                self.assertEqual(check_site.accent_problems(page.read_text(encoding="utf-8")), [])
+
+
 if __name__ == "__main__":
     unittest.main()
