@@ -136,19 +136,27 @@ def image_problems(path):
     return problems
 
 
+def accent_problems(text):
+    """Lines that spell Resume with accents; AGENTS.md says to write it without."""
+    return [f"line {n}: write 'Resume' without accents"
+            for n, line in enumerate(text.splitlines(), 1) if "résumé" in line.lower()]
+
+
 def main():
     site = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "site").resolve()
     problems = []
     pages = {}
     for f in sorted(site.rglob("*.html")):
         p = Page()
-        p.feed(f.read_text(encoding="utf-8"))
+        text = f.read_text(encoding="utf-8")
+        p.feed(text)
         p.close()
         p.finish()
         if not p.has_title:
             p.errors.append("no <title>")
         if not p.has_lang:
             p.errors.append("no <html lang>")
+        p.errors += accent_problems(text)
         pages[f] = p
 
     for f, p in pages.items():

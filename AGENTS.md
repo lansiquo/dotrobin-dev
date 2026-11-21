@@ -14,3 +14,5 @@
 - If a step's output was not captured, describe the step without a caveat and without fabricated output, or drop the sub-detail; do not claim expected output was captured. Consult `EVIDENCE.md` for current coverage.
 - Validate balanced HTML, internal assets/links, screenshot dimensions, absence of sensitive incidental data, command preservation and scope. Verify the exact deployed commit and live HTTPS bytes after publishing. State when rendered browser QA was not performed.
 - Never change DNS, HTTPS settings, account permissions or hosting providers as part of a content/style edit.
+
+- Write 'Resume' without accents in all visible text.
