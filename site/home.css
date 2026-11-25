@@ -3,7 +3,7 @@
 @font-face{font-family:"Instrument Serif";src:url(fonts/instrument-serif-italic.woff2) format("woff2");font-weight:400;font-style:italic;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-medium.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
-:root{color-scheme:light;--bg:#faf8f4;--fg:#1d1b18;--text:#3d3933;--muted:#746e64;--line:#e8e3da;--card:#ffffff;--accent:#c2410c;--blue:#1d4ed8;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif}
+:root{color-scheme:light;--bg:#faf8f4;--fg:#1d1b18;--text:#3d3933;--muted:#756e64;--line:#e8e3da;--card:#ffffff;--accent:#c2410c;--blue:#1d4ed8;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}

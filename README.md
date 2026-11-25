@@ -11,7 +11,7 @@ python3 -m http.server 8788 --bind 127.0.0.1 --directory site
 ## Projects
 
 - **sca-triage** v1.3.0: npm SCA scanner (CLI on npm, and GitHub Action). Ranks vulnerable dependencies by whether your code loads them, applies the smallest safe upgrades, runs your tests and rescans. [Case study](https://dotrobin.dev/sca-triage.html), [repo](https://github.com/lansiquo/sca-triage), [npm](https://www.npmjs.com/package/sca-triage).
-- **sast-triage** v2.6.3: Semgrep reviewer for Python, JavaScript and TypeScript (CLI and GitHub Action; GitHub App service prepared, not yet live). Labels findings new or pre-existing from the diff, ranks them P1–P3 and fails only on new P1s. [Case study](https://dotrobin.dev/sast-triage.html), [repo](https://github.com/lansiquo/sast-triage).
+- **sast-triage** v2.6.4: Semgrep reviewer for Python, JavaScript and TypeScript (CLI and GitHub Action; GitHub App service prepared, not yet live). Labels findings new or pre-existing from the diff, ranks them P1–P3 and fails only on new P1s. [Case study](https://dotrobin.dev/sast-triage.html), [repo](https://github.com/lansiquo/sast-triage).
 
 ## Lab writeups
 
