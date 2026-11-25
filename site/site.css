@@ -4,7 +4,7 @@
 @font-face{font-family:Inter;src:url(fonts/inter-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:Inter;src:url(fonts/inter-medium.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrains-mono-regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
-:root{color-scheme:light;--bg:#faf8f4;--fg:#1d1b18;--text:#3d3933;--muted:#746e64;--line:#e8e3da;--edge:#958d80;--code:#f5f2ec;--card:#ffffff;--accent:#c2410c;--blue:#1d4ed8;--ok:#15803d;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
+:root{color-scheme:light;--bg:#faf8f4;--fg:#1d1b18;--text:#3d3933;--muted:#756e64;--line:#e8e3da;--edge:#958d80;--code:#f5f2ec;--card:#ffffff;--accent:#c2410c;--blue:#1d4ed8;--ok:#15803d;--serif:"Instrument Serif",Georgia,"Times New Roman",serif;--sans:Inter,Arial,Helvetica,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font:var(--sans)}
 *{box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.7 var(--sans);-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
