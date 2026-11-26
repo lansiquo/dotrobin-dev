@@ -125,7 +125,8 @@ pre .flag{color:var(--accent)}
 .sca-results thead th{font-size:14px;font-weight:500;color:var(--muted);border-bottom-color:var(--edge)}
 .sca-results tbody th{font-weight:500;color:var(--fg)}
 .sca-results td{color:var(--text)}
-.sca-table-scroll th,.sca-table-scroll td:nth-child(2),.sca-table-scroll td:nth-child(3){white-space:nowrap}
+.sca-table-scroll th,.sca-table-scroll td,.sca-table-scroll code{overflow-wrap:normal}
+.sca-table-scroll th,.sca-table-scroll td:nth-child(2),.sca-table-scroll td:nth-child(3),.sca-table-scroll td:nth-child(5){white-space:nowrap}
 .sca-results small{display:block;margin-top:4px;font:14px var(--mono);color:var(--muted);white-space:nowrap}
 .findings-table thead th:first-child{width:34%}
 .verification-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin:24px 0}
