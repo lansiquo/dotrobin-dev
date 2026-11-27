@@ -164,34 +164,107 @@ class CredentialValueTest(unittest.TestCase):
 
     # Synthetic stand-ins only. None of these is, or resembles, a real password.
     SHOWN = {
+        # Butler-shaped pairs, 'password: X' forms and tool output
         "butler pair in two code elements": "<p><code>jenkins</code> / <code>Zq7stand1n</code> logged me in</p>",
         "pair inside one code element": "<p><code>admin / Zq7stand1n</code></p>",
-        "pair in an image alt": '<img src="a.png" alt="Login with admin / Zq7stand1n" width="1" height="1">',
         "password colon": "<p>password: Zq7stand1n</p>",
         "password equals in a pre block": "<pre><code>mysql --user=a\npass=Zq7stand1n</code></pre>",
         "password is in code": "<p>The password is <code>Zq7stand1n</code>.</p>",
         "password is in quotes": "<p>The password was \u201c'Zq7stand1n'\u201d.</p>",
         "passphrase": "<p>Passphrase: Zq7stand1n</p>",
-        "secret in a title": '<a href="/" title="secret=Zq7stand1n">x</a>',
         "api key": "<p>API key: Zq7stand1n</p>",
         "token": "<code>token=Zq7stand1n</code>",
+        "table row with a password cell": "<table><tr><th>Password</th><td>Zq7stand1n</td></tr></table>",
+        # user:pass URLs and user:pass pairs
+        "ssh URL with user:pass": "<p><code>ssh://admin:Zq7stand1n@10.0.0.5</code></p>",
+        "http URL in prose": "<p>Opened http://admin:Zq7stand1n@&lt;TARGET_IP&gt;:8080/ next.</p>",
+        "bare user:pass@host": "<code>ftp admin:Zq7stand1n@10.0.0.5</code>",
+        "mysql URL in pre": "<pre><code>mysql://root:Zq7stand1n@localhost/db</code></pre>",
         "user:password pair": "<p>Tried <code>admin:Zq7stand1n</code> over SSH</p>",
-        "hydra -u pair": "<pre><code>curl -u admin:Zq7stand1n http://&lt;TARGET_IP&gt;/</code></pre>",
+        "curl -u": "<pre><code>curl -u admin:Zq7stand1n http://&lt;TARGET_IP&gt;/</code></pre>",
+        "curl --user": "<pre><code>curl --user admin:Zq7stand1n http://&lt;TARGET_IP&gt;/</code></pre>",
+        "smbclient -U user%pass": "<pre><code>smbclient -U 'admin%Zq7stand1n' //&lt;TARGET_IP&gt;/share</code></pre>",
+        # creds and pairs in prose and code
+        "creds colon pair": "<p>creds: admin/Zq7stand1n</p>",
+        "default creds in code": "<p>The default creds are <code>admin/Zq7stand1n</code>.</p>",
+        "logged in as pair": "<p>Logged in as admin / Zq7stand1n</p>",
+        "valid credentials line": "<p>Valid credentials: admin:Zq7stand1n</p>",
+        "login colon pair": "<p>login: root/Zq7stand1n</p>",
+        # tool output
+        "hydra success line": "<pre><code>[22][ssh] host: 10.0.0.5   login: admin   password: Zq7stand1n</code></pre>",
+        "hydra login password line": "<pre><code>login: admin password: Zq7stand1n</code></pre>",
+        "hydra SUCCESS line": "<pre><code>[SUCCESS] - 10.0.0.5:445 - Login Successful: admin:Zq7stand1n</code></pre>",
+        "netexec plus line": "<pre><code>SMB 10.0.0.5 445 DC01 [+] corp.local\\admin:Zq7stand1n (Pwn3d!)</code></pre>",
+        "valid credentials in a pre block": "<pre><code>[+] Valid credentials: admin:Zq7stand1n</code></pre>",
+        "intruder row in a pre block": "<pre><code>Request Payload1 Payload2 Status Length\n142 admin Zq7stand1n 200 181</code></pre>",
+        "intruder row in a table": "<table><tr><td>142</td><td>admin</td><td>Zq7stand1n</td><td>200</td><td>181</td></tr></table>",
+        # command flags
+        "hydra -p": "<pre><code>hydra -l admin -p Zq7stand1n ssh://&lt;TARGET_IP&gt;</code></pre>",
+        "sshpass -p": "<pre><code>sshpass -p Zq7stand1n ssh admin@&lt;TARGET_IP&gt;</code></pre>",
+        "sshpass -p quoted": "<pre><code>sshpass -p 'Zq7stand1n' ssh admin@&lt;TARGET_IP&gt;</code></pre>",
+        "mysql -pVALUE": "<pre><code>mysql -u root -pZq7stand1n</code></pre>",
+        "--password flag": "<pre><code>tool --user admin --password Zq7stand1n</code></pre>",
+        "--password=": "<pre><code>tool --password=Zq7stand1n</code></pre>",
+        "evil-winrm -p": "<pre><code>evil-winrm -i &lt;TARGET_IP&gt; -u admin -p Zq7stand1n</code></pre>",
+        "netexec -p": "<pre><code>netexec smb &lt;TARGET_IP&gt; -u admin -p Zq7stand1n</code></pre>",
+        # attributes
+        "pair in an image alt": '<img src="a.png" alt="Login with admin / Zq7stand1n" width="1" height="1">',
+        "creds in an image alt": '<img src="a.png" alt="creds: admin/Zq7stand1n" width="1" height="1">',
+        "secret in a title": '<a href="/" title="secret=Zq7stand1n">x</a>',
+        "URL in a title": '<a href="/" title="ssh://admin:Zq7stand1n@10.0.0.5">x</a>',
+        "hydra line in aria-label": '<div aria-label="login: admin password: Zq7stand1n">x</div>',
         "pwd in figure alt": '<img src="a.png" alt="pwd = Zq7stand1n" width="1" height="1">',
     }
     FINE = {
+        # placeholders
         "password placeholder": "<p>password: &lt;PASSWORD&gt;</p>",
         "pair with placeholder": "<p><code>jenkins</code> / <code>&lt;PASSWORD&gt;</code></p>",
         "any upper-case placeholder": "<p>token=&lt;API_TOKEN&gt; secret: &lt;SECRET_VALUE_2&gt;</p>",
+        "lower-case angle placeholder": "<p>password: &lt;password&gt;</p>",
         "stars": "<p>password: *****</p>",
+        "bullets": "<p>password: \u2022\u2022\u2022\u2022\u2022\u2022</p>",
+        "shell variable": "<pre><code>sshpass -p $PASSWORD ssh admin@&lt;TARGET_IP&gt;</code></pre>",
+        "workflow secret": "<pre><code>token: ${{ secrets.GITHUB_TOKEN }}</code></pre>",
+        "URL with placeholder": "<code>ssh://admin:&lt;PASSWORD&gt;@10.0.0.5</code>",
+        "URL with stars": "<code>ssh://admin:*****@10.0.0.5</code>",
+        "smbclient placeholder": "<pre><code>smbclient -U 'admin%&lt;PASSWORD&gt;' //host/share</code></pre>",
+        "creds placeholder pair": "<p>creds: admin/&lt;PASSWORD&gt;</p>",
+        "generic user/pass": "<p>creds: user/pass</p>",
+        "hydra placeholder": "<pre><code>hydra -l admin -p &lt;PASSWORD&gt; ssh://&lt;TARGET_IP&gt;</code></pre>",
+        # flags that are not secrets
+        "hydra wordlist -P": "<pre><code>hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://&lt;TARGET_IP&gt;</code></pre>",
+        "nmap ports": "<pre><code>nmap -sS -p 22,80,8080 &lt;TARGET_IP&gt;</code></pre>",
+        "mkdir -p": "<pre><code>mkdir -p ./evidence</code></pre>",
+        "fcrackzip -p wordlist": "<pre><code>fcrackzip -v -u -D -p /usr/share/wordlists/rockyou.txt x.zip</code></pre>",
+        "mysql prompts for the password": "<pre><code>mysql -u root -p mydb</code></pre>",
+        "ssh port": "<pre><code>ssh -p 2222 admin@&lt;TARGET_IP&gt;</code></pre>",
+        "msfvenom payload": "<pre><code>msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;IP&gt;</code></pre>",
+        "metasploit payload": "<pre><code>set PAYLOAD windows/x64/meterpreter/reverse_tcp</code></pre>",
+        "password-stdin": "<pre><code>docker login --password-stdin</code></pre>",
+        # descriptions of passwords and tool output without a credential
         "password list": "<p>I tried a short password list.</p>",
         "password hash": "<p>The password hash was cracked offline.</p>",
+        "password spraying": "<p>Password spraying: one password tried across many accounts.</p>",
+        "cracked the password": "<p>A wordlist cracked the password in a second.</p>",
+        "password reused": "<p>The password was reused across services.</p>",
         "descriptive is": "<p>The password is reused across services.</p>",
+        "passwords omitted": "<p>Tested passwords are omitted: hashes and keys too.</p>",
+        "last login line": "<pre><code>Last login: Tue Nov 25 on ttys000</code></pre>",
+        "last login in prose": "<p>Last login: Tue</p>",
+        "pass then a word": "<p>Run offline with npm test and pass: version matching works.</p>",
+        "token then a word": "<p>sast-triage itself uses no token: unlike the app it needs none.</p>",
+        "token needs a scope": "<p>token: read-only access</p>",
         "ssh prompt": "<pre><code>jp@&lt;TARGET_IP&gt;'s password:\nPermission denied</code></pre>",
+        "etc passwd": "<p>Read <code>/etc/passwd</code> and the NOPASSWD rule.</p>",
         "windows path": "<p>Looked in <code>C:\\Users\\Public</code>.</p>",
         "host and port": "<p><code>localhost:8080</code> and <code>/etc/passwd</code></p>",
+        "mailto text": "<p>Write to <code>mailto:me@example.com</code>.</p>",
+        "email next to a colon": "<p>Contact: me@example.com</p>",
         "label then word": "<p>Login: required</p>",
         "slash pair of numbers": "<p><code>3</code> / <code>4</code> checks</p>",
+        "valid input and output": "<p>Valid input/output pairs are listed below.</p>",
+        "version in a table": "<table><tr><td>3</td><td>sast-triage</td><td>v1.2</td><td>200</td><td>5</td></tr></table>",
+        "table password cell with a word": "<table><tr><th>Password</th><td>hashed</td></tr></table>",
         "script text": "<script>var password = 'Zq7stand1n';</script>",
         "token in prose": "<p>CI tokens are read-only.</p>",
     }
@@ -208,6 +281,11 @@ class CredentialValueTest(unittest.TestCase):
         for name, html in self.FINE.items():
             with self.subTest(name):
                 self.assertEqual(check_site.credential_problems(html), [])
+
+    def test_a_default_login_word_counts_in_prose_and_code(self):
+        for html in ("<p>creds: admin/admin</p>", "<p>password: admin</p>", "<code>--password root</code>"):
+            with self.subTest(html):
+                self.assertEqual(len(check_site.credential_problems(html)), 1, html)
 
     def test_report_names_the_line(self):
         html = "<p>ok</p>\n<p>fine</p>\n<p>password: Zq7stand1n</p>"

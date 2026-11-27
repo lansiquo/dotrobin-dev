@@ -38,25 +38,59 @@ JPEG_METADATA = {b"Exif\x00\x00": "EXIF metadata",
 
 
 # Credential values shown on a page (A-422). Code text is wrapped in CODE_ON
-# and CODE_OFF so the patterns can tell a code element from prose.
-CODE_ON, CODE_OFF = "\x01", "\x02"
+# and CODE_OFF so the rules can tell a code element from prose; table cells are
+# joined by a tab so a row reads as one line.
+CODE_ON, CODE_OFF, MARKS = "\x01", "\x02", "\x01\x02"
 SHOWN_ATTRS = ("alt", "title", "aria-label")
 INLINE = {"a", "abbr", "b", "code", "em", "i", "kbd", "mark", "small", "span", "strong", "sub", "sup"}
-WORD = r"(?:password|passwd|pass|pwd|passphrase|secret|token|api[ _-]?key|credential|login|creds?)s?"
-VALUE = rf"{CODE_ON}?[\"'`]?([^\s{CODE_ON}{CODE_OFF}\"'`,;]+)"
-PLACEHOLDER = re.compile(r"<[A-Z][A-Z0-9_]*>|\*{3,}")
-NOT_A_VALUE = {"the", "a", "an", "and", "or", "to", "of", "in", "none", "n/a", "required",
-               "not", "no", "set", "empty", "blank", "hidden", "redacted", "removed"}
-# 'password: X', 'pass=X'; any value that is not a placeholder or a plain word.
-CREDENTIAL_SET = re.compile(rf"\b{WORD}[ \t]*[:=][ \t]*{VALUE}", re.I)
-# 'password is X': prose follows these words, so the value must be in code or quotes.
-CREDENTIAL_IS = re.compile(rf"\b{WORD}\s+(?:is|was)\s+(?:{CODE_ON}|[\"'`\u2018\u201c])+([^\s{CODE_ON}{CODE_OFF}\"'`\u2019\u201d]+)", re.I)
-# 'user / X' in code, split across two code elements or inside one.
-CODE_PAIR = re.compile(rf"{CODE_ON}([A-Za-z][\w.-]*){CODE_OFF}\s+/\s+{CODE_ON}([^\s{CODE_ON}{CODE_OFF}]+){CODE_OFF}"
-                       rf"|{CODE_ON}(?:[^{CODE_OFF}]*?\s)?([A-Za-z][\w.-]*) / ([^\s\-/{CODE_ON}{CODE_OFF}][^\s{CODE_ON}{CODE_OFF}]*)")
-# 'user:secret' as a whole code element, or after -u / --user / --userpass.
-USER_PASS = re.compile(rf"{CODE_ON}([A-Za-z][\w.-]+):([^\s:/\\<>{CODE_ON}{CODE_OFF}]+){CODE_OFF}"
-                       rf"|(?:\s-u|--user(?:pass)?)[ =]{CODE_ON}?[\"']?[\w.-]+:([^\s:/<>{CODE_ON}{CODE_OFF}\"']+)")
+CELLS = {"td", "th"}
+SECRET = r"(?:password|passwd|pass|pwd|passphrase|secret|token|api[ _-]?key)s?"
+# Words that point at a credential pair: 'creds: admin/X', 'logged in as admin / X', 'accepted admin:X'.
+CUE = (r"(?:creds?|credentials?|logins?|log(?:ged)?[ \t]+in|sign(?:ed)?[ \t]+in|accepted|authenticat\w*|valid"
+       r"|default|worked|success\w*|cracked|found|\[\+\])")
+VALUE = rf"{CODE_ON}?[\"'`]?([^\s{MARKS}\"'`,;]+)"
+USER = rf"{CODE_ON}?[\"'`]?(?:[\w.-]+\\)?(?!(?:valid|creds?|credentials?|logins?|success\w*)\b)([A-Za-z][\w.-]*)"
+NOT_A_VALUE = {"the", "a", "an", "and", "or", "to", "of", "in", "none", "n/a", "required", "not", "no", "set",
+               "empty", "blank", "hidden", "redacted", "removed", "true", "false", "null", "string", "str",
+               "int", "bool", "undefined", "user", "username", "pass", "password", "passwd", "pwd", "secret",
+               "token", "key", "value", "x", "xx", "xxx"}
+MAIL = r"(?!(?:mailto|email|e-mail|contact|from|to|cc):)"
+# Plain words that still count as a credential where prose would otherwise hide them.
+DEFAULTS = {"admin", "administrator", "root", "toor", "password", "passw0rd", "guest", "test", "default",
+            "changeme", "letmein", "welcome", "qwerty", "hunter2", "secret", "user", "pass"}
+PLACEHOLDER = re.compile(r"<[^<>]+>|\*+|\u2022+|\.{3}|\u2026|x{3,}|\$.*|\{\{.*|%s|\[?REDACTED\]?|[A-Z][A-Z_]+")
+VERSION = re.compile(r"v?\d+(?:\.\d+)+")
+# Each rule is (pattern, when the value must look like a credential): 'always',
+# 'prose' (outside code) or 'never'. The value is the pattern's last group.
+RULES = (
+    # 'password: X', 'pass=X', 'login: Y password: Z' (hydra), 'token=X'
+    (re.compile(rf"\b{SECRET}[ \t]*[:=][ \t]*{VALUE}", re.I), "prose"),
+    # 'password is X': prose follows these words, so the value must be in code or quotes.
+    (re.compile(rf"\b{SECRET}\s+(?:is|was)\s+(?:{CODE_ON}|[\"'`\u2018\u201c])+([^\s{MARKS}\"'`\u2019\u201d]+)", re.I), "always"),
+    # a table row 'Password | X'
+    (re.compile(rf"(?:^|\t){CODE_ON}?[ \t]*{SECRET}[ \t]*\t+[ \t]*{CODE_ON}?([^\s{MARKS}]+)", re.I | re.M), "always"),
+    # 'user / X' in code, split across two code elements or inside one.
+    (re.compile(rf"{CODE_ON}([A-Za-z][\w.-]*){CODE_OFF}\s+/\s+{CODE_ON}([^\s{MARKS}]+){CODE_OFF}"
+                rf"|{CODE_ON}(?:[^{CODE_OFF}]*?\s)?([A-Za-z][\w.-]*) / ([^\s\-/{MARKS}][^\s{MARKS}]*)"), "never"),
+    # 'creds: admin/X', 'logged in as admin / X', 'Valid credentials: admin:X', '[+] corp\admin:X'
+    (re.compile(rf"(?<!\w){CUE}(?!\w)(?:[ \t]+(?:with|as|is|are|was|using|me|in|on|to|for))*[ \t]*[:=]?[ \t]*{USER}[ \t]*[/:][ \t]*{VALUE}", re.I), "prose"),
+    # 'user:X' as a whole code element, or after -u / --user / --userpass.
+    (re.compile(rf"{CODE_ON}{MAIL}([A-Za-z][\w.-]+):(?!\d+{CODE_OFF})([^\s:/\\<>{MARKS}]+){CODE_OFF}"
+                rf"|(?:\s-u|--user(?:pass)?)[ =]{CODE_ON}?[\"']?[\w.-]+:([^\s:/<>{MARKS}\"']+)"), "never"),
+    # 'user:X@host' in a URL or a login string, and '-U user%X'
+    (re.compile(rf"(?<![\w-]){MAIL}[A-Za-z][\w.-]*:([^\s:/@<>{MARKS}]+)@[\w<$]"), "never"),
+    (re.compile(rf"(?:\s-U|--user(?:name)?)[ =]{CODE_ON}?[\"']?[\w.-]+%([^\s{MARKS}\"']+)"), "never"),
+    # a Burp Intruder row 'request  user  X  status  length'
+    (re.compile(rf"^[ \t]*{CODE_ON}?\d+[ \t]+[A-Za-z][\w.@-]*[ \t]+([^\s\t{MARKS}]+)[ \t]+[23]\d\d[ \t]+\d+[ \t]*{CODE_OFF}?$", re.M), "prose"),
+)
+# Command flags that carry a secret, on a line that runs a tool known to take one.
+# '-P' is a wordlist and never counts; 'mysql -p db' prompts, so mysql needs '-pX'.
+SPACED_TOOLS = re.compile(r"\b(?:hydra|medusa|sshpass|evil-winrm|crackmapexec|netexec|nxc|cme|smbmap|mongosh?|xfreerdp)\b")
+ATTACHED_TOOLS = re.compile(r"\b(?:mysql|mysqldump|mysqladmin|mariadb)\b")
+FLAG_VALUE = rf"{CODE_ON}?[\"'`]?([^\s\-{MARKS}\"'`;|&][^\s{MARKS}\"'`;|&]*)"
+LONG_FLAG = re.compile(rf"(?<![\w-])--(?:password|passwd|pass|pwd|passphrase)(?![\w-])[ =]+{FLAG_VALUE}")
+SPACED_FLAG = re.compile(rf"(?<![\w-])-p[ \t]+{FLAG_VALUE}|(?<![\w/-])/p:{FLAG_VALUE}")
+ATTACHED_FLAG = re.compile(rf"(?<![\w-])-p(?![\s=-]){FLAG_VALUE}")
 
 
 class TextCollector(HTMLParser):
@@ -71,9 +105,14 @@ class TextCollector(HTMLParser):
         self.parts.append(text)
         self.size += len(text)
 
-    def handle_starttag(self, tag, attrs):
-        if tag not in INLINE:
+    def boundary(self, tag):
+        if tag in CELLS:
+            self.add("\t")
+        elif tag not in INLINE:
             self.add("\n")  # a block boundary separates words, so 'title' and 'p' text never join
+
+    def handle_starttag(self, tag, attrs):
+        self.boundary(tag)
         if tag in ("script", "style"):
             self.hidden += 1
         for name, value in attrs:
@@ -81,16 +120,17 @@ class TextCollector(HTMLParser):
                 self.add(f" {CODE_ON}{value}{CODE_OFF} ")
         if tag in ("code", "pre"):
             self.code += 1
-            self.add(CODE_ON)
+            if self.code == 1:
+                self.add(CODE_ON)
 
     def handle_endtag(self, tag):
-        if tag not in INLINE:
-            self.add("\n")
+        self.boundary(tag)
         if tag in ("script", "style") and self.hidden:
             self.hidden -= 1
         if tag in ("code", "pre") and self.code:
             self.code -= 1
-            self.add(CODE_OFF)
+            if not self.code:
+                self.add(CODE_OFF)
 
     def handle_data(self, data):
         if not self.hidden:
@@ -105,28 +145,74 @@ def mask(value):
     return f"{value[0]}... ({len(value)} characters)"
 
 
-def is_credential_value(value):
-    return not PLACEHOLDER.fullmatch(value) and value.lower().rstrip(".") not in NOT_A_VALUE
+def looks_like_credential(value):
+    """True for a default login word or a value with a digit and a letter, or a symbol; false for plain words."""
+    v = value.lower()
+    if v in DEFAULTS:
+        return True
+    if VERSION.fullmatch(v):
+        return False
+    return bool(re.search(r"[a-z]", v) and re.search(r"\d", v) or re.search(r"[!@#$%^&*+=~?]", v))
+
+
+def is_credential_value(value, strict):
+    value = value.rstrip(".")
+    if not value or PLACEHOLDER.fullmatch(value) or value.lower() in NOT_A_VALUE:
+        return False
+    if value.isdigit():
+        return not strict and len(value) >= 4  # prose numbers are counts and years; code may hold '123456'
+    return looks_like_credential(value) if strict else True
+
+
+def flag_matches(text):
+    """Secrets passed as command-line flags, found line by line."""
+    offset = 0
+    for line in text.split("\n"):
+        patterns = [LONG_FLAG]
+        if SPACED_TOOLS.search(line):
+            patterns.append(SPACED_FLAG)
+        if ATTACHED_TOOLS.search(line):
+            patterns.append(ATTACHED_FLAG)
+        for pattern in patterns:
+            for m in pattern.finditer(line):
+                yield offset + m.start(), [g for g in m.groups() if g][-1]
+        offset += len(line) + 1
+
+
+def rule_matches(text):
+    spans = [(m.start(), m.end()) for m in re.finditer(f"{CODE_ON}[^{CODE_OFF}]*{CODE_OFF}", text)]
+    starts = [s for s, _ in spans]
+
+    def in_code(pos):
+        i = bisect.bisect_right(starts, pos) - 1
+        return i >= 0 and pos < spans[i][1]
+
+    for pattern, demand in RULES:
+        for m in pattern.finditer(text):
+            value = [g for g in m.groups() if g][-1]
+            yield m.start(), value, demand == "always" or (demand == "prose" and not in_code(m.start()))
+    for pos, value in flag_matches(text):
+        yield pos, value, False
 
 
 def credential_problems(html):
-    """Lines that show a credential value next to a credential word, masked.
+    """Lines that show a credential value, masked.
 
-    Flags 'password: X', 'pass=X', 'password is X' (X in code or quotes),
-    'user / X' in code, and 'user:X' in code or after -u. Placeholders such as
-    <PASSWORD> and ***** pass, as do phrases that describe a password without
-    showing one ('password list', 'password hash').
+    What it catches: 'password: X' and similar, 'password is X' in code or quotes,
+    'user / X' and 'creds: user/X' pairs, 'user:X' after -u or in a whole code
+    element, 'user:X@host', hydra and Intruder result lines, '-p X' after hydra,
+    sshpass and similar, '--password X', 'mysql -pX', and the same in alt, title
+    and aria-label. Placeholders such as <PASSWORD> and ***** pass, as do phrases
+    that describe a password without showing one ('password list', 'password hash').
+    Outside code, a plain word after 'password:' passes unless it is a common
+    default such as 'admin'.
     """
     page = TextCollector()
     page.feed(html)
     page.close()
     text = "".join(page.parts)
-    found = set()
-    for pattern in (CREDENTIAL_SET, CREDENTIAL_IS, CODE_PAIR, USER_PASS):
-        for m in pattern.finditer(text):
-            value = [g for g in m.groups() if g][-1].rstrip(".")
-            if value and not value.isdigit() and is_credential_value(value):
-                found.add((page.line_at(m.start()), mask(value)))
+    found = {(page.line_at(pos), mask(value.rstrip(".")))
+             for pos, value, strict in rule_matches(text) if is_credential_value(value, strict)}
     return [f"line {n}: shows a credential value ({masked}); use a placeholder such as <PASSWORD>"
             for n, masked in sorted(found)]
 
