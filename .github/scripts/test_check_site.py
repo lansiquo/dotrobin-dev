@@ -159,6 +159,80 @@ class ImageMetadataTest(unittest.TestCase):
         self.assertEqual(code, 1)
 
 
+class CredentialValueTest(unittest.TestCase):
+    """A credential value shown on a page fails; placeholders and descriptions pass (A-422)."""
+
+    # Synthetic stand-ins only. None of these is, or resembles, a real password.
+    SHOWN = {
+        "butler pair in two code elements": "<p><code>jenkins</code> / <code>Zq7stand1n</code> logged me in</p>",
+        "pair inside one code element": "<p><code>admin / Zq7stand1n</code></p>",
+        "pair in an image alt": '<img src="a.png" alt="Login with admin / Zq7stand1n" width="1" height="1">',
+        "password colon": "<p>password: Zq7stand1n</p>",
+        "password equals in a pre block": "<pre><code>mysql --user=a\npass=Zq7stand1n</code></pre>",
+        "password is in code": "<p>The password is <code>Zq7stand1n</code>.</p>",
+        "password is in quotes": "<p>The password was \u201c'Zq7stand1n'\u201d.</p>",
+        "passphrase": "<p>Passphrase: Zq7stand1n</p>",
+        "secret in a title": '<a href="/" title="secret=Zq7stand1n">x</a>',
+        "api key": "<p>API key: Zq7stand1n</p>",
+        "token": "<code>token=Zq7stand1n</code>",
+        "user:password pair": "<p>Tried <code>admin:Zq7stand1n</code> over SSH</p>",
+        "hydra -u pair": "<pre><code>curl -u admin:Zq7stand1n http://&lt;TARGET_IP&gt;/</code></pre>",
+        "pwd in figure alt": '<img src="a.png" alt="pwd = Zq7stand1n" width="1" height="1">',
+    }
+    FINE = {
+        "password placeholder": "<p>password: &lt;PASSWORD&gt;</p>",
+        "pair with placeholder": "<p><code>jenkins</code> / <code>&lt;PASSWORD&gt;</code></p>",
+        "any upper-case placeholder": "<p>token=&lt;API_TOKEN&gt; secret: &lt;SECRET_VALUE_2&gt;</p>",
+        "stars": "<p>password: *****</p>",
+        "password list": "<p>I tried a short password list.</p>",
+        "password hash": "<p>The password hash was cracked offline.</p>",
+        "descriptive is": "<p>The password is reused across services.</p>",
+        "ssh prompt": "<pre><code>jp@&lt;TARGET_IP&gt;'s password:\nPermission denied</code></pre>",
+        "windows path": "<p>Looked in <code>C:\\Users\\Public</code>.</p>",
+        "host and port": "<p><code>localhost:8080</code> and <code>/etc/passwd</code></p>",
+        "label then word": "<p>Login: required</p>",
+        "slash pair of numbers": "<p><code>3</code> / <code>4</code> checks</p>",
+        "script text": "<script>var password = 'Zq7stand1n';</script>",
+        "token in prose": "<p>CI tokens are read-only.</p>",
+    }
+
+    def test_shown_credential_values_fail_and_the_value_is_never_printed(self):
+        for name, html in self.SHOWN.items():
+            with self.subTest(name):
+                found = check_site.credential_problems(html)
+                self.assertEqual(len(found), 1, found)
+                self.assertIn("shows a credential value (Z... (10 characters))", found[0])
+                self.assertNotIn("Zq7stand1n", found[0])
+
+    def test_placeholders_and_descriptions_pass(self):
+        for name, html in self.FINE.items():
+            with self.subTest(name):
+                self.assertEqual(check_site.credential_problems(html), [])
+
+    def test_report_names_the_line(self):
+        html = "<p>ok</p>\n<p>fine</p>\n<p>password: Zq7stand1n</p>"
+        self.assertEqual(check_site.credential_problems(html)[0][:7], "line 3:")
+
+    def test_no_page_under_site_shows_a_credential_value(self):
+        site = pathlib.Path(__file__).resolve().parents[2] / "site"
+        pages = sorted(site.rglob("*.html"))
+        self.assertEqual(len(pages), 12)
+        for page in pages:
+            with self.subTest(page=str(page.relative_to(site))):
+                self.assertEqual(check_site.credential_problems(page.read_text(encoding="utf-8")), [])
+
+    def test_main_fails_a_site_that_shows_a_credential_value(self):
+        with tempfile.TemporaryDirectory() as site:
+            pathlib.Path(site, "index.html").write_text(
+                "<!doctype html><html lang=en><title>t</title><p>password: Zq7stand1n</p></html>")
+            out = io.StringIO()
+            with mock.patch.object(sys, "argv", ["check_site.py", site]), contextlib.redirect_stdout(out):
+                code = check_site.main()
+        self.assertEqual(code, 1)
+        self.assertIn("index.html: line 1: shows a credential value (Z... (10 characters))", out.getvalue())
+        self.assertNotIn("Zq7stand1n", out.getvalue())
+
+
 class ResumeAccentTest(unittest.TestCase):
     def test_accented_resume_is_reported_in_any_case(self):
         for word in ("R\u00e9sum\u00e9", "r\u00e9sum\u00e9", "R\u00c9SUM\u00c9"):

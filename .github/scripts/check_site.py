@@ -6,11 +6,14 @@ Usage: python3 .github/scripts/check_site.py [site_dir]
 Fails (exit 1) on: unbalanced HTML, a missing <title> or <html lang>,
 duplicate ids, internal links or assets that do not exist, links to
 #anchors that do not exist, images without alt text or width/height,
-sitemap entries without a page, and PNG, WebP or JPEG images that still
+sitemap entries without a page, a credential value shown next to a
+credential word (see credential_problems), and PNG, WebP or JPEG images that still
 carry EXIF, XMP or PNG text metadata, or that cannot be read in full to
 check. External links are not fetched.
 """
+import bisect
 import pathlib
+import re
 import sys
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
@@ -32,6 +35,100 @@ PNG_METADATA = {b"eXIf": "EXIF metadata",
 WEBP_METADATA = {b"EXIF": "EXIF metadata", b"XMP ": "XMP metadata"}
 JPEG_METADATA = {b"Exif\x00\x00": "EXIF metadata",
                  b"http://ns.adobe.com/xap/1.0/\x00": "XMP metadata"}
+
+
+# Credential values shown on a page (A-422). Code text is wrapped in CODE_ON
+# and CODE_OFF so the patterns can tell a code element from prose.
+CODE_ON, CODE_OFF = "\x01", "\x02"
+SHOWN_ATTRS = ("alt", "title", "aria-label")
+INLINE = {"a", "abbr", "b", "code", "em", "i", "kbd", "mark", "small", "span", "strong", "sub", "sup"}
+WORD = r"(?:password|passwd|pass|pwd|passphrase|secret|token|api[ _-]?key|credential|login|creds?)s?"
+VALUE = rf"{CODE_ON}?[\"'`]?([^\s{CODE_ON}{CODE_OFF}\"'`,;]+)"
+PLACEHOLDER = re.compile(r"<[A-Z][A-Z0-9_]*>|\*{3,}")
+NOT_A_VALUE = {"the", "a", "an", "and", "or", "to", "of", "in", "none", "n/a", "required",
+               "not", "no", "set", "empty", "blank", "hidden", "redacted", "removed"}
+# 'password: X', 'pass=X'; any value that is not a placeholder or a plain word.
+CREDENTIAL_SET = re.compile(rf"\b{WORD}[ \t]*[:=][ \t]*{VALUE}", re.I)
+# 'password is X': prose follows these words, so the value must be in code or quotes.
+CREDENTIAL_IS = re.compile(rf"\b{WORD}\s+(?:is|was)\s+(?:{CODE_ON}|[\"'`\u2018\u201c])+([^\s{CODE_ON}{CODE_OFF}\"'`\u2019\u201d]+)", re.I)
+# 'user / X' in code, split across two code elements or inside one.
+CODE_PAIR = re.compile(rf"{CODE_ON}([A-Za-z][\w.-]*){CODE_OFF}\s+/\s+{CODE_ON}([^\s{CODE_ON}{CODE_OFF}]+){CODE_OFF}"
+                       rf"|{CODE_ON}(?:[^{CODE_OFF}]*?\s)?([A-Za-z][\w.-]*) / ([^\s\-/{CODE_ON}{CODE_OFF}][^\s{CODE_ON}{CODE_OFF}]*)")
+# 'user:secret' as a whole code element, or after -u / --user / --userpass.
+USER_PASS = re.compile(rf"{CODE_ON}([A-Za-z][\w.-]+):([^\s:/\\<>{CODE_ON}{CODE_OFF}]+){CODE_OFF}"
+                       rf"|(?:\s-u|--user(?:pass)?)[ =]{CODE_ON}?[\"']?[\w.-]+:([^\s:/<>{CODE_ON}{CODE_OFF}\"']+)")
+
+
+class TextCollector(HTMLParser):
+    """The text a visitor can read or hear: text nodes plus alt, title and aria-label."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts, self.starts, self.size, self.hidden, self.code = [], [], 0, 0, 0
+
+    def add(self, text):
+        self.starts.append((self.size, self.getpos()[0]))
+        self.parts.append(text)
+        self.size += len(text)
+
+    def handle_starttag(self, tag, attrs):
+        if tag not in INLINE:
+            self.add("\n")  # a block boundary separates words, so 'title' and 'p' text never join
+        if tag in ("script", "style"):
+            self.hidden += 1
+        for name, value in attrs:
+            if name in SHOWN_ATTRS and value:
+                self.add(f" {CODE_ON}{value}{CODE_OFF} ")
+        if tag in ("code", "pre"):
+            self.code += 1
+            self.add(CODE_ON)
+
+    def handle_endtag(self, tag):
+        if tag not in INLINE:
+            self.add("\n")
+        if tag in ("script", "style") and self.hidden:
+            self.hidden -= 1
+        if tag in ("code", "pre") and self.code:
+            self.code -= 1
+            self.add(CODE_OFF)
+
+    def handle_data(self, data):
+        if not self.hidden:
+            self.add(data)
+
+    def line_at(self, offset):
+        return self.starts[bisect.bisect_right([s for s, _ in self.starts], offset) - 1][1]
+
+
+def mask(value):
+    """First character and length only; the value itself is never printed."""
+    return f"{value[0]}... ({len(value)} characters)"
+
+
+def is_credential_value(value):
+    return not PLACEHOLDER.fullmatch(value) and value.lower().rstrip(".") not in NOT_A_VALUE
+
+
+def credential_problems(html):
+    """Lines that show a credential value next to a credential word, masked.
+
+    Flags 'password: X', 'pass=X', 'password is X' (X in code or quotes),
+    'user / X' in code, and 'user:X' in code or after -u. Placeholders such as
+    <PASSWORD> and ***** pass, as do phrases that describe a password without
+    showing one ('password list', 'password hash').
+    """
+    page = TextCollector()
+    page.feed(html)
+    page.close()
+    text = "".join(page.parts)
+    found = set()
+    for pattern in (CREDENTIAL_SET, CREDENTIAL_IS, CODE_PAIR, USER_PASS):
+        for m in pattern.finditer(text):
+            value = [g for g in m.groups() if g][-1].rstrip(".")
+            if value and not value.isdigit() and is_credential_value(value):
+                found.add((page.line_at(m.start()), mask(value)))
+    return [f"line {n}: shows a credential value ({masked}); use a placeholder such as <PASSWORD>"
+            for n, masked in sorted(found)]
 
 
 class Page(HTMLParser):
@@ -142,6 +239,11 @@ def accent_problems(text):
             for n, line in enumerate(text.splitlines(), 1) if "résumé" in line.lower()]
 
 
+def text_problems(text):
+    """Problems found in a page's text: accented Resume and shown credential values."""
+    return accent_problems(text) + credential_problems(text)
+
+
 def main():
     site = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "site").resolve()
     problems = []
@@ -156,7 +258,7 @@ def main():
             p.errors.append("no <title>")
         if not p.has_lang:
             p.errors.append("no <html lang>")
-        p.errors += accent_problems(text)
+        p.errors += text_problems(text)
         pages[f] = p
 
     for f, p in pages.items():
